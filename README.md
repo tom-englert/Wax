@@ -1,7 +1,26 @@
 # Wax
 An interactive editor for WiX setup projects.
 
+_Wax keeps your candle burning_
+
 Currently migrating from https://waxsetupeditor.codeplex.com
+
+While it's an easy task to create an empty setup project with the WiX toolkit, populating the list of deployable files and even more keeping the list up to date can be a very fumbling task.
+This tool is a Visual Studio Extension that helps you to create, verify and maintain the list of the deployed files in an interactive GUI.
+
+Just select the projects that you want to install in the list box on the left side.
+Two data grids on the right will show you the target directories needed and files to be installed, and how they are mapped to the file nodes in your WiX setup project.
+
+Files that have no corresponding item in the WiX setup project are show in red. You can add them to the setup project by clicking the '+' button in the rightmost column.
+Files that already exist in the setup project are shown in yellow. You can link them together by clicking the '?' button in the rightmost column.
+Files that already exist in the setup project but have multiple matches are shown in orange. You can link items together by selecting the proper file from the combo box.
+
+The file grid supports multiple selection, so you can apply all commands to many files in one step.
+
+
+
+
+
 
 ## Installation
 
