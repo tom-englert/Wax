@@ -68,10 +68,10 @@ If you are editing an existing WiX project that you have created manually or e.g
 
 ### Post processing
 
-###! Save all files
+#### Save all files
 Wax adds a new file to your setup project, named "<project name>.wax". This file stores all configurations you have made in the above steps. Make sure to save this file with your project, since it contains all information you need to maintain the project later. Also make sure the WiX files (.wxs, .wxi) are saved.
 
-###! Check your feature tree
+#### Check your feature tree
 Wax will add a ComponentGroupRef node for all component groups it creates to the first feature it finds in your project. If you have just one feature defined, this will be fine; if you have more than one feature in your setup project, copy or move the entries as desired.
 
 ```
