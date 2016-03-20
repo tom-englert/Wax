@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{305BD4E4-C124-4172-9F2C-49CCA08CCFD1}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation.txt = Documentation.txt
+		ReleaseNotes.txt = ReleaseNotes.txt
+		Screenshot.png = Screenshot.png
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wax", "Wax\Wax.csproj", "{A9900171-C65D-40ED-8764-74C80E05DB9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wax.Model", "Wax.Model\Wax.Model.csproj", "{A3F2A655-5194-4A7A-AA66-E9A536F3E352}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9900171-C65D-40ED-8764-74C80E05DB9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9900171-C65D-40ED-8764-74C80E05DB9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9900171-C65D-40ED-8764-74C80E05DB9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9900171-C65D-40ED-8764-74C80E05DB9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3F2A655-5194-4A7A-AA66-E9A536F3E352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3F2A655-5194-4A7A-AA66-E9A536F3E352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3F2A655-5194-4A7A-AA66-E9A536F3E352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3F2A655-5194-4A7A-AA66-E9A536F3E352}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

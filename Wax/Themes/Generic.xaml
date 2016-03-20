@@ -1,0 +1,34 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="clr-namespace:tomenglertde.Wax">
+
+  <Style TargetType="{x:Type local:GroupBox}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:GroupBox}">
+          <DockPanel>
+            <Grid Background="LightGray" DockPanel.Dock="Top">
+              <DockPanel Margin="5">
+                <Grid DockPanel.Dock="Left">
+                  <Ellipse Fill="Black" Width="20" Height="20" />
+                  <TextBlock Text="{Binding Ordinal, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Grid>
+                <Grid DockPanel.Dock="Right">
+                  <Image x:Name="stateImage" Source="/Wax;component/Resources/warning.png" Stretch="None" />
+                </Grid>
+                <ContentPresenter Content="{TemplateBinding Header}" VerticalAlignment="Center" Margin="7,0" TextElement.Foreground="DarkSlateGray" TextElement.FontWeight="DemiBold" />
+              </DockPanel>
+            </Grid>
+            <ContentPresenter Margin="3" />
+          </DockPanel>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsOk" Value="True">
+              <Setter Property="Source" TargetName="stateImage" Value="/Wax;component/Resources/ok.png" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>
