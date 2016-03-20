@@ -17,6 +17,8 @@ Files that already exist in the setup project but have multiple matches are show
 
 The file grid supports multiple selection, so you can apply all commands to many files in one step.
 
+![Wax main screen](http://tom-englert.github.io/Wax/Screenshot.png)
+
 ## Installation
 
 This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Galery](https://visualstudiogallery.msdn.microsoft.com/ab48d869-8f75-4e02-8e7d-577346065aa6), or download the binaries and double click the Wax.vsix in the windows explorer.
@@ -40,7 +42,7 @@ If you don't already have a WiX Setup project in your solution, create a new one
 
 The WiX Setup Editor menu entry is located in the Visual Studios "Tools" menu. 
 
-[image:Screenshot.png]
+![Wax main screen](http://tom-englert.github.io/Wax/Screenshot.png)
 
 If you have made conceptual changes to your solution while the editor is open, click the refresh button.
 When parsing the projects, all files of the "Built", "ContentFiles" and "LocalizedResourceDlls" build groups are collected. If you want to deploy the symbol files with your project, check the "Deploy symbols" toggle button in the tool bar.
