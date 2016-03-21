@@ -103,5 +103,5 @@ Wax will add a ComponentGroupRef node for all component groups it creates to the
 Now you should be able to build the setup project.
 
 Powerd by&nbsp;&nbsp;&nbsp;<a href="http://www.jetbrains.com/resharper/"><img style="margin-bottom: -5px;" src="http://www.jetbrains.com/img/logos/logo_resharper.gif" alt="ReSharper" width="152" height="30" /></a> &nbsp;&nbsp;&nbsp; <a href="http://research.microsoft.com/en-us/projects/contracts/"><img style="margin-bottom: -5px;" src="http://research.microsoft.com/en-us/projects/contracts/codecontracts_sm.png" alt="CodeContracts" width="113" height="70" /></a>&nbsp;</p>
-<p>Support this Project: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=TQQR8AKGNHELQ"> <img style="border: none; margin-bottom: -6px;" title="Donate" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate" /></a></p>
+<p>Support this Project: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=799WX673GPQM8"> <img style="border: none; margin-bottom: -6px;" title="Donate" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate" /></a></p>
 
