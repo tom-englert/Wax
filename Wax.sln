@@ -5,7 +5,6 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{305BD4E4-C124-4172-9F2C-49CCA08CCFD1}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation.txt = Documentation.txt
 		ReleaseNotes.txt = ReleaseNotes.txt
 		Screenshot.png = Screenshot.png
 	EndProjectSection
