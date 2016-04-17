@@ -1,4 +1,5 @@
-﻿namespace tomenglertde.Wax.Model.VisualStudio
+﻿using System.Diagnostics.Contracts;
+namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Diagnostics.Contracts;
@@ -13,6 +14,7 @@
         {
             Contract.Requires(solution != null);
             Contract.Requires(reference != null);
+            Contract.Requires(reference.SourceProject != null);
 
             _solution = solution;
             _reference = reference;
@@ -102,8 +104,6 @@
         {
             Contract.Invariant(_solution != null);
             Contract.Invariant(_reference != null);
-
         }
-
     }
 }

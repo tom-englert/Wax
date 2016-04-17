@@ -38,7 +38,7 @@
                 Contract.Ensures(Contract.Result<IEnumerable<ProjectReference>>() != null);
 
                 var projectReferences = References
-                    .Where(reference => reference.SourceProject != null)
+                    .Where(reference => reference.GetSourceProject() != null)
                     .Where(reference => reference.CopyLocal)
                     .Select(reference => new ProjectReference(Solution, reference));
 
@@ -52,7 +52,7 @@
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var localFileReferences = References
-                .Where(reference => reference.SourceProject == null)
+                .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
                 .Select(reference => new ProjectOutput(rootProject, reference));
 
@@ -101,21 +101,9 @@
             }
         }
 
-        public bool IsTestProject
-        {
-            get
-            {
-                return _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}");
-            }
-        }
+        public bool IsTestProject => _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}");
 
-        public bool IsVsProject
-        {
-            get
-            {
-                return _vsProject != null;
-            }
-        }
+        public bool IsVsProject => _vsProject != null;
 
         public IEnumerable<ProjectOutput> GetProjectOutput(Project rootProject, bool deploySymbols)
         {
@@ -214,11 +202,11 @@
                 return;
 
             var projectReferences = References
-                .Where(r => r.SourceProject != null)
+                .Where(r => r.GetSourceProject() != null)
                 .ToArray();
 
             var newProjects = projects
-                .Where(project => projectReferences.All(reference => !Equals(reference.SourceProject, project)))
+                .Where(project => projectReferences.All(reference => !Equals(reference.GetSourceProject(), project)))
                 .ToArray();
 
             foreach (var project in newProjects)
@@ -237,7 +225,7 @@
             var references = References;
 
             var projectReferences = projects
-                .Select(project => references.FirstOrDefault(reference => Equals(reference.SourceProject, project)))
+                .Select(project => references.FirstOrDefault(reference => Equals(reference.GetSourceProject(), project)))
                 .ToArray();
 
             foreach (var reference in projectReferences)
@@ -424,6 +412,23 @@
             Contract.Invariant(_projectTypeGuids != null);
             Contract.Invariant(_referencedBy != null);
             Contract.Invariant(_uniqueName != null);
+        }
+    }
+
+    internal static class ProjectExtension
+    {
+        public static EnvDTE.Project GetSourceProject(this VSLangProj.Reference reference)
+        {
+            Contract.Requires(reference != null);
+
+            try
+            {
+                return reference.SourceProject;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }
