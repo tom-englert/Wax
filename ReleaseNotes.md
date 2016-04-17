@@ -1,3 +1,6 @@
+1.0.13.0
+* Fix http://waxsetupeditor.codeplex.com/workitem/4692
+
 1.0.12.0
 * Support VS15
 
