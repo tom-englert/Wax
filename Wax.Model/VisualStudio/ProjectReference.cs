@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-namespace tomenglertde.Wax.Model.VisualStudio
+﻿namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Diagnostics.Contracts;
