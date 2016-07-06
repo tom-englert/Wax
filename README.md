@@ -35,7 +35,10 @@ If you follow this pattern, you won't have to manually fumble around with additi
 
 ### Create a new WiX Setup project
 
-If you don't already have a WiX Setup project in your solution, [create a new one now](http://wixtoolset.org/documentation/manual/v3/votive/authoring_first_votive_project.html). You only need to follow step #2, item 1-3, since files and references will be automatically maintained by Wax.
+If you don't already have a WiX Setup project in your solution, create a new one now:
+- In Visual Studio Click `File`, then click `New`, then click `Project`.
+- Choose the Windows Installer XML node in the Project types tree, then select Setup Project
+- Name your project and press OK.
 
 ### Open the editor
 
