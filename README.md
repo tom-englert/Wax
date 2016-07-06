@@ -46,10 +46,11 @@ The WiX Setup Editor menu entry is located in the Visual Studios "Tools" menu.
 
 ![Wax main screen](http://tom-englert.github.io/Wax/Screenshot.png)
 
-If you have made conceptual changes to your solution while the editor is open, click the refresh button.
 When parsing the projects, all files of the `Built`, `ContentFiles` and `LocalizedResourceDlls` build groups are collected. If you want to deploy the symbol files with your project, check the `Deploy symbols` toggle button in the tool bar.
 
 There are five sections you have to edit in sequential order. If a green check mark appears in the top right corner, this section is complete. If there is a red exclamation mark, the section needs editing.
+
+If you have made conceptual changes to your solution while the editor is open, click the refresh button.
 
 ### (1) Select the WiX project to edit. 
 
