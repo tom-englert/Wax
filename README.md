@@ -19,7 +19,7 @@ The file grid supports multiple selection, so you can apply all commands to many
 
 ## Installation
 
-This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Galery](https://visualstudiogallery.msdn.microsoft.com/ab48d869-8f75-4e02-8e7d-577346065aa6), or download the binaries and double click the Wax.vsix in the windows explorer.
+This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Gallery](https://visualstudiogallery.msdn.microsoft.com/ab48d869-8f75-4e02-8e7d-577346065aa6), or download the binaries and double click the Wax.vsix in the windows explorer.
 
 The Wax editor is a tool to maintain WiX projects, so you should have installed the [WiX Toolset](http://wix.codeplex.com/).
 
@@ -34,7 +34,7 @@ If you follow this pattern, you won't have to manually fumble around with additi
 
 ### Create a new WiX Setup project
 
-If you don't already have a WiX Setup project in your solution, create a new one now.
+If you don't already have a WiX Setup project in your solution, [create a new one now](http://wixtoolset.org/documentation/manual/v3/votive/authoring_first_votive_project.html).
 
 ### Open the editor
 
@@ -53,8 +53,8 @@ As the first step select the WiX project you want to edit. If there is only one 
 
 ### (2) Map the root directory.
 
-The editor needs to know the root directory definition in the wix file. Simply select if from the items in the combo box.
-If you have created a new WiX Setup project, there is only one and it is named "INSTALLFOLDER".
+The editor needs to know the root directory definition in the wix file. Simply select it from the items in the combo box.
+If you have created a new WiX Setup project, there is only one and it is named ```INSTALLFOLDER```.
 
 ### (3) Select the project(s) to install.
 
@@ -66,7 +66,7 @@ Every project you select will be automatically added to the WiX projects referen
 
 ### (4) Create the directory mappings.
 
-If you projects need to deploy files into subdirectories of the "INSTALLFOLDER", you need to define or map them here.
+If you projects need to deploy files into subdirectories of the ```INSTALLFOLDER```, you need to define or map them here.
 If you are starting with an empty project, just click on the "+" in the rightmost column of each directory to create the WiX definitions. 
 If there are already directories defined in the WiX project, a combo box will appear where you can select the directory that maps to the projects output folder.
 
@@ -83,7 +83,7 @@ If you are editing an existing WiX project that you have created manually or e.g
 ### Post processing
 
 #### Save all files
-Wax adds a new file to your setup project, named "<project name>.wax". This file stores all configurations you have made in the above steps. Make sure to save this file with your project, since it contains all information you need to maintain the project later. Also make sure the WiX files (.wxs, .wxi) are saved.
+Wax adds a new file to your setup project, named ```<project name>.wax```. This file stores all configurations you have made in the above steps. Make sure to save this file with your project, since it contains all information you need to maintain the project later. Also make sure the WiX files (.wxs, .wxi) are saved.
 
 #### Check your feature tree
 Wax will add a ComponentGroupRef node for all component groups it creates to the first feature it finds in your project. If you have just one feature defined, this will be fine; if you have more than one feature in your setup project, copy or move the entries as desired.
