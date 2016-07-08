@@ -1,3 +1,6 @@
+1.0.14.0
+* Fix #3: No vertical scrollbar in directory pane.
+
 1.0.13.0
 * Fix http://waxsetupeditor.codeplex.com/workitem/4692
 
