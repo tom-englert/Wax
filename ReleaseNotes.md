@@ -1,3 +1,6 @@
+1.0.15.0:
+* Fix #6: Possible null ref exception when a project has no valid references
+
 1.0.14.0
 * Fix #3: No vertical scrollbar in directory pane.
 

@@ -16,5 +16,5 @@ using System.Runtime.InteropServices;
 
 internal static class Product
 {
-    public const string Version = "1.0.14.0";
+    public const string Version = "1.0.15.0";
 }
