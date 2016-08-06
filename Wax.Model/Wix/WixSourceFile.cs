@@ -198,6 +198,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(id != null);
             Contract.Requires(name != null);
             Contract.Requires(fileMapping != null);
+            Contract.Ensures(Contract.Result<WixFileNode>() != null);
 
             Contract.Assume(componentGroup.SourceFile.Equals(this));
 

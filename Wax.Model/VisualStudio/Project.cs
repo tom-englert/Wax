@@ -188,7 +188,7 @@
             {
                 Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
 
-                return VsProjectReferences ?? MpfProjectReferences;
+                return VsProjectReferences ?? MpfProjectReferences ?? Enumerable.Empty<VSLangProj.Reference>();
             }
         }
 
@@ -234,6 +234,7 @@
             }
         }
 
+        [ContractVerification(false)]
         private VSLangProj.References ReferencesCollection
         {
             get
@@ -260,11 +261,11 @@
             }
         }
 
+        [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> MpfProjectReferences
         {
             get
             {
-                Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
                 try
                 {
                     var projectItems = _project.ProjectItems;
@@ -277,7 +278,7 @@
                         .Take(1)
                         .SelectMany(references => references.Cast<VSLangProj.Reference>());
                 }
-                catch (ExternalException)
+                catch
                 {
                 }
 
@@ -285,6 +286,7 @@
             }
         }
 
+        [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> VsProjectReferences
         {
             get
@@ -293,9 +295,9 @@
                 {
                     return _vsProject?.References?.Cast<VSLangProj.Reference>();
                 }
-                catch (ExternalException)
+                catch
                 {
-                    return Enumerable.Empty<VSLangProj.Reference>();
+                    return null;
                 }
             }
         }

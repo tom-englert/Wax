@@ -109,6 +109,7 @@ namespace tomenglertde.Wax.Model.Wix
             return InternalEquals(this, other);
         }
 
+        [ContractVerification(false)]
         private static bool InternalEquals(WixNode left, WixNode right)
         {
             if (ReferenceEquals(left, right))
