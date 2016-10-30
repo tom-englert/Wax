@@ -1,4 +1,4 @@
-# Wax
+# Wax ![Badge](https://tom-englert.visualstudio.com/_apis/public/build/definitions/75bf84d2-d359-404a-a712-07c9f693f635/6/badge)
 An interactive editor for WiX setup projects.
 
 _Wax keeps your candle burning_
