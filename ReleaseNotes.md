@@ -1,3 +1,6 @@
+1.0.16.0:
+* Support VS15 RC
+
 1.0.15.0:
 * Fix #6: Possible null ref exception when a project has no valid references
 
