@@ -1,3 +1,6 @@
+1.0.17.0:
+* Fix #9: VS does not always reliably detect the installation of Wix
+
 1.0.16.0:
 * Support VS15 RC
 
