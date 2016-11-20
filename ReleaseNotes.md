@@ -1,3 +1,6 @@
+1.0.18.0:
+* Fix #10: VSIX installer problem with .net framework version
+
 1.0.17.0:
 * Fix #9: VS does not always reliably detect the installation of Wix
 
