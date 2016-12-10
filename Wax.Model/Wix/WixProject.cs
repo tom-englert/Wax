@@ -13,7 +13,7 @@ namespace tomenglertde.Wax.Model.Wix
 
     public class WixProject : Project
     {
-        private static readonly string[] WixFileExtensions = new[] { ".wxs", ".wxi" };
+        private static readonly string[] WixFileExtensions = { ".wxs", ".wxi" };
         private const string WaxConfigurationFileExtension = ".wax";
 
         private readonly EnvDTE.ProjectItem _configurationItem;

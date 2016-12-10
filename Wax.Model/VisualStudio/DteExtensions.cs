@@ -14,8 +14,6 @@
     using Microsoft.VisualStudio.Shell.Flavor;
     using Microsoft.VisualStudio.Shell.Interop;
 
-    using TomsToolbox.Desktop;
-
     using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
     internal static class DteExtensions
