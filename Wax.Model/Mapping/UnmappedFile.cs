@@ -4,16 +4,20 @@
     using System.Diagnostics.Contracts;
     using System.Windows.Input;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Wix;
 
     using TomsToolbox.Wpf;
 
     public class UnmappedFile
     {
+        [NotNull]
         private readonly WixFileNode _node;
+        [NotNull]
         private readonly IList<UnmappedFile> _allUnmappedFiles;
 
-        public UnmappedFile(WixFileNode node, IList<UnmappedFile> allUnmappedFiles)
+        public UnmappedFile([NotNull] WixFileNode node, [NotNull] IList<UnmappedFile> allUnmappedFiles)
         {
             Contract.Requires(node != null);
             Contract.Requires(allUnmappedFiles != null);
@@ -22,6 +26,7 @@
             _allUnmappedFiles = allUnmappedFiles;
         }
 
+        [NotNull]
         public ICommand DeleteCommand
         {
             get
@@ -32,6 +37,7 @@
             }
         }
 
+        [NotNull]
         public WixFileNode Node
         {
             get
@@ -42,6 +48,7 @@
             }
         }
 
+        [NotNull]
         public WixFileNode ToWixFileNode()
         {
             Contract.Ensures(Contract.Result<WixFileNode>() != null);

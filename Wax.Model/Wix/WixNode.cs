@@ -5,14 +5,18 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Desktop;
 
     public class WixNode : IEquatable<WixNode>
     {
+        [NotNull]
         private readonly WixSourceFile _sourceFile;
+        [NotNull]
         private readonly XElement _node;
 
-        public WixNode(WixSourceFile sourceFile, XElement node)
+        public WixNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
         {
             Contract.Requires(sourceFile != null);
             Contract.Requires(node != null);
@@ -21,6 +25,7 @@ namespace tomenglertde.Wax.Model.Wix
             _node = node;
         }
 
+        [NotNull]
         public string Kind
         {
             get
@@ -31,6 +36,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public string Id
         {
             get
@@ -49,6 +55,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         internal XElement Node
         {
             get
@@ -59,6 +66,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public WixSourceFile SourceFile
         {
             get
@@ -69,7 +77,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public string GetAttribute(string name)
+        public string GetAttribute([NotNull] string name)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 

@@ -4,12 +4,16 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     public class ProjectReference : IEquatable<ProjectReference>
     {
+        [NotNull]
         private readonly Solution _solution;
+        [NotNull]
         private readonly VSLangProj.Reference _reference;
 
-        public ProjectReference(Solution solution, VSLangProj.Reference reference)
+        public ProjectReference([NotNull] Solution solution, [NotNull] VSLangProj.Reference reference)
         {
             Contract.Requires(solution != null);
             Contract.Requires(reference != null);
@@ -19,6 +23,7 @@
             _reference = reference;
         }
 
+        [NotNull]
         public Project SourceProject
         {
             get

@@ -5,17 +5,20 @@
     using System.Linq;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Desktop;
 
     public class WixFeatureNode : WixNode
     {
-        public WixFeatureNode(WixSourceFile sourceFile, XElement node) 
+        public WixFeatureNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node) 
             : base(sourceFile, node)
         {
             Contract.Requires(sourceFile != null);
             Contract.Requires(node != null);
         }
 
+        [NotNull]
         public IEnumerable<string> ComponentGroupRefs
         {
             get
@@ -29,7 +32,7 @@
             }
         }
 
-        public void AddComponentGroupRef(string id)
+        public void AddComponentGroupRef([NotNull] string id)
         {
             Contract.Requires(id != null);
 

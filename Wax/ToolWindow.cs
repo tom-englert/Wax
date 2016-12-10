@@ -8,6 +8,8 @@
     using System.Windows;
     using System.Windows.Controls.Primitives;
 
+    using JetBrains.Annotations;
+
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -83,7 +85,7 @@
 
 
         [Localizable(false)]
-        private void CreateWebBrowser(string url)
+        private void CreateWebBrowser([NotNull] string url)
         {
             Contract.Requires(url != null);
 

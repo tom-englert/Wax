@@ -6,15 +6,20 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Xml.Serialization;
 
+    using JetBrains.Annotations;
+
     [Serializable]
     [XmlType("Configuration")]
     public class ProjectConfiguration
     {
+        [NotNull]
         private Dictionary<string, string> _directoryMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        [NotNull]
         private Dictionary<string, string> _fileMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private string[] _deployProjectNames;
 
         [XmlArray("DeployedProjects")]
+        [NotNull]
         public string[] DeployedProjectNames
         {
             get
@@ -30,6 +35,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlArray("DirectoryMappings")]
+        [NotNull]
         public MappingItem[] DirectoryMappingNames
         {
             get
@@ -47,6 +53,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlArray("FileMappings")]
+        [NotNull]
         public MappingItem[] FileMappingNames
         {
             get
@@ -63,6 +70,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlIgnore]
+        [NotNull]
         public Dictionary<string, string> DirectoryMappings
         {
             get
@@ -74,6 +82,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlIgnore]
+        [NotNull]
         public Dictionary<string, string> FileMappings
         {
             get

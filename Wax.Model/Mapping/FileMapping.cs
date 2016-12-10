@@ -10,6 +10,8 @@
     using System.Linq;
     using System.Windows.Input;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.VisualStudio;
     using tomenglertde.Wax.Model.Wix;
 
@@ -19,18 +21,25 @@
 
     public class FileMapping : ObservableObject
     {
+        [NotNull]
         private readonly ProjectOutput _projectOutput;
+        [NotNull]
         private readonly ObservableCollection<ProjectOutput> _allUnmappedProjectOutputs;
+        [NotNull]
         private readonly FilteredObservableCollection<ProjectOutput> _unmappedProjectOutputs;
+        [NotNull]
         private readonly WixProject _wixProject;
+        [NotNull]
         private readonly IList<UnmappedFile> _allUnmappedFiles;
+        [NotNull]
         private readonly FilteredObservableCollection<UnmappedFile> _unmappedFiles;
+        [NotNull]
         private readonly string _id;
 
         private WixFileNode _mappedNode;
         private MappingState _mappingState;
 
-        public FileMapping(ProjectOutput projectOutput, ObservableCollection<ProjectOutput> allUnmappedProjectOutputs, WixProject wixProject, ObservableCollection<UnmappedFile> allUnmappedFiles)
+        public FileMapping([NotNull] ProjectOutput projectOutput, ObservableCollection<ProjectOutput> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
         {
             Contract.Requires(projectOutput != null);
             Contract.Requires(wixProject != null);
@@ -54,6 +63,7 @@
             UpdateMappingState();
         }
 
+        [NotNull]
         public string DisplayName
         {
             get
@@ -64,6 +74,7 @@
             }
         }
 
+        [NotNull]
         public string Id
         {
             get
@@ -74,6 +85,7 @@
             }
         }
 
+        [NotNull]
         public string UniqueName
         {
             get
@@ -84,6 +96,7 @@
             }
         }
 
+        [NotNull]
         public string Extension
         {
             get
@@ -95,6 +108,7 @@
 
         }
 
+        [NotNull]
         public string SourceName
         {
             get
@@ -107,6 +121,7 @@
             }
         }
 
+        [NotNull]
         public IList<UnmappedFile> UnmappedNodes
         {
             get
@@ -117,6 +132,7 @@
             }
         }
 
+        [NotNull]
         public ICommand AddFileCommand
         {
             get
@@ -129,6 +145,7 @@
             }
         }
 
+        [NotNull]
         public ICommand ClearMappingCommand
         {
             get
@@ -141,6 +158,7 @@
             }
         }
 
+        [NotNull]
         public ICommand ResolveFileCommand
         {
             get
@@ -153,6 +171,7 @@
             }
         }
 
+        [NotNull]
         public Project Project
         {
             get
@@ -301,6 +320,7 @@
             MappingState = MappingState.Ambiguous;
         }
 
+        [NotNull]
         public static IEqualityComparer<FileMapping> Comparer
         {
             get

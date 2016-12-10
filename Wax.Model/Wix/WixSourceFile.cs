@@ -9,24 +9,34 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Xml;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.VisualStudio;
 
     public class WixSourceFile
     {
+        [NotNull]
         private readonly WixProject _project;
+        [NotNull]
         private readonly EnvDTE.ProjectItem _projectItem;
+        [NotNull]
         private readonly XDocument _xmlFile;
+        [NotNull]
         private XDocument _rawXmlFile;
+        [NotNull]
         private readonly XElement _root;
 
+        [NotNull]
         private readonly List<WixFileNode> _fileNodes;
+        [NotNull]
         private readonly List<WixDirectoryNode> _directoryNodes;
+        [NotNull]
         private readonly List<WixComponentGroupNode> _componentGroups;
         private readonly List<WixFeatureNode> _featureNodes;
         private readonly List<WixDefine> _defines;
 
-        public WixSourceFile(WixProject project, EnvDTE.ProjectItem projectItem)
+        public WixSourceFile([NotNull] WixProject project, [NotNull] EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(project != null);
             Contract.Requires(projectItem != null);
@@ -68,6 +78,7 @@ namespace tomenglertde.Wax.Model.Wix
                 .ToList();
         }
 
+        [NotNull]
         public IEnumerable<WixFileNode> FileNodes
         {
             get
@@ -78,6 +89,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixDirectoryNode> DirectoryNodes
         {
             get
@@ -88,6 +100,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroups
         {
             get
@@ -98,6 +111,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes
         {
             get
@@ -108,6 +122,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public WixProject Project
         {
             get
@@ -135,7 +150,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        internal WixDirectoryNode AddDirectory(string id, string name, string parentId)
+        internal WixDirectoryNode AddDirectory([NotNull] string id, [NotNull] string name, [NotNull] string parentId)
         {
             Contract.Requires(id != null);
             Contract.Requires(name != null);
@@ -160,7 +175,8 @@ namespace tomenglertde.Wax.Model.Wix
             return AddDirectoryNode(directoryElement);
         }
 
-        public WixDirectoryNode AddDirectoryNode(XElement directoryElement)
+        [NotNull]
+        public WixDirectoryNode AddDirectoryNode([NotNull] XElement directoryElement)
         {
             Contract.Requires(directoryElement != null);
             Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
@@ -170,7 +186,8 @@ namespace tomenglertde.Wax.Model.Wix
             return directoryNode;
         }
 
-        internal WixComponentGroupNode AddComponentGroup(string directoryId)
+        [NotNull]
+        internal WixComponentGroupNode AddComponentGroup([NotNull] string directoryId)
         {
             Contract.Requires(directoryId != null);
             Contract.Ensures(Contract.Result<WixComponentGroupNode>() != null);
@@ -192,7 +209,8 @@ namespace tomenglertde.Wax.Model.Wix
             return componentGroup;
         }
 
-        internal WixFileNode AddFileComponent(WixComponentGroupNode componentGroup, string id, string name, FileMapping fileMapping)
+        [NotNull]
+        internal WixFileNode AddFileComponent([NotNull] WixComponentGroupNode componentGroup, [NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)
         {
             Contract.Requires(componentGroup != null);
             Contract.Requires(id != null);
@@ -236,7 +254,7 @@ namespace tomenglertde.Wax.Model.Wix
             _rawXmlFile = _projectItem.GetXmlContent(LoadOptions.None);
         }
 
-        private void ForceDirectoryVariable(string variableName, Project project)
+        private void ForceDirectoryVariable([NotNull] string variableName, [NotNull] Project project)
         {
             Contract.Requires(variableName != null);
             Contract.Requires(project != null);

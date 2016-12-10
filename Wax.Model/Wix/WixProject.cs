@@ -7,6 +7,8 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Text;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
@@ -16,11 +18,14 @@ namespace tomenglertde.Wax.Model.Wix
         private static readonly string[] WixFileExtensions = { ".wxs", ".wxi" };
         private const string WaxConfigurationFileExtension = ".wax";
 
+        [NotNull]
         private readonly EnvDTE.ProjectItem _configurationItem;
+        [NotNull]
         private readonly ProjectConfiguration _configuration;
+        [NotNull]
         private readonly IList<WixSourceFile> _sourceFiles;
 
-        public WixProject(Solution solution, EnvDTE.Project project)
+        public WixProject([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
             : base(solution, project)
         {
             Contract.Requires(solution != null);
@@ -55,6 +60,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Assume(_sourceFiles.First() != null);
         }
 
+        [NotNull]
         public IEnumerable<WixSourceFile> SourceFiles
         {
             get
@@ -65,6 +71,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixFileNode> FileNodes
         {
             get
@@ -75,6 +82,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixDirectoryNode> DirectoryNodes
         {
             get
@@ -85,6 +93,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes
         {
             get
@@ -95,6 +104,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroups
         {
             get
@@ -105,6 +115,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         public IEnumerable<Project> DeployedProjects
         {
             get
@@ -149,7 +160,8 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public string GetDirectoryId(string directory)
+        [NotNull]
+        public string GetDirectoryId([NotNull] string directory)
         {
             Contract.Requires(directory != null);
             Contract.Ensures(Contract.Result<string>() != null);
@@ -159,7 +171,7 @@ namespace tomenglertde.Wax.Model.Wix
             return (_configuration.DirectoryMappings.TryGetValue(directory, out value) && (value != null)) ? value : GetDefaultId(directory);
         }
 
-        public void UnmapDirectory(string directory)
+        public void UnmapDirectory([NotNull] string directory)
         {
             Contract.Requires(directory != null);
 
@@ -168,7 +180,7 @@ namespace tomenglertde.Wax.Model.Wix
             SaveProjectConfiguration();
         }
 
-        public void MapDirectory(string directory, WixDirectoryNode node)
+        public void MapDirectory([NotNull] string directory, [NotNull] WixDirectoryNode node)
         {
             Contract.Requires(directory != null);
             Contract.Requires(node != null);
@@ -176,7 +188,7 @@ namespace tomenglertde.Wax.Model.Wix
             MapElement(directory, node, _configuration.DirectoryMappings);
         }
 
-        public WixDirectoryNode AddDirectoryNode(string directory)
+        public WixDirectoryNode AddDirectoryNode([NotNull] string directory)
         {
             Contract.Requires(directory != null);
 
@@ -205,7 +217,7 @@ namespace tomenglertde.Wax.Model.Wix
             return parent.AddDirectory(id, name);
         }
 
-        public bool HasDefaultDirectoryId(DirectoryMapping directoryMapping)
+        public bool HasDefaultDirectoryId([NotNull] DirectoryMapping directoryMapping)
         {
             Contract.Requires(directoryMapping != null);
             var directory = directoryMapping.Directory;
@@ -216,7 +228,8 @@ namespace tomenglertde.Wax.Model.Wix
             return id == defaultId;
         }
 
-        public string GetFileId(string filePath)
+        [NotNull]
+        public string GetFileId([NotNull] string filePath)
         {
             Contract.Requires(filePath != null);
             Contract.Ensures(Contract.Result<string>() != null);
@@ -226,7 +239,7 @@ namespace tomenglertde.Wax.Model.Wix
             return (_configuration.FileMappings.TryGetValue(filePath, out value) && value != null) ? value : GetDefaultId(filePath);
         }
 
-        public void UnmapFile(string filePath)
+        public void UnmapFile([NotNull] string filePath)
         {
             Contract.Requires(filePath != null);
 
@@ -235,7 +248,7 @@ namespace tomenglertde.Wax.Model.Wix
             SaveProjectConfiguration();
         }
 
-        public void MapFile(string filePath, WixFileNode node)
+        public void MapFile([NotNull] string filePath, [NotNull] WixFileNode node)
         {
             Contract.Requires(filePath != null);
             Contract.Requires(node != null);
@@ -243,7 +256,8 @@ namespace tomenglertde.Wax.Model.Wix
             MapElement(filePath, node, _configuration.FileMappings);
         }
 
-        public WixFileNode AddFileNode(FileMapping fileMapping)
+        [NotNull]
+        public WixFileNode AddFileNode([NotNull] FileMapping fileMapping)
         {
             Contract.Requires(fileMapping != null);
             Contract.Ensures(Contract.Result<WixFileNode>() != null);
@@ -264,7 +278,8 @@ namespace tomenglertde.Wax.Model.Wix
             return componentGroup.AddFileComponent(id, name, fileMapping);
         }
 
-        public static string GetDefaultId(string path)
+        [NotNull]
+        public static string GetDefaultId([NotNull] string path)
         {
             Contract.Requires(path != null);
             Contract.Ensures(Contract.Result<string>() != null);
@@ -290,7 +305,8 @@ namespace tomenglertde.Wax.Model.Wix
             return s.ToString();
         }
 
-        private WixComponentGroupNode ForceComponentGroup(string directoryId)
+        [NotNull]
+        private WixComponentGroupNode ForceComponentGroup([NotNull] string directoryId)
         {
             Contract.Requires(directoryId != null);
             Contract.Ensures(Contract.Result<WixComponentGroupNode>() != null);
@@ -298,7 +314,7 @@ namespace tomenglertde.Wax.Model.Wix
             return ComponentGroups.FirstOrDefault(group => @group.Directory == directoryId) ?? _sourceFiles.First().AddComponentGroup(directoryId);
         }
 
-        private void ForceFeatureRef(string componentGroupId)
+        private void ForceFeatureRef([NotNull] string componentGroupId)
         {
             Contract.Requires(componentGroupId != null);
 
@@ -312,7 +328,7 @@ namespace tomenglertde.Wax.Model.Wix
             firstFeature.AddComponentGroupRef(componentGroupId);
         }
 
-        public bool HasDefaultFileId(FileMapping fileMapping)
+        public bool HasDefaultFileId([NotNull] FileMapping fileMapping)
         {
             Contract.Requires(fileMapping != null);
 
@@ -323,7 +339,7 @@ namespace tomenglertde.Wax.Model.Wix
             return id == defaultId;
         }
 
-        private void MapElement(string path, WixNode node, IDictionary<string, string> mappings)
+        private void MapElement([NotNull] string path, [NotNull] WixNode node, [NotNull] IDictionary<string, string> mappings)
         {
             Contract.Requires(path != null);
             Contract.Requires(node != null);

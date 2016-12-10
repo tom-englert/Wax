@@ -9,14 +9,17 @@
 
     using DataGridExtensions;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainView
     {
+        [NotNull]
         private readonly EnvDTE.DTE _dte;
 
-        public MainView(EnvDTE.DTE dte)
+        public MainView([NotNull] EnvDTE.DTE dte)
         {
             Contract.Requires(dte != null);
 

@@ -7,16 +7,23 @@
     using System.Linq;
     using System.Runtime.InteropServices;
 
+    using JetBrains.Annotations;
+
     public class Project : IEquatable<Project>
     {
+        [NotNull]
         private readonly Solution _solution;
+        [NotNull]
         private readonly EnvDTE.Project _project;
         private readonly VSLangProj.VSProject _vsProject;
+        [NotNull]
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
+        [NotNull]
         private readonly string _uniqueName;
+        [NotNull]
         private readonly string _projectTypeGuids;
 
-        public Project(Solution solution, EnvDTE.Project project)
+        public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
         {
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
@@ -31,6 +38,7 @@
             _projectTypeGuids = _project.GetProjectTypeGuids();
         }
 
+        [NotNull]
         public IEnumerable<ProjectReference> ProjectReferences
         {
             get
@@ -46,7 +54,8 @@
             }
         }
 
-        public IEnumerable<ProjectOutput> GetLocalFileReferences(Project rootProject)
+        [NotNull]
+        public IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -59,6 +68,7 @@
             return localFileReferences;
         }
 
+        [NotNull]
         public ICollection<Project> ReferencedBy
         {
             get
@@ -69,6 +79,7 @@
             }
         }
 
+        [NotNull]
         public string FullName
         {
             get
@@ -81,6 +92,7 @@
             }
         }
 
+        [NotNull]
         public string UniqueName
         {
             get
@@ -91,6 +103,7 @@
             }
         }
 
+        [NotNull]
         public string RelativeFolder
         {
             get
@@ -105,7 +118,8 @@
 
         public bool IsVsProject => _vsProject != null;
 
-        public IEnumerable<ProjectOutput> GetProjectOutput(Project rootProject, bool deploySymbols)
+        [NotNull]
+        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -119,6 +133,7 @@
             return projectOutput;
         }
 
+        [NotNull]
         public string Name
         {
             get
@@ -131,6 +146,7 @@
             }
         }
 
+        [NotNull]
         public Solution Solution
         {
             get
@@ -141,6 +157,7 @@
             }
         }
 
+        [NotNull]
         public IEnumerable<ProjectOutput> GetBuildFiles(Project rootProject, bool deploySymbols)
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -154,6 +171,7 @@
             return GetBuildFiles(rootProject, buildFileGroups);
         }
 
+        [NotNull]
         public IEnumerable<ProjectOutput> GetBuildFiles(Project rootProject, BuildFileGroups groups)
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -172,6 +190,7 @@
             return buildFiles;
         }
 
+        [NotNull]
         protected internal IEnumerable<EnvDTE.ProjectItem> AllProjectItems
         {
             get
@@ -182,6 +201,7 @@
             }
         }
 
+        [NotNull]
         protected internal IEnumerable<VSLangProj.Reference> References
         {
             get
@@ -192,7 +212,7 @@
             }
         }
 
-        protected internal void AddProjectReferences(params Project[] projects)
+        protected internal void AddProjectReferences([NotNull] params Project[] projects)
         {
             Contract.Requires(projects != null);
 
@@ -218,7 +238,7 @@
             }
         }
 
-        protected internal void RemoveProjectReferences(params Project[] projects)
+        protected internal void RemoveProjectReferences([NotNull] params Project[] projects)
         {
             Contract.Requires(projects != null);
 
@@ -302,7 +322,7 @@
             }
         }
 
-        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup(Project project, EnvDTE.OutputGroup outputGroup)
+        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup(Project project, [NotNull] EnvDTE.OutputGroup outputGroup)
         {
             Contract.Requires(outputGroup != null);
 
@@ -419,7 +439,7 @@
 
     internal static class ProjectExtension
     {
-        public static EnvDTE.Project GetSourceProject(this VSLangProj.Reference reference)
+        public static EnvDTE.Project GetSourceProject([NotNull] this VSLangProj.Reference reference)
         {
             Contract.Requires(reference != null);
 

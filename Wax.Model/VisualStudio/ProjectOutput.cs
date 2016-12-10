@@ -4,14 +4,18 @@
     using System.Diagnostics.Contracts;
     using System.IO;
 
+    using JetBrains.Annotations;
+
     public class ProjectOutput : IEquatable<ProjectOutput>
     {
+        [NotNull]
         private readonly string _fullName;
         private readonly BuildFileGroups _buildFileGroup;
+        [NotNull]
         private readonly Project _project;
         private readonly VSLangProj.Reference _reference;
 
-        public ProjectOutput(Project project, string fullName, BuildFileGroups buildFileGroup)
+        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup)
         {
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
@@ -21,7 +25,7 @@
             _project = project;
         }
 
-        public ProjectOutput(Project project, VSLangProj.Reference reference)
+        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference)
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
@@ -32,6 +36,7 @@
             _project = project;
         }
 
+        [NotNull]
         public string FullName
         {
             get
@@ -42,6 +47,7 @@
             }
         }
 
+        [NotNull]
         public string FileName
         {
             get
@@ -60,6 +66,7 @@
             }
         }
 
+        [NotNull]
         public Project Project
         {
             get

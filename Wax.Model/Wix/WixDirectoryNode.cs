@@ -5,13 +5,15 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Desktop;
 
     public class WixDirectoryNode : WixNode
     {
         private WixDirectoryNode _parent;
 
-        public WixDirectoryNode(WixSourceFile sourceFile, XElement node)
+        public WixDirectoryNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
             : base(sourceFile, node)
         {
             Contract.Requires(sourceFile != null);
@@ -52,7 +54,8 @@ namespace tomenglertde.Wax.Model.Wix
             return null;
         }
 
-        public WixDirectoryNode AddDirectory(string id, string name)
+        [NotNull]
+        public WixDirectoryNode AddDirectory([NotNull] string id, [NotNull] string name)
         {
             Contract.Requires(id != null);
             Contract.Requires(name != null);

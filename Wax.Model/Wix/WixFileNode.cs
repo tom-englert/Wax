@@ -6,14 +6,17 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Desktop;
 
     public class WixFileNode : WixNode
     {
+        [NotNull]
         private readonly IList<WixFileNode> _collection;
         private WixComponentGroupNode _componentGroup;
 
-        public WixFileNode(WixSourceFile sourceFile, XElement node, IList<WixFileNode> collection)
+        public WixFileNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node, [NotNull] IList<WixFileNode> collection)
             : base(sourceFile, node)
         {
             Contract.Requires(sourceFile != null);

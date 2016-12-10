@@ -5,12 +5,16 @@
     using System.Linq;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     public class WixDefine : IEquatable<WixDefine>
     {
+        [NotNull]
         private readonly WixSourceFile _sourceFile;
+        [NotNull]
         private readonly XProcessingInstruction _node;
 
-        public WixDefine(WixSourceFile sourceFile, XProcessingInstruction node)
+        public WixDefine([NotNull] WixSourceFile sourceFile, [NotNull] XProcessingInstruction node)
         {
             Contract.Requires(sourceFile != null);
             Contract.Requires(node != null);
@@ -19,6 +23,7 @@
             _node = node;
         }
 
+        [NotNull]
         public string Name
         {
             get
@@ -29,6 +34,7 @@
             }
         }
 
+        [NotNull]
         public XProcessingInstruction Node
         {
             get
@@ -39,6 +45,7 @@
             }
         }
 
+        [NotNull]
         public WixSourceFile SourceFile
         {
             get

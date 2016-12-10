@@ -12,6 +12,8 @@
     using System.Windows;
     using System.Windows.Input;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.VisualStudio;
     using tomenglertde.Wax.Model.Wix;
@@ -22,10 +24,11 @@
     public class MainViewModel : DependencyObject, INotifyPropertyChanged
     {
         private bool _wixProjectChanging;
+        [NotNull]
         private readonly Solution _solution;
         private readonly ObservableCollection<Project> _selectedVSProjects = new ObservableCollection<Project>();
 
-        public MainViewModel(EnvDTE.Solution solution)
+        public MainViewModel([NotNull] EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
 
@@ -35,6 +38,7 @@
             CommandManager.RequerySuggested += CommandManager_RequerySuggested;
         }
 
+        [NotNull]
         public Solution Solution
         {
             get
@@ -57,6 +61,7 @@
             DependencyProperty.Register("SelectedWixProject", typeof(WixProject), typeof(MainViewModel), new FrameworkPropertyMetadata(null, (sender, e) => ((MainViewModel)sender).SelectedWixProject_Changed((WixProject)e.NewValue)));
 
 
+        [NotNull]
         public IList SelectedVSProjects
         {
             get
@@ -164,6 +169,7 @@
             }
         }
 
+        [NotNull]
         public static IEnumerable<BuildFileGroups> ProjectOutputs
         {
             get
@@ -236,7 +242,7 @@
             }
         }
 
-        private void GenerateFileMappings(IEnumerable<Project> vsProjects, WixProject wixProject)
+        private void GenerateFileMappings([NotNull] IEnumerable<Project> vsProjects, [NotNull] WixProject wixProject)
         {
             Contract.Requires(vsProjects != null);
             Contract.Requires(wixProject != null);
@@ -257,7 +263,7 @@
             UnmappedFileNodes = unmappedFileNodes;
         }
 
-        private void GenerateDirectoryMappings(IEnumerable<Project> vsProjects, WixProject wixProject)
+        private void GenerateDirectoryMappings([NotNull] IEnumerable<Project> vsProjects, [NotNull] WixProject wixProject)
         {
             Contract.Requires(vsProjects != null);
             Contract.Requires(wixProject != null);
@@ -308,7 +314,7 @@
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        protected virtual void OnPropertyChanged([NotNull] string propertyName)
         {
             Contract.Requires(!string.IsNullOrEmpty(propertyName));
 

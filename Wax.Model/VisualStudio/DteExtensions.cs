@@ -4,12 +4,15 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Windows.Threading;
     using System.Xml.Linq;
+
+    using JetBrains.Annotations;
 
     using Microsoft.VisualStudio.Shell.Flavor;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -23,7 +26,8 @@
         /// </summary>
         /// <param name="solution">The solution.</param>
         /// <returns>The projects.</returns>
-        public static IEnumerable<EnvDTE.Project> GetProjects(this EnvDTE.Solution solution)
+        [NotNull]
+        public static IEnumerable<EnvDTE.Project> GetProjects([NotNull] this EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
@@ -53,7 +57,7 @@
             return items;
         }
 
-        private static void GetSubProjects(this IEnumerable projectItems, ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects(this IEnumerable projectItems, [NotNull] ICollection<EnvDTE.Project> items)
         {
             Contract.Requires(items != null);
 
@@ -66,14 +70,11 @@
             }
         }
 
-        private static void GetSubProjects(this EnvDTE.ProjectItem projectItem, ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects(this EnvDTE.ProjectItem projectItem, [NotNull] ICollection<EnvDTE.Project> items)
         {
             Contract.Requires(items != null);
 
-            if (projectItem == null)
-                return;
-
-            var subProject = projectItem.SubProject;
+            var subProject = projectItem?.SubProject;
 
             if (subProject == null)
                 return;
@@ -83,8 +84,12 @@
             subProject.ProjectItems.GetSubProjects(items);
         }
 
-        public static IEnumerable<EnvDTE.ProjectItem> GetAllProjectItems(this EnvDTE.Project project)
+        [NotNull, ItemNotNull]
+        public static IEnumerable<EnvDTE.ProjectItem> GetAllProjectItems([NotNull] this EnvDTE.Project project)
         {
+            Contract.Requires(project != null);
+            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.ProjectItem>>() != null);
+
             if (project.ProjectItems == null)
                 yield break;
 
@@ -99,8 +104,12 @@
             }
         }
 
-        private static IEnumerable<EnvDTE.ProjectItem> GetProjectItems(EnvDTE.ProjectItem projectItem)
+        [NotNull, ItemNotNull]
+        private static IEnumerable<EnvDTE.ProjectItem> GetProjectItems([NotNull] EnvDTE.ProjectItem projectItem)
         {
+            Contract.Requires(projectItem != null);
+            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.ProjectItem>>() != null);
+
             if (projectItem.ProjectItems == null)
                 yield break;
 
@@ -115,7 +124,8 @@
             }
         }
 
-        public static string GetProjectTypeGuids(this EnvDTE.Project proj)
+        [NotNull]
+        public static string GetProjectTypeGuids([NotNull] this EnvDTE.Project proj)
         {
             Contract.Requires(proj != null);
             Contract.Ensures(Contract.Result<string>() != null);
@@ -153,14 +163,14 @@
             return string.Empty;
         }
 
-        private static T GetService<T>(object serviceProvider) where T : class
+        private static T GetService<T>([NotNull] object serviceProvider) where T : class
         {
             Contract.Requires(serviceProvider != null);
 
             return (T)GetService((IServiceProvider)serviceProvider, typeof(T).GUID);
         }
 
-        private static object GetService(IServiceProvider serviceProvider, Guid guid)
+        private static object GetService([NotNull] IServiceProvider serviceProvider, Guid guid)
         {
             Contract.Requires(serviceProvider != null);
 
@@ -181,7 +191,7 @@
             return null;
         }
 
-        public static string TryGetFileName(this EnvDTE.ProjectItem projectItem)
+        public static string TryGetFileName([NotNull] this EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(projectItem != null);
 
@@ -200,7 +210,8 @@
             return null;
         }
 
-        public static XDocument GetXmlContent(this EnvDTE.ProjectItem projectItem, LoadOptions loadOptions)
+        [NotNull]
+        public static XDocument GetXmlContent([NotNull] this EnvDTE.ProjectItem projectItem, LoadOptions loadOptions)
         {
             Contract.Requires(projectItem != null);
             Contract.Ensures(Contract.Result<XDocument>() != null);
@@ -208,7 +219,8 @@
             return XDocument.Parse(projectItem.GetContent(), loadOptions);
         }
 
-        public static string GetContent(this EnvDTE.ProjectItem projectItem)
+        [NotNull]
+        public static string GetContent([NotNull] this EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(projectItem != null);
             Contract.Ensures(Contract.Result<string>() != null);
@@ -220,6 +232,7 @@
 
             if (document != null)
             {
+                // ReSharper disable once AssignNullToNotNullAttribute
                 return GetContent((EnvDTE.TextDocument)document.Object("TextDocument"));
             }
 
@@ -231,15 +244,17 @@
             return File.ReadAllText(fileName);
         }
 
-        [ContractVerification(false)]
-        private static string GetContent(EnvDTE.TextDocument document)
+        [NotNull]
+        [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute"), SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        private static string GetContent([NotNull] EnvDTE.TextDocument document)
         {
+            Contract.Requires(document != null);
             Contract.Ensures(Contract.Result<string>() != null);
 
             return document.StartPoint.CreateEditPoint().GetText(document.EndPoint);
         }
 
-        public static void SetContent(this EnvDTE.ProjectItem projectItem, string text)
+        public static void SetContent([NotNull] this EnvDTE.ProjectItem projectItem, [NotNull] string text)
         {
             Contract.Requires(projectItem != null);
             Contract.Requires(text != null);
@@ -265,8 +280,10 @@
         }
 
         [ContractVerification(false)]
-        private static void SetContent(EnvDTE.Document document, string text)
+        private static void SetContent([NotNull] EnvDTE.Document document, string text)
         {
+            Contract.Requires(document != null);
+
             if (!document.ActiveWindow.Visible)
             {
                 var activeWindow = document.DTE.ActiveWindow;
@@ -288,7 +305,7 @@
             new DispatcherTimer(TimeSpan.FromMilliseconds(1000), DispatcherPriority.Background, callback, Dispatcher.CurrentDispatcher);
         }
 
-        public static void FormatSelection(EnvDTE.TextSelection selection)
+        public static void FormatSelection([NotNull] EnvDTE.TextSelection selection)
         {
             Contract.Requires(selection != null);
 

@@ -6,6 +6,8 @@
     using System.Linq;
     using System.Windows.Input;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Wix;
 
     using TomsToolbox.Desktop;
@@ -13,14 +15,17 @@
 
     public class DirectoryMapping : ObservableObject
     {
+        [NotNull]
         private readonly string _directory;
         private readonly string _id;
+        [NotNull]
         private readonly IList<WixDirectoryNode> _unmappedNodes;
+        [NotNull]
         private readonly WixProject _wixProject;
 
         private WixDirectoryNode _mappedNode;
 
-        public DirectoryMapping(string directory, WixProject wixProject, IList<WixDirectoryNode> unmappedNodes)
+        public DirectoryMapping([NotNull] string directory, [NotNull] WixProject wixProject, [NotNull] IList<WixDirectoryNode> unmappedNodes)
         {
             Contract.Requires(directory != null);
             Contract.Requires(wixProject != null);
@@ -34,6 +39,7 @@
             MappedNode = wixProject.DirectoryNodes.FirstOrDefault(node => node.Id == _id);
         }
 
+        [NotNull]
         public string Directory
         {
             get
@@ -44,6 +50,7 @@
             }
         }
 
+        [NotNull]
         public string Id
         {
             get
@@ -54,6 +61,7 @@
             }
         }
 
+        [NotNull]
         public IList<WixDirectoryNode> UnmappedNodes
         {
             get
@@ -64,6 +72,7 @@
             }
         }
 
+        [NotNull]
         public ICommand AddDirectoryCommand
         {
             get
@@ -74,6 +83,7 @@
             }
         }
 
+        [NotNull]
         public ICommand ClearMappingCommand
         {
             get

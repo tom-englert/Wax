@@ -5,15 +5,20 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Wix;
 
     public class Solution
     {
+        [NotNull]
         private readonly EnvDTE.Solution _solution;
+        [NotNull]
         private readonly IEnumerable<Project> _projects;
+        [NotNull]
         private readonly IEnumerable<WixProject> _wixProjects;
 
-        public Solution(EnvDTE.Solution solution)
+        public Solution([NotNull] EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
 
@@ -51,6 +56,7 @@
             }
         }
 
+        [NotNull]
         public IEnumerable<Project> Projects
         {
             get
@@ -61,6 +67,7 @@
             }
         }
 
+        [NotNull]
         public IEnumerable<Project> TopLevelProjects
         {
             get
@@ -74,6 +81,7 @@
             }
         }
 
+        [NotNull]
         public IEnumerable<WixProject> WixProjects
         {
             get

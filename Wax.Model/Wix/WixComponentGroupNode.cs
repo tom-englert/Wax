@@ -3,11 +3,13 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.Wax.Model.Mapping;
 
     public class WixComponentGroupNode : WixNode
     {
-        public WixComponentGroupNode(WixSourceFile sourceFile, XElement node)
+        public WixComponentGroupNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
             : base(sourceFile, node)
         {
             Contract.Requires(sourceFile != null);
@@ -22,7 +24,8 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public WixFileNode AddFileComponent(string id, string name, FileMapping fileMapping)
+        [NotNull]
+        public WixFileNode AddFileComponent([NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)
         {
             Contract.Requires(id != null);
             Contract.Requires(name != null);
