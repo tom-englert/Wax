@@ -182,16 +182,24 @@ namespace tomenglertde.Wax.Model.Wix
 
             var name = Path.GetFileName(directory);
             var id = GetDirectoryId(directory);
-            var parentId = string.IsNullOrEmpty(directory) ? string.Empty : GetDirectoryId(Path.GetDirectoryName(directory));
+            var parentDirectoryName = Path.GetDirectoryName(directory);
+            var parentId = string.IsNullOrEmpty(directory) ? string.Empty : GetDirectoryId(parentDirectoryName);
 
             var parent = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(parentId));
 
             if (parent == null)
             {
-                parentId = "TODO:" + Guid.NewGuid();
-                var sourceFile = _sourceFiles.FirstOrDefault();
-                Contract.Assume(sourceFile != null);
-                return sourceFile.AddDirectory(id, name, parentId);
+                if (!string.IsNullOrEmpty(parentId))
+                {
+                    parent = AddDirectoryNode(parentDirectoryName);
+                }
+                else
+                {
+                    parentId = "TODO:" + Guid.NewGuid();
+                    var sourceFile = _sourceFiles.FirstOrDefault();
+                    Contract.Assume(sourceFile != null);
+                    return sourceFile.AddDirectory(id, name, parentId);
+                }
             }
 
             return parent.AddDirectory(id, name);
