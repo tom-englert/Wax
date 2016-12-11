@@ -22,7 +22,30 @@ namespace tomenglertde.Wax.Model.Wix
 
         public WixDirectoryNode Parent => _parent ?? (_parent = ResolveParent());
 
-        public string Path => Parent != null ? (Parent.Path + @"\" + Name) : Name;
+        [NotNull]
+        public string Path
+        {
+            get
+            {
+                var name = Name ?? ".";
+                return Parent != null ? (Parent.Path + @"\" + name) : name;
+            }
+        }
+
+        [NotNull]
+        public WixDirectoryNode AddSubDirectory([NotNull] string id, [NotNull] string name)
+        {
+            Contract.Requires(id != null);
+            Contract.Requires(name != null);
+            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
+
+            var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
+            Node.Add(directoryElement);
+
+            SourceFile.Save();
+
+            return SourceFile.AddDirectoryNode(directoryElement);
+        }
 
         [ContractVerification(false)] // because of switch(string) 
         private WixDirectoryNode ResolveParent()
@@ -40,21 +63,6 @@ namespace tomenglertde.Wax.Model.Wix
             }
 
             return null;
-        }
-
-        [NotNull]
-        public WixDirectoryNode AddDirectory([NotNull] string id, [NotNull] string name)
-        {
-            Contract.Requires(id != null);
-            Contract.Requires(name != null);
-            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
-
-            var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
-            Node.Add(directoryElement);
-
-            SourceFile.Save();
-
-            return SourceFile.AddDirectoryNode(directoryElement);
         }
 
         public override string ToString()

@@ -71,7 +71,6 @@ namespace tomenglertde.Wax.Model.Wix
                 .Descendants(WixNames.DirectoryNode)
                 .Select(node => new WixDirectoryNode(this, node))
                 .Where(node => node.Id != "TARGETDIR")
-                .Where(node => node.Name != null)
                 .ToList();
 
             _featureNodes = _root

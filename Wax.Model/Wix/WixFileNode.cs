@@ -56,10 +56,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
             var componentNode = Node.Parent;
 
-            if (componentNode == null)
-                return null;
-
-            var componentGroupNode = componentNode.Parent;
+            var componentGroupNode = componentNode?.Parent;
 
             if (componentGroupNode == null)
                 return null;

@@ -197,7 +197,7 @@ namespace tomenglertde.Wax.Model.Wix
                 }
             }
 
-            return parent.AddDirectory(id, name);
+            return parent.AddSubDirectory(id, name);
         }
 
         public bool HasDefaultDirectoryId([NotNull] DirectoryMapping directoryMapping)
