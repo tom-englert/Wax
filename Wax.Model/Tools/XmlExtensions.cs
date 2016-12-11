@@ -8,7 +8,7 @@ namespace tomenglertde.Wax.Model.Tools
 
     public static class XmlExtensions
     {
-        public static void RemoveSelfAndWhitespace([NotNull] this XElement element)
+        public static void RemoveSelfAndWhiteSpace([NotNull] this XElement element)
         {
             Contract.Requires(element != null);
 
