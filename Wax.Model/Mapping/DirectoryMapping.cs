@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.Wax.Model.Mapping
+﻿using System.Diagnostics;
+
+namespace tomenglertde.Wax.Model.Mapping
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -160,6 +162,7 @@
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_wixProject != null);

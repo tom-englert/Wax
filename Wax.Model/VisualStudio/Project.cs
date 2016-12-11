@@ -1,7 +1,10 @@
-﻿namespace tomenglertde.Wax.Model.VisualStudio
+﻿using System.Diagnostics;
+
+namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
@@ -158,8 +161,9 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles(Project rootProject, bool deploySymbols)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols)
         {
+            Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls;
@@ -171,8 +175,9 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles(Project rootProject, BuildFileGroups groups)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups)
         {
+            Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
@@ -253,6 +258,16 @@
             }
         }
 
+        [NotNull]
+        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException", Justification = "No contracts for EnvDTE"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        protected EnvDTE.ProjectItem AddItemFromFile([NotNull] string fileName)
+        {
+            Contract.Requires(fileName != null);
+            Contract.Ensures(Contract.Result<EnvDTE.ProjectItem>() != null);
+
+            return _project.ProjectItems.AddFromFile(fileName);
+        }
+
         [ContractVerification(false)]
         private VSLangProj.References ReferencesCollection
         {
@@ -320,9 +335,12 @@
             }
         }
 
-        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup(Project project, [NotNull] EnvDTE.OutputGroup outputGroup)
+        [NotNull, ItemNotNull]
+        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup)
         {
+            Contract.Requires(project != null);
             Contract.Requires(outputGroup != null);
+            Contract.Ensures(Contract.Result<ProjectOutput>() != null);
 
             BuildFileGroups buildFileGroup;
             var canonicalName = outputGroup.CanonicalName;
@@ -334,7 +352,7 @@
 
             Contract.Assume(fileNames != null);
 
-            var projectOutputForGroup = fileNames.Cast<string>().Select(fileName => new ProjectOutput(project, fileName, buildFileGroup));
+            var projectOutputForGroup = fileNames.OfType<string>().Select(fileName => new ProjectOutput(project, fileName, buildFileGroup));
 
             return projectOutputForGroup;
         }
@@ -425,6 +443,7 @@
 
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_solution != null);

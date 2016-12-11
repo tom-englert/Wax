@@ -1,7 +1,10 @@
-﻿namespace tomenglertde.Wax.Model.VisualStudio
+﻿using System.Diagnostics;
+
+namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
 
@@ -13,11 +16,13 @@
     {
         [NotNull]
         private readonly EnvDTE.Solution _solution;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly IEnumerable<Project> _projects;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly IEnumerable<WixProject> _wixProjects;
 
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute", Justification = "No contracts for VS objects")]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException", Justification = "No contracts for VS objects")]
         public Solution([NotNull] EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
@@ -48,15 +53,9 @@
                 .ToArray();
         }
 
-        public string FullName
-        {
-            get
-            {
-                return _solution.FullName;
-            }
-        }
+        public string FullName => _solution.FullName;
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<Project> Projects
         {
             get
@@ -67,7 +66,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<Project> TopLevelProjects
         {
             get
@@ -81,7 +80,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<WixProject> WixProjects
         {
             get
@@ -93,7 +92,8 @@
         }
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_solution != null);

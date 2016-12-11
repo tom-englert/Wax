@@ -30,6 +30,7 @@
             }
             catch
             {
+                // file is corrupt
             }
 
             return new T();

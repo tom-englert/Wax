@@ -20,21 +20,9 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(node != null);
         }
 
-        public WixDirectoryNode Parent
-        {
-            get
-            {
-                return _parent ?? (_parent = ResolveParent());
-            }
-        }
+        public WixDirectoryNode Parent => _parent ?? (_parent = ResolveParent());
 
-        public string Path
-        {
-            get
-            {
-                return Parent != null ? (Parent.Path + @"\" + Name) : Name;
-            }
-        }
+        public string Path => Parent != null ? (Parent.Path + @"\" + Name) : Name;
 
         [ContractVerification(false)] // because of switch(string) 
         private WixDirectoryNode ResolveParent()

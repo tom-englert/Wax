@@ -16,13 +16,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(node != null);
         }
 
-        public string Directory
-        {
-            get
-            {
-                return GetAttribute("Directory");
-            }
-        }
+        public string Directory => GetAttribute("Directory");
 
         [NotNull]
         public WixFileNode AddFileComponent([NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)

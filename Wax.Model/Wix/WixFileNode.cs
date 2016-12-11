@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace tomenglertde.Wax.Model.Wix
 {
     using System.Collections.Generic;
@@ -26,21 +28,9 @@ namespace tomenglertde.Wax.Model.Wix
             _collection = collection;
         }
 
-        public string Source
-        {
-            get
-            {
-                return GetAttribute("Source");
-            }
-        }
+        public string Source => GetAttribute("Source");
 
-        public WixComponentGroupNode ComponentGroup
-        {
-            get
-            {
-                return _componentGroup ?? (_componentGroup = ResolveComponentGroup());
-            }
-        }
+        public WixComponentGroupNode ComponentGroup => _componentGroup ?? (_componentGroup = ResolveComponentGroup());
 
         public void Remove()
         {
@@ -90,6 +80,7 @@ namespace tomenglertde.Wax.Model.Wix
 
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_collection != null);

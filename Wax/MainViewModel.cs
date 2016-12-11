@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.Wax
+﻿using System.Diagnostics;
+
+namespace tomenglertde.Wax
 {
     using System;
     using System.Collections;
@@ -145,13 +147,7 @@
         public static readonly DependencyProperty UnmappedFileNodesProperty =
             DependencyProperty.Register("UnmappedFileNodes", typeof(IList<UnmappedFile>), typeof(MainViewModel));
 
-        public bool HasExternalChanges
-        {
-            get
-            {
-                return ((SelectedWixProject != null) && (SelectedWixProject.HasChanges));
-            }
-        }
+        public bool HasExternalChanges => ((SelectedWixProject != null) && (SelectedWixProject.HasChanges));
 
         public bool AreAllDirectoriesMapped
         {
@@ -325,6 +321,7 @@
 
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_solution != null);

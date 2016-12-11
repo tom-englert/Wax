@@ -1,22 +1,19 @@
+using System.Diagnostics.Contracts;
 namespace tomenglertde.Wax.Model.Wix
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Text;
-
-    using EnvDTE;
 
     using JetBrains.Annotations;
 
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
-
-    using Project = tomenglertde.Wax.Model.VisualStudio.Project;
-    using Solution = tomenglertde.Wax.Model.VisualStudio.Solution;
 
     public class WixProject : Project
     {
@@ -27,7 +24,7 @@ namespace tomenglertde.Wax.Model.Wix
         private readonly EnvDTE.ProjectItem _configurationFileProjectItem;
         [NotNull]
         private readonly ProjectConfiguration _configuration;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly IList<WixSourceFile> _sourceFiles;
 
         public WixProject([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
@@ -36,7 +33,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
 
-            _configurationFileProjectItem = GetConfigurationFileProjectItem(project);
+            _configurationFileProjectItem = GetConfigurationFileProjectItem();
 
             var configurationText = _configurationFileProjectItem.GetContent();
 
@@ -52,7 +49,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Assume(_sourceFiles.First() != null);
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<WixSourceFile> SourceFiles
         {
             get
@@ -63,7 +60,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<WixFileNode> FileNodes
         {
             get
@@ -74,7 +71,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<WixDirectoryNode> DirectoryNodes
         {
             get
@@ -85,7 +82,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes
         {
             get
@@ -96,7 +93,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroups
         {
             get
@@ -107,7 +104,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<Project> DeployedProjects
         {
             get
@@ -144,13 +141,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public bool HasChanges
-        {
-            get
-            {
-                return HasConfigurationChanges | HasSourceFileChanges;
-            }
-        }
+        public bool HasChanges => HasConfigurationChanges | HasSourceFileChanges;
 
         [NotNull]
         public string GetDirectoryId([NotNull] string directory)
@@ -303,7 +294,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(directoryId != null);
             Contract.Ensures(Contract.Result<WixComponentGroupNode>() != null);
 
-            return ComponentGroups.FirstOrDefault(group => @group.Directory == directoryId) ?? _sourceFiles.First().AddComponentGroup(directoryId);
+            return ComponentGroups.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.First().AddComponentGroup(directoryId);
         }
 
         private void ForceFeatureRef([NotNull] string componentGroupId)
@@ -350,13 +341,7 @@ namespace tomenglertde.Wax.Model.Wix
             return (value <= 'z') && (char.IsLetterOrDigit(value) || (value == '_') || (value == '.'));
         }
 
-        private bool HasConfigurationChanges
-        {
-            get
-            {
-                return (_configuration.Serialize() != _configurationFileProjectItem.GetContent());
-            }
-        }
+        private bool HasConfigurationChanges => (_configuration.Serialize() != _configurationFileProjectItem.GetContent());
 
         private bool HasSourceFileChanges
         {
@@ -375,30 +360,26 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull]
-        private static ProjectItem GetConfigurationFileProjectItem([NotNull] EnvDTE.Project project)
+        private EnvDTE.ProjectItem GetConfigurationFileProjectItem()
         {
-            Contract.Requires(project != null);
-            Contract.Ensures(Contract.Result<ProjectItem>() != null);
+            Contract.Ensures(Contract.Result<EnvDTE.ProjectItem>() != null);
 
-            var configurationFileProjectItem = project.GetAllProjectItems().FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
+            var configurationFileProjectItem = AllProjectItems.FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
 
-            if (configurationFileProjectItem == null)
-            {
-                var configurationFileName = Path.ChangeExtension(project.FullName, WaxConfigurationFileExtension);
+            if (configurationFileProjectItem != null)
+                return configurationFileProjectItem;
 
-                if (!File.Exists(configurationFileName))
-                    File.WriteAllText(configurationFileName, new ProjectConfiguration().Serialize());
+            var configurationFileName = Path.ChangeExtension(FullName, WaxConfigurationFileExtension);
 
-                var projectItems = project.ProjectItems;
-                Contract.Assume(projectItems != null);
-                configurationFileProjectItem = projectItems.AddFromFile(configurationFileName);
-                Contract.Assume(configurationFileProjectItem != null);
-            }
-            return configurationFileProjectItem;
+            if (!File.Exists(configurationFileName))
+                File.WriteAllText(configurationFileName, new ProjectConfiguration().Serialize());
+
+            return AddItemFromFile(configurationFileName);
         }
 
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_sourceFiles != null);

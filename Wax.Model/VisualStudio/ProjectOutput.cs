@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.Wax.Model.VisualStudio
+﻿using System.Diagnostics;
+
+namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Diagnostics.Contracts;
@@ -58,13 +60,7 @@
             }
         }
 
-        public BuildFileGroups BuildFileGroup
-        {
-            get
-            {
-                return _buildFileGroup;
-            }
-        }
+        public BuildFileGroups BuildFileGroup => _buildFileGroup;
 
         [NotNull]
         public Project Project
@@ -77,13 +73,7 @@
             }
         }
 
-        public bool IsReference
-        {
-            get
-            {
-                return _reference != null;
-            }
-        }
+        public bool IsReference => _reference != null;
 
         public override string ToString()
         {
@@ -154,6 +144,7 @@
  
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_fullName != null);

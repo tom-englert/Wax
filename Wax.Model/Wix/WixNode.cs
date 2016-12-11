@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace tomenglertde.Wax.Model.Wix
 {
     using System;
@@ -47,13 +49,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public string Name
-        {
-            get
-            {
-                return GetAttribute("Name");
-            }
-        }
+        public string Name => GetAttribute("Name");
 
         [NotNull]
         internal XElement Node
@@ -149,6 +145,7 @@ namespace tomenglertde.Wax.Model.Wix
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_node != null);
