@@ -7,6 +7,8 @@ namespace tomenglertde.Wax.Model.Wix
 
     using JetBrains.Annotations;
 
+    using tomenglertde.Wax.Model.Tools;
+
     using TomsToolbox.Desktop;
 
     public class WixDirectoryNode : WixNode
@@ -33,14 +35,15 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull]
-        public WixDirectoryNode AddSubDirectory([NotNull] string id, [NotNull] string name)
+        public WixDirectoryNode AddSubdirectory([NotNull] string id, [NotNull] string name)
         {
             Contract.Requires(id != null);
             Contract.Requires(name != null);
             Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
 
             var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
-            Node.Add(directoryElement);
+
+            Node.AddWithFormatting(directoryElement);
 
             SourceFile.Save();
 

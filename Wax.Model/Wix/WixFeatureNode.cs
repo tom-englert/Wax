@@ -7,6 +7,8 @@
 
     using JetBrains.Annotations;
 
+    using tomenglertde.Wax.Model.Tools;
+
     using TomsToolbox.Desktop;
 
     public class WixFeatureNode : WixNode
@@ -37,7 +39,8 @@
             Contract.Requires(id != null);
 
             var newNode = new XElement(WixNames.ComponentGroupRefNode, new XAttribute("Id", id));
-            Node.Add(newNode);
+
+            Node.AddWithFormatting(newNode);
         }
     }
 }

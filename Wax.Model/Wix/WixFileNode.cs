@@ -10,6 +10,8 @@ namespace tomenglertde.Wax.Model.Wix
 
     using JetBrains.Annotations;
 
+    using tomenglertde.Wax.Model.Tools;
+
     using TomsToolbox.Desktop;
 
     public class WixFileNode : WixNode
@@ -37,7 +39,8 @@ namespace tomenglertde.Wax.Model.Wix
             var parentNode = Node.Parent;
 
             _collection.Remove(this);
-            Node.Remove();
+
+            Node.RemoveSelfAndWhitespace();
 
             if (parentNode != null && (parentNode.Name == WixNames.ComponentNode) && !parentNode.Descendants().Any())
             {

@@ -14,6 +14,7 @@ namespace tomenglertde.Wax.Model.Wix
     using JetBrains.Annotations;
 
     using tomenglertde.Wax.Model.Mapping;
+    using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
 
     public class WixSourceFile
@@ -160,13 +161,13 @@ namespace tomenglertde.Wax.Model.Wix
             var root = _root;
 
             var fragmentElement = new XElement(WixNames.FragmentNode);
-            root.Add(fragmentElement);
+            root.AddWithFormatting(fragmentElement);
 
             var directoryRefElement = new XElement(WixNames.DirectoryRefNode, new XAttribute("Id", parentId));
-            fragmentElement.Add(directoryRefElement);
+            fragmentElement.AddWithFormatting(directoryRefElement);
 
             var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
-            directoryRefElement.Add(directoryElement);
+            directoryRefElement.AddWithFormatting(directoryElement);
 
             Save();
 
@@ -193,10 +194,10 @@ namespace tomenglertde.Wax.Model.Wix
             var root = _root;
 
             var fragmentElement = new XElement(WixNames.FragmentNode);
-            root.Add(fragmentElement);
+            root.AddWithFormatting(fragmentElement);
 
             var componentGroupElement = new XElement(WixNames.ComponentGroupNode, new XAttribute("Id", directoryId + "_files"), new XAttribute("Directory", directoryId));
-            fragmentElement.Add(componentGroupElement);
+            fragmentElement.AddWithFormatting(componentGroupElement);
 
             Save();
 
@@ -222,13 +223,15 @@ namespace tomenglertde.Wax.Model.Wix
 
             ForceDirectoryVariable(variableName, project);
 
+            var componentElement = new XElement(WixNames.ComponentNode, new XAttribute("Id", id), new XAttribute("Guid", Guid.NewGuid().ToString()));
+
+            componentGroup.Node.AddWithFormatting(componentElement);
+
             var source = string.Format(CultureInfo.InvariantCulture, "$(var.{0}){1}", variableName, fileMapping.SourceName);
 
             var fileElement = new XElement(WixNames.FileNode, new XAttribute("Id", id), new XAttribute("Name", name), new XAttribute("Source", source));
 
-            var componentElement = new XElement(WixNames.ComponentNode, new XAttribute("Id", id), new XAttribute("Guid", Guid.NewGuid().ToString()), fileElement);
-
-            componentGroup.Node.Add(componentElement);
+            componentElement.AddWithFormatting(fileElement);
 
             Save();
 
