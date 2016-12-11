@@ -16,7 +16,7 @@
         [NotNull]
         private readonly EnvDTE.Project _project;
         private readonly VSLangProj.VSProject _vsProject;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
         [NotNull]
         private readonly string _uniqueName;
@@ -32,8 +32,8 @@
             _project = project;
             _vsProject = project.Object as VSLangProj.VSProject;
 
+            Contract.Assume(_project.UniqueName != null);
             _uniqueName = _project.UniqueName;
-            Contract.Assume(_uniqueName != null);
 
             _projectTypeGuids = _project.GetProjectTypeGuids();
         }
@@ -54,7 +54,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject)
         {
             Contract.Requires(rootProject != null);
@@ -68,7 +68,7 @@
             return localFileReferences;
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ICollection<Project> ReferencedBy
         {
             get
@@ -118,7 +118,7 @@
 
         public bool IsVsProject => _vsProject != null;
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols)
         {
             Contract.Requires(rootProject != null);
@@ -157,11 +157,10 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectOutput> GetBuildFiles(Project rootProject, bool deploySymbols)
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
 
             var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls;
 
@@ -171,12 +170,12 @@
             return GetBuildFiles(rootProject, buildFileGroups);
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectOutput> GetBuildFiles(Project rootProject, BuildFileGroups groups)
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
-            var groupNames = Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => (groups & item) != 0);
+            var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
 
             var configurationManager = _project.ConfigurationManager;
             Contract.Assume(configurationManager != null);
@@ -190,7 +189,7 @@
             return buildFiles;
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         protected internal IEnumerable<EnvDTE.ProjectItem> AllProjectItems
         {
             get
@@ -201,7 +200,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         protected internal IEnumerable<VSLangProj.Reference> References
         {
             get
@@ -268,7 +267,7 @@
                     Contract.Assume(projectItems != null);
 
                     return projectItems
-                        .Cast<EnvDTE.ProjectItem>()
+                        .OfType<EnvDTE.ProjectItem>()
                         .Select(p => p.Object)
                         .OfType<VSLangProj.References>()
                         .FirstOrDefault();
@@ -292,7 +291,7 @@
                     Contract.Assume(projectItems != null);
 
                     return projectItems
-                        .Cast<EnvDTE.ProjectItem>()
+                        .OfType<EnvDTE.ProjectItem>()
                         .Select(p => p.Object)
                         .OfType<VSLangProj.References>()
                         .Take(1)
@@ -300,9 +299,8 @@
                 }
                 catch
                 {
+                    return null;
                 }
-
-                return null;
             }
         }
 

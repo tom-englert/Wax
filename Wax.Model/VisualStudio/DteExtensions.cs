@@ -9,7 +9,6 @@
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Windows.Threading;
     using System.Xml.Linq;
 
     using JetBrains.Annotations;
@@ -200,6 +199,7 @@
                 // some items report a file count > 0 but don't return a file name!
                 if (projectItem.FileCount > 0)
                 {
+                    // ReSharper disable once PossibleNullReferenceException
                     return projectItem.FileNames[0];
                 }
             }
@@ -279,50 +279,14 @@
             }
         }
 
-        [ContractVerification(false)]
+        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static void SetContent([NotNull] EnvDTE.Document document, string text)
         {
             Contract.Requires(document != null);
 
-            if (!document.ActiveWindow.Visible)
-            {
-                var activeWindow = document.DTE.ActiveWindow;
-                document.ActiveWindow.Visible = true;
-                activeWindow.Activate();
-            }
-
             var textDocument = (EnvDTE.TextDocument)document.Object("TextDocument");
 
             textDocument.StartPoint.CreateEditPoint().ReplaceText(textDocument.EndPoint, text, 0);
-
-            // Must heavily delay formatting - does not work if called too early, especially if the window has been recently opened.
-            EventHandler callback = (sender, e) =>
-            {
-                FormatSelection(textDocument.Selection);
-                ((DispatcherTimer)sender).Stop();
-            };
-
-            new DispatcherTimer(TimeSpan.FromMilliseconds(1000), DispatcherPriority.Background, callback, Dispatcher.CurrentDispatcher);
-        }
-
-        public static void FormatSelection([NotNull] EnvDTE.TextSelection selection)
-        {
-            Contract.Requires(selection != null);
-
-            try
-            {
-                var selStart = selection.AnchorPoint;
-                var selEnd = selection.ActivePoint;
-
-                selection.SelectAll();
-                selection.SmartFormat();
-
-                selection.MoveToPoint(selStart);
-                selection.MoveToPoint(selEnd, true);
-            }
-            catch
-            {
-            }
         }
     }
 }

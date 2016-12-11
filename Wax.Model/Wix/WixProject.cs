@@ -7,11 +7,16 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Text;
 
+    using EnvDTE;
+
     using JetBrains.Annotations;
 
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
+
+    using Project = tomenglertde.Wax.Model.VisualStudio.Project;
+    using Solution = tomenglertde.Wax.Model.VisualStudio.Solution;
 
     public class WixProject : Project
     {
@@ -19,7 +24,7 @@ namespace tomenglertde.Wax.Model.Wix
         private const string WaxConfigurationFileExtension = ".wax";
 
         [NotNull]
-        private readonly EnvDTE.ProjectItem _configurationItem;
+        private readonly EnvDTE.ProjectItem _configurationFileProjectItem;
         [NotNull]
         private readonly ProjectConfiguration _configuration;
         [NotNull]
@@ -31,22 +36,9 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
 
-            _configurationItem = project.GetAllProjectItems().FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
+            _configurationFileProjectItem = GetConfigurationFileProjectItem(project);
 
-            if (_configurationItem == null)
-            {
-                var configurationFileName = Path.ChangeExtension(project.FullName, WaxConfigurationFileExtension);
-
-                if (!File.Exists(configurationFileName))
-                    File.WriteAllText(configurationFileName, new ProjectConfiguration().Serialize());
-
-                var projectItems = project.ProjectItems;
-                Contract.Assume(projectItems != null);
-                _configurationItem = projectItems.AddFromFile(configurationFileName);
-                Contract.Assume(_configurationItem != null);
-            }
-
-            var configurationText = _configurationItem.GetContent();
+            var configurationText = _configurationFileProjectItem.GetContent();
 
             _configuration = configurationText.Deserialize<ProjectConfiguration>();
 
@@ -362,7 +354,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
             get
             {
-                return (_configuration.Serialize() != _configurationItem.GetContent());
+                return (_configuration.Serialize() != _configurationFileProjectItem.GetContent());
             }
         }
 
@@ -378,8 +370,31 @@ namespace tomenglertde.Wax.Model.Wix
         {
             var configurationText = _configuration.Serialize();
 
-            if (configurationText != _configurationItem.GetContent())
-                _configurationItem.SetContent(configurationText);
+            if (configurationText != _configurationFileProjectItem.GetContent())
+                _configurationFileProjectItem.SetContent(configurationText);
+        }
+
+        [NotNull]
+        private static ProjectItem GetConfigurationFileProjectItem([NotNull] EnvDTE.Project project)
+        {
+            Contract.Requires(project != null);
+            Contract.Ensures(Contract.Result<ProjectItem>() != null);
+
+            var configurationFileProjectItem = project.GetAllProjectItems().FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
+
+            if (configurationFileProjectItem == null)
+            {
+                var configurationFileName = Path.ChangeExtension(project.FullName, WaxConfigurationFileExtension);
+
+                if (!File.Exists(configurationFileName))
+                    File.WriteAllText(configurationFileName, new ProjectConfiguration().Serialize());
+
+                var projectItems = project.ProjectItems;
+                Contract.Assume(projectItems != null);
+                configurationFileProjectItem = projectItems.AddFromFile(configurationFileName);
+                Contract.Assume(configurationFileProjectItem != null);
+            }
+            return configurationFileProjectItem;
         }
 
         [ContractInvariantMethod]
@@ -390,7 +405,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Invariant(_sourceFiles.Any());
             Contract.Invariant(_sourceFiles.First() != null);
             Contract.Invariant(_configuration != null);
-            Contract.Invariant(_configurationItem != null);
+            Contract.Invariant(_configurationFileProjectItem != null);
         }
     }
 }
