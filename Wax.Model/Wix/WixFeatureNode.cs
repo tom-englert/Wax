@@ -36,8 +36,7 @@
         {
             Contract.Requires(id != null);
 
-            var newNode = new XElement(WixNames.ComponentGroupRefNode);
-            newNode.Add(new XAttribute("Id", id));
+            var newNode = new XElement(WixNames.ComponentGroupRefNode, new XAttribute("Id", id));
             Node.Add(newNode);
         }
     }
