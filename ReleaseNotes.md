@@ -1,4 +1,9 @@
-1.0.18.0:
+1.0.19.0:
+* Fix #11: Handle deep directory structures
+* Fix #12: Allow DirectoryNodes without name to support merge modules with the "MergeRedirectFolder"
+* Format XML when adding new nodes.
+ 
+* 1.0.18.0:
 * Fix #10: VSIX installer problem with .net framework version
 
 1.0.17.0:
