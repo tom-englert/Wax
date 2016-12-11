@@ -163,13 +163,10 @@ namespace tomenglertde.Wax.Model.Wix
             var fragmentElement = new XElement(WixNames.FragmentNode);
             root.Add(fragmentElement);
 
-            var directoryRefElement = new XElement(WixNames.DirectoryRefNode);
-            directoryRefElement.Add(new XAttribute("Id", parentId));
+            var directoryRefElement = new XElement(WixNames.DirectoryRefNode, new XAttribute("Id", parentId));
             fragmentElement.Add(directoryRefElement);
 
-            var directoryElement = new XElement(WixNames.DirectoryNode);
-            directoryElement.Add(new XAttribute("Id", id));
-            directoryElement.Add(new XAttribute("Name", name));
+            var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
             directoryRefElement.Add(directoryElement);
 
             Save();
@@ -199,9 +196,7 @@ namespace tomenglertde.Wax.Model.Wix
             var fragmentElement = new XElement(WixNames.FragmentNode);
             root.Add(fragmentElement);
 
-            var componentGroupElement = new XElement(WixNames.ComponentGroupNode);
-            componentGroupElement.Add(new XAttribute("Id", directoryId + "_files"));
-            componentGroupElement.Add(new XAttribute("Directory", directoryId));
+            var componentGroupElement = new XElement(WixNames.ComponentGroupNode, new XAttribute("Id", directoryId + "_files"), new XAttribute("Directory", directoryId));
             fragmentElement.Add(componentGroupElement);
 
             Save();
@@ -222,15 +217,6 @@ namespace tomenglertde.Wax.Model.Wix
 
             Contract.Assume(componentGroup.SourceFile.Equals(this));
 
-            var componentElement = new XElement(WixNames.ComponentNode);
-            var fileElement = new XElement(WixNames.FileNode);
-
-            componentElement.Add(new XAttribute("Id", id));
-            componentElement.Add(new XAttribute("Guid", Guid.NewGuid().ToString()));
-
-            fileElement.Add(new XAttribute("Id", id));
-            fileElement.Add(new XAttribute("Name", name));
-
             var project = fileMapping.Project;
 
             var variableName = string.Format(CultureInfo.InvariantCulture, "{0}_TargetDir", project.Name);
@@ -238,9 +224,11 @@ namespace tomenglertde.Wax.Model.Wix
             ForceDirectoryVariable(variableName, project);
 
             var source = string.Format(CultureInfo.InvariantCulture, "$(var.{0}){1}", variableName, fileMapping.SourceName);
-            fileElement.Add(new XAttribute("Source", source));
 
-            componentElement.Add(fileElement);
+            var fileElement = new XElement(WixNames.FileNode, new XAttribute("Id", id), new XAttribute("Name", name), new XAttribute("Source", source));
+
+            var componentElement = new XElement(WixNames.ComponentNode, new XAttribute("Id", id), new XAttribute("Guid", Guid.NewGuid().ToString()), fileElement);
+
             componentGroup.Node.Add(componentElement);
 
             Save();

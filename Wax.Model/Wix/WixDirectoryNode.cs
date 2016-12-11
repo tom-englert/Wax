@@ -49,9 +49,7 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(name != null);
             Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
 
-            var directoryElement = new XElement(WixNames.DirectoryNode);
-            directoryElement.Add(new XAttribute("Id", id));
-            directoryElement.Add(new XAttribute("Name", name));
+            var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
             Node.Add(directoryElement);
 
             SourceFile.Save();
