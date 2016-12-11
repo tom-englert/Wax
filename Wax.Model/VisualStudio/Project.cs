@@ -340,7 +340,7 @@ namespace tomenglertde.Wax.Model.VisualStudio
         {
             Contract.Requires(project != null);
             Contract.Requires(outputGroup != null);
-            Contract.Ensures(Contract.Result<ProjectOutput>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             BuildFileGroups buildFileGroup;
             var canonicalName = outputGroup.CanonicalName;
