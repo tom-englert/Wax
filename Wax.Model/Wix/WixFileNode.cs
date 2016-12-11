@@ -40,7 +40,7 @@ namespace tomenglertde.Wax.Model.Wix
 
             _collection.Remove(this);
 
-            Node.RemoveSelfAndWhitespace();
+            Node.RemoveSelfAndWhiteSpace();
 
             if (parentNode != null && (parentNode.Name == WixNames.ComponentNode) && !parentNode.Descendants().Any())
             {
