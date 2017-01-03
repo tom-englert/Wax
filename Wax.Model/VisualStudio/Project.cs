@@ -7,6 +7,7 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.InteropServices;
 
     using JetBrains.Annotations;
@@ -130,9 +131,33 @@
                 .Concat(GetLocalFileReferences(rootProject))
                 .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)))
                 .Distinct()
-                .OrderBy(output => output.FullName, StringComparer.OrdinalIgnoreCase);
+                .OrderBy(output => output.FullName, StringComparer.OrdinalIgnoreCase).ToList();
 
-            return projectOutput;
+            //Try to resolve second-tier references for CopyLocal references
+            foreach (var reference in References.Where(r => r.CopyLocal))
+            {
+                //Reference can be a project reference and not be built
+                if (File.Exists(reference.Path))
+                {
+                    //Load first-tier reference
+                    var assembly = Assembly.LoadFile(reference.Path);
+                    //Get its references
+                    var referenced = assembly.GetReferencedAssemblies();
+                    var directory = new FileInfo(reference.Path).Directory;
+                    foreach (var referred in referenced)
+                    {
+                        //If second-tier reference is not in project references
+                        if (!References.Any(r => r.Name == referred.Name))
+                        {
+                            //Try to resolve it from first-tier reference folder like MSBuild does
+                            var existingDll = directory.GetFiles().FirstOrDefault(f => f.Name == string.Concat(referred.Name, ".dll"));
+                            if (existingDll != null)
+                                projectOutput.Add(new ProjectOutput(rootProject, existingDll.Name, BuildFileGroups.Built));
+                        }
+                    }
+                }
+            }
+            return projectOutput.AsEnumerable();
         }
 
         [NotNull]
