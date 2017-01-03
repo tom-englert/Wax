@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.Wax.Model.VisualStudio
+﻿namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
@@ -348,11 +347,9 @@ namespace tomenglertde.Wax.Model.VisualStudio
             if (!Enum.TryParse(canonicalName, out buildFileGroup))
                 throw new InvalidOperationException("Unknown output group: " + canonicalName);
 
-            var fileNames = (Array)outputGroup.FileNames;
+            var fileNames = outputGroup.GetFileNames();
 
-            Contract.Assume(fileNames != null);
-
-            var projectOutputForGroup = fileNames.OfType<string>().Select(fileName => new ProjectOutput(project, fileName, buildFileGroup));
+            var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup));
 
             return projectOutputForGroup;
         }
@@ -468,6 +465,17 @@ namespace tomenglertde.Wax.Model.VisualStudio
             {
                 return null;
             }
+        }
+
+        [NotNull, ItemNotNull]
+        public static string[] GetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        {
+            Contract.Requires(outputGroup != null);
+            Contract.Ensures(Contract.Result<string[]>() != null);
+
+            Contract.Assume(outputGroup.FileNames != null);
+
+            return ((Array)outputGroup.FileNames).OfType<string>().ToArray();
         }
     }
 }

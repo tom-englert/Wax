@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.Wax.Model.VisualStudio
+﻿namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
 
@@ -12,7 +11,7 @@ namespace tomenglertde.Wax.Model.VisualStudio
     {
         [NotNull]
         private readonly string _fullName;
-        private readonly BuildFileGroups _buildFileGroup;
+
         [NotNull]
         private readonly Project _project;
         private readonly VSLangProj.Reference _reference;
@@ -22,8 +21,15 @@ namespace tomenglertde.Wax.Model.VisualStudio
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
 
+            if (buildFileGroup == BuildFileGroups.Built)
+            {
+                // Build output should be only a file name, without folder.
+                // => Workaround: In Web API projects (ASP.NET MVC) the build output is always "bin\<targetname>.dll" instead of just "<targetname>.dll",
+                // where "bin" seems to be hard coded.
+                fullName = Path.GetFileName(fullName);
+            }
+
             _fullName = fullName;
-            _buildFileGroup = buildFileGroup;
             _project = project;
         }
 
@@ -33,8 +39,8 @@ namespace tomenglertde.Wax.Model.VisualStudio
             Contract.Requires(reference != null);
 
             _reference = reference;
+            Contract.Assume(reference.Path != null);
             _fullName = reference.Path;
-            Contract.Assume(_fullName != null);
             _project = project;
         }
 
@@ -59,8 +65,6 @@ namespace tomenglertde.Wax.Model.VisualStudio
                 return Path.GetFileName(_fullName);
             }
         }
-
-        public BuildFileGroups BuildFileGroup => _buildFileGroup;
 
         [NotNull]
         public Project Project
@@ -141,7 +145,7 @@ namespace tomenglertde.Wax.Model.VisualStudio
         }
 
         #endregion
- 
+
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
