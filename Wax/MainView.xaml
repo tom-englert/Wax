@@ -78,7 +78,7 @@
       </Setter>
     </Style>
   </UserControl.Resources>
-  <DockPanel>
+    <DockPanel Background="{x:Static SystemColors.ControlBrush}">
     <ToolBarTray DockPanel.Dock="Top" Margin="0">
       <ToolBar>
         <Button ToolTip="Refresh" Click="Refresh_Click">
