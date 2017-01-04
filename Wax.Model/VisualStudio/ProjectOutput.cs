@@ -21,7 +21,7 @@
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
 
-            if (buildFileGroup == BuildFileGroups.Built)
+            if (buildFileGroup == BuildFileGroups.Built || buildFileGroup == BuildFileGroups.Symbols)
             {
                 // Build output should be only a file name, without folder.
                 // => Workaround: In Web API projects (ASP.NET MVC) the build output is always "bin\<targetname>.dll" instead of just "<targetname>.dll",
