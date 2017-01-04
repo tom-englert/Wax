@@ -220,6 +220,7 @@
         }
 
         [NotNull]
+        [ContractVerification(false)]
         public static string GetContent([NotNull] this EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(projectItem != null);

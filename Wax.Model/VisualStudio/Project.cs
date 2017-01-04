@@ -156,7 +156,7 @@
         }
 
         [NotNull]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private static IEnumerable<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName)
         {
             Contract.Requires(assemblyFileName != null);

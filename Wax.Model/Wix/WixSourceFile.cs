@@ -152,11 +152,13 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        [NotNull]
         internal WixDirectoryNode AddDirectory([NotNull] string id, [NotNull] string name, [NotNull] string parentId)
         {
             Contract.Requires(id != null);
             Contract.Requires(name != null);
             Contract.Requires(parentId != null);
+            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
 
             var root = _root;
 
