@@ -121,6 +121,7 @@
 
         public bool IsVsProject => _vsProject != null;
 
+        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile")]
         [NotNull, ItemNotNull]
         public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols)
         {
@@ -131,40 +132,47 @@
                 .Concat(GetLocalFileReferences(rootProject))
                 .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)))
                 .Distinct()
-                .OrderBy(output => output.FullName, StringComparer.OrdinalIgnoreCase).ToList();
+                .ToList();
 
             //Try to resolve second-tier references for CopyLocal references
-            foreach (var reference in References.Where(r => r.CopyLocal))
+            var references = References.ToArray();
+
+            foreach (var reference in references.Where(r => r.CopyLocal))
             {
                 //Reference can be a project reference and not be built
-                if (File.Exists(reference.Path))
+                if (!File.Exists(reference.Path))
+                    continue;
+
+                try
                 {
-                    try
+                    //Load first-tier reference
+                    var assembly = Assembly.LoadFile(reference.Path);
+                    //Get its references
+                    var referencedAssemblies = assembly.GetReferencedAssemblies();
+                    var directory = new FileInfo(reference.Path).Directory;
+                    var files = directory.GetFiles();
+
+                    foreach (var referencedAssembly in referencedAssemblies)
                     {
-                        //Load first-tier reference
-                        var assembly = Assembly.LoadFile(reference.Path);
-                        //Get its references
-                        var referenced = assembly.GetReferencedAssemblies();
-                        var directory = new FileInfo(reference.Path).Directory;
-                        foreach (var referred in referenced)
+                        //If second-tier reference is not in project references
+                        if (!references.Any(r => r.Name == referencedAssembly.Name))
                         {
-                            //If second-tier reference is not in project references
-                            if (!References.Any(r => r.Name == referred.Name))
-                            {
-                                //Try to resolve it from first-tier reference folder like MSBuild does
-                                var existingDll = directory.GetFiles().FirstOrDefault(f => f.Name == string.Concat(referred.Name, ".dll"));
-                                if (existingDll != null)
-                                    projectOutput.Add(new ProjectOutput(rootProject, existingDll.Name, BuildFileGroups.Built));
-                            }
+                            //Try to resolve it from first-tier reference folder like MSBuild does
+                            var existingDll = files.FirstOrDefault(f => f.Name == string.Concat(referencedAssembly.Name, ".dll"));
+                            if (existingDll != null)
+                                projectOutput.Add(new ProjectOutput(rootProject, existingDll.Name, BuildFileGroups.Built));
                         }
                     }
-                    catch
-                    {
-                        //Reference cannot be loaded
-                    }
+                }
+                catch
+                {
+                    //Reference cannot be loaded
                 }
             }
-            return projectOutput.AsEnumerable();
+
+            return projectOutput
+                .Distinct()
+                .OrderBy(output => output.FullName, StringComparer.OrdinalIgnoreCase);
         }
 
         [NotNull]
