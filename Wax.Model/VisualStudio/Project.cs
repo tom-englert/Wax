@@ -43,7 +43,7 @@
             _projectTypeGuids = _project.GetProjectTypeGuids();
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectReference> ProjectReferences
         {
             get
