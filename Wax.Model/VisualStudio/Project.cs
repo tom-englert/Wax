@@ -139,21 +139,28 @@
                 //Reference can be a project reference and not be built
                 if (File.Exists(reference.Path))
                 {
-                    //Load first-tier reference
-                    var assembly = Assembly.LoadFile(reference.Path);
-                    //Get its references
-                    var referenced = assembly.GetReferencedAssemblies();
-                    var directory = new FileInfo(reference.Path).Directory;
-                    foreach (var referred in referenced)
+                    try
                     {
-                        //If second-tier reference is not in project references
-                        if (!References.Any(r => r.Name == referred.Name))
+                        //Load first-tier reference
+                        var assembly = Assembly.LoadFile(reference.Path);
+                        //Get its references
+                        var referenced = assembly.GetReferencedAssemblies();
+                        var directory = new FileInfo(reference.Path).Directory;
+                        foreach (var referred in referenced)
                         {
-                            //Try to resolve it from first-tier reference folder like MSBuild does
-                            var existingDll = directory.GetFiles().FirstOrDefault(f => f.Name == string.Concat(referred.Name, ".dll"));
-                            if (existingDll != null)
-                                projectOutput.Add(new ProjectOutput(rootProject, existingDll.Name, BuildFileGroups.Built));
+                            //If second-tier reference is not in project references
+                            if (!References.Any(r => r.Name == referred.Name))
+                            {
+                                //Try to resolve it from first-tier reference folder like MSBuild does
+                                var existingDll = directory.GetFiles().FirstOrDefault(f => f.Name == string.Concat(referred.Name, ".dll"));
+                                if (existingDll != null)
+                                    projectOutput.Add(new ProjectOutput(rootProject, existingDll.Name, BuildFileGroups.Built));
+                            }
                         }
+                    }
+                    catch
+                    {
+                        //Reference cannot be loaded
                     }
                 }
             }
