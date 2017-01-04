@@ -14,7 +14,7 @@
 
         [NotNull]
         private readonly Project _project;
-        private readonly VSLangProj.Reference _reference;
+        private readonly bool _isReference;
 
         public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup)
         {
@@ -33,12 +33,22 @@
             _project = project;
         }
 
+        public ProjectOutput([NotNull] Project project, [NotNull] string fullName)
+        {
+            Contract.Requires(project != null);
+            Contract.Requires(fullName != null);
+
+            _isReference = true;
+            _fullName = fullName;
+            _project = project;
+        }
+
         public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference)
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
 
-            _reference = reference;
+            _isReference = true;
             Contract.Assume(reference.Path != null);
             _fullName = reference.Path;
             _project = project;
@@ -77,7 +87,7 @@
             }
         }
 
-        public bool IsReference => _reference != null;
+        public bool IsReference => _isReference;
 
         public override string ToString()
         {

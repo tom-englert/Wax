@@ -248,6 +248,7 @@ namespace tomenglertde.Wax
 
             var projectOutputs = vsProjects
                 .SelectMany(project => project.GetProjectOutput(project, DeploySymbols))
+                .OrderBy(item => item.IsReference ? 1 : 0)
                 .Distinct()
                 .ToArray();
 
