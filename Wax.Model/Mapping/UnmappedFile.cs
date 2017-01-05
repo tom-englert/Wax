@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.Wax.Model.Mapping
+﻿namespace tomenglertde.Wax.Model.Mapping
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Windows.Input;
 

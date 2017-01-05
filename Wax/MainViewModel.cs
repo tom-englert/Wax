@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.Wax
+﻿namespace tomenglertde.Wax
 {
     using System;
     using System.Collections;
@@ -8,6 +6,7 @@ namespace tomenglertde.Wax
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
@@ -267,7 +266,7 @@ namespace tomenglertde.Wax
 
             var directories = vsProjects.SelectMany(project => project.GetProjectOutput(project, DeploySymbols))
                 .Where(projectOutput => !projectOutput.IsReference)
-                .Select(projectOutput => Path.GetDirectoryName(projectOutput.FullName))
+                .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(item => item)
                 .DefaultIfEmpty(string.Empty)

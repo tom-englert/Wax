@@ -1,10 +1,10 @@
-﻿using JetBrains.Annotations;
-
-namespace tomenglertde.Wax.Model.Tools
+﻿namespace tomenglertde.Wax.Model.Tools
 {
     using System.Diagnostics.Contracts;
     using System.Xml;
     using System.Xml.Linq;
+
+    using JetBrains.Annotations;
 
     public static class XmlExtensions
     {

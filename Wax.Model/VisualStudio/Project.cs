@@ -7,7 +7,6 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Runtime.InteropServices;
 
     using JetBrains.Annotations;
@@ -60,16 +59,17 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject)
+        public IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, [NotNull] string targetDirectory)
         {
             Contract.Requires(rootProject != null);
+            Contract.Requires(targetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var localFileReferences = References
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
-                .Select(reference => new ProjectOutput(rootProject, reference))
-                .Concat(GetSecondTierReferences(rootProject));
+                .Select(reference => new ProjectOutput(rootProject, reference, targetDirectory))
+                .Concat(GetSecondTierReferences(rootProject, targetDirectory));
 
             return localFileReferences;
         }
@@ -132,16 +132,23 @@
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var projectOutput = GetBuildFiles(rootProject, deploySymbols)
-                .Concat(GetLocalFileReferences(rootProject))
-                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)));
+                .ToArray();
 
-            return projectOutput;
+            var targetDirectory = projectOutput
+                .Where(output => output.BuildFileGroup == BuildFileGroups.Built)
+                .Select(output => Path.GetDirectoryName(output.TargetName))
+                .FirstOrDefault() ?? string.Empty;
+
+            return projectOutput
+                .Concat(GetLocalFileReferences(rootProject, targetDirectory)) // references must go to the same folder as the referencing component.
+                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)));
         }
 
         [NotNull, ItemNotNull]
-        private IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] Project rootProject)
+        private IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] Project rootProject, [NotNull] string targetDirectory)
         {
             Contract.Requires(rootProject != null);
+            Contract.Requires(targetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             // Try to resolve second-tier references for CopyLocal references
@@ -152,7 +159,7 @@
                 .SelectMany(GetReferencedAssemblyNames)
                 .Distinct()
                 .Where(File.Exists)
-                .Select(file => new ProjectOutput(rootProject, file));
+                .Select(file => new ProjectOutput(rootProject, file, targetDirectory));
         }
 
         [NotNull]

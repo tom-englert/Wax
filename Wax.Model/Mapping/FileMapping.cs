@@ -1,12 +1,11 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.Wax.Model.Mapping
+﻿namespace tomenglertde.Wax.Model.Mapping
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
@@ -52,7 +51,7 @@ namespace tomenglertde.Wax.Model.Mapping
             _wixProject = wixProject;
             _allUnmappedFiles = allUnmappedFiles;
 
-            _id = wixProject.GetFileId(SourceName);
+            _id = wixProject.GetFileId(TargetName);
 
             MappedNode = wixProject.FileNodes.FirstOrDefault(node => node.Id == _id);
 
@@ -94,7 +93,7 @@ namespace tomenglertde.Wax.Model.Mapping
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _projectOutput.FullName;
+                return _projectOutput.TargetName;
             }
         }
 
@@ -105,9 +104,20 @@ namespace tomenglertde.Wax.Model.Mapping
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetExtension(_projectOutput.FullName);
+                return Path.GetExtension(_projectOutput.TargetName);
             }
 
+        }
+
+        [NotNull]
+        public string TargetName
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+
+                return _projectOutput.TargetName;
+            }
         }
 
         [NotNull]
@@ -117,11 +127,10 @@ namespace tomenglertde.Wax.Model.Mapping
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                var fileName = _projectOutput.FullName;
-
-                return Path.IsPathRooted(fileName) ? Path.GetFileName(fileName) : fileName;
+                return _projectOutput.SourceName;
             }
         }
+
 
         [NotNull]
         public IList<UnmappedFile> UnmappedNodes
@@ -218,7 +227,7 @@ namespace tomenglertde.Wax.Model.Mapping
             if (oldValue != null)
             {
                 _allUnmappedFiles.Add(new UnmappedFile(oldValue, _allUnmappedFiles));
-                _wixProject.UnmapFile(SourceName);
+                _wixProject.UnmapFile(TargetName);
                 _allUnmappedProjectOutputs.Add(_projectOutput);
             }
 
@@ -226,7 +235,7 @@ namespace tomenglertde.Wax.Model.Mapping
             {
                 var unmappedFile = _allUnmappedFiles.FirstOrDefault(file => Equals(file.Node, newValue));
                 _allUnmappedFiles.Remove(unmappedFile);
-                _wixProject.MapFile(SourceName, newValue);
+                _wixProject.MapFile(TargetName, newValue);
                 _allUnmappedProjectOutputs.Remove(_projectOutput);
             }
 
