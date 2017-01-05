@@ -1,6 +1,7 @@
 ﻿namespace tomenglertde.Wax.Model.Tools
 {
     using System.Diagnostics.Contracts;
+    using System.Linq;
     using System.Xml;
     using System.Xml.Linq;
 
@@ -27,22 +28,30 @@
             Contract.Requires(parent != null);
             Contract.Requires(item != null);
 
+            var firstNode = parent.FirstNode;
             var lastNode = parent.LastNode;
 
-            if (lastNode?.NodeType == XmlNodeType.Text)
+            if ((firstNode?.NodeType == XmlNodeType.Text) && (lastNode != null))
             {
-                var lastDelimiter = lastNode.PreviousNode?.PreviousNode as XText;
-                var whiteSpace = new XText(lastDelimiter?.Value ?? "\n    ");
-                lastNode.AddBeforeSelf(whiteSpace, item);
+                var whiteSpace = "\n" + ((firstNode as XText)?.Value?.Split('\n').LastOrDefault() ?? new string(' ', lastNode.GetDefaultIndent()));
+
+                lastNode.AddBeforeSelf(new XText(whiteSpace), item);
             }
             else
             {
                 var previousNode = parent.PreviousNode;
 
-                var whiteSpace = (previousNode as XText)?.Value ?? "\n  ";
+                var whiteSpace = "\n" + ((previousNode as XText)?.Value?.Split('\n').LastOrDefault() ?? new string(' ', parent.GetDefaultIndent()));
 
                 parent.Add(new XText(whiteSpace + "  "), item, new XText(whiteSpace));
             }
+        }
+
+        private static int GetDefaultIndent([NotNull] this XObject item)
+        {
+            Contract.Requires(item != null);
+
+            return item.Parent?.GetDefaultIndent() ?? 0 + 2;
         }
     }
 }
