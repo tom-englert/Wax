@@ -171,9 +171,11 @@ namespace tomenglertde.Wax.Model.Wix
             MapElement(directory, node, _configuration.DirectoryMappings);
         }
 
+        [NotNull]
         public WixDirectoryNode AddDirectoryNode([NotNull] string directory)
         {
             Contract.Requires(directory != null);
+            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
 
             var name = Path.GetFileName(directory);
             var id = GetDirectoryId(directory);

@@ -12,6 +12,8 @@
 
     using JetBrains.Annotations;
 
+    using Mono.Cecil;
+
     public class Project : IEquatable<Project>
     {
         [NotNull]
@@ -41,7 +43,7 @@
             _projectTypeGuids = _project.GetProjectTypeGuids();
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectReference> ProjectReferences
         {
             get
@@ -66,7 +68,8 @@
             var localFileReferences = References
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
-                .Select(reference => new ProjectOutput(rootProject, reference));
+                .Select(reference => new ProjectOutput(rootProject, reference))
+                .Concat(GetSecondTierReferences(rootProject));
 
             return localFileReferences;
         }
@@ -121,8 +124,8 @@
 
         public bool IsVsProject => _vsProject != null;
 
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile")]
         [NotNull, ItemNotNull]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols)
         {
             Contract.Requires(rootProject != null);
@@ -130,49 +133,50 @@
 
             var projectOutput = GetBuildFiles(rootProject, deploySymbols)
                 .Concat(GetLocalFileReferences(rootProject))
-                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)))
+                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)));
+
+            return projectOutput;
+        }
+
+        [NotNull, ItemNotNull]
+        private IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] Project rootProject)
+        {
+            Contract.Requires(rootProject != null);
+            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
+
+            // Try to resolve second-tier references for CopyLocal references
+            return References
+                .Where(r => r.CopyLocal)
+                .Select(r => r.Path)
+                .Where(File.Exists) // Reference can be a project reference but not be built yet.
+                .SelectMany(GetReferencedAssemblyNames)
                 .Distinct()
-                .ToList();
+                .Where(File.Exists)
+                .Select(file => new ProjectOutput(rootProject, file));
+        }
 
-            //Try to resolve second-tier references for CopyLocal references
-            var references = References.ToArray();
+        [NotNull]
+        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        private static IEnumerable<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName)
+        {
+            Contract.Requires(assemblyFileName != null);
+            Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
 
-            foreach (var reference in references.Where(r => r.CopyLocal))
+            try
             {
-                //Reference can be a project reference and not be built
-                if (!File.Exists(reference.Path))
-                    continue;
+                var directory = Path.GetDirectoryName(assemblyFileName);
 
-                try
-                {
-                    //Load first-tier reference
-                    var assembly = Assembly.LoadFile(reference.Path);
-                    //Get its references
-                    var referencedAssemblies = assembly.GetReferencedAssemblies();
-                    var directory = new FileInfo(reference.Path).Directory;
-                    var files = directory.GetFiles();
-
-                    foreach (var referencedAssembly in referencedAssemblies)
-                    {
-                        //If second-tier reference is not in project references
-                        if (!references.Any(r => r.Name == referencedAssembly.Name))
-                        {
-                            //Try to resolve it from first-tier reference folder like MSBuild does
-                            var existingDll = files.FirstOrDefault(f => f.Name == string.Concat(referencedAssembly.Name, ".dll"));
-                            if (existingDll != null)
-                                projectOutput.Add(new ProjectOutput(rootProject, existingDll.Name, BuildFileGroups.Built));
-                        }
-                    }
-                }
-                catch
-                {
-                    //Reference cannot be loaded
-                }
+                return AssemblyDefinition.ReadAssembly(assemblyFileName)
+                    .MainModule
+                    .AssemblyReferences
+                    .Select(reference => Path.Combine(directory, reference.Name + ".dll"));
+            }
+            catch
+            {
+                // assembly cannot be loaded
             }
 
-            return projectOutput
-                .Distinct()
-                .OrderBy(output => output.FullName, StringComparer.OrdinalIgnoreCase);
+            return Enumerable.Empty<string>();
         }
 
         [NotNull]

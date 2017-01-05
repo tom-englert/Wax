@@ -220,28 +220,36 @@
         }
 
         [NotNull]
+        [ContractVerification(false)]
         public static string GetContent([NotNull] this EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(projectItem != null);
             Contract.Ensures(Contract.Result<string>() != null);
 
-            if (!projectItem.IsOpen)
-                projectItem.Open();
-
-            var document = projectItem.Document;
-
-            if (document != null)
+            try
             {
-                // ReSharper disable once AssignNullToNotNullAttribute
-                return GetContent((EnvDTE.TextDocument)document.Object("TextDocument"));
+                if (!projectItem.IsOpen)
+                    projectItem.Open();
+
+                var document = projectItem.Document;
+
+                if (document != null)
+                {
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    return GetContent((EnvDTE.TextDocument) document.Object("TextDocument"));
+                }
+
+                var fileName = projectItem.TryGetFileName();
+
+                if (string.IsNullOrEmpty(fileName))
+                    return string.Empty;
+
+                return File.ReadAllText(fileName);
             }
-
-            var fileName = projectItem.TryGetFileName();
-
-            if (string.IsNullOrEmpty(fileName))
+            catch (InvalidOperationException)
+            {
                 return string.Empty;
-
-            return File.ReadAllText(fileName);
+            }
         }
 
         [NotNull]
