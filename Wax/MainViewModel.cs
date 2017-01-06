@@ -221,15 +221,19 @@
             GenerateMappings(vsProjects.Cast<Project>().ToArray(), wixProject);
         }
 
-        private void GenerateMappings(IList<Project> vsProjects, WixProject wixProject)
+        private void GenerateMappings([ItemNotNull] IList<Project> vsProjects, WixProject wixProject)
         {
             if ((vsProjects == null) || (wixProject == null))
                 return;
 
             try
             {
-                GenerateDirectoryMappings(vsProjects, wixProject);
-                GenerateFileMappings(vsProjects, wixProject);
+                var projectOutputs = vsProjects
+                    .SelectMany(project => project.GetProjectOutput(DeploySymbols))
+                    .ToArray();
+
+                GenerateDirectoryMappings(projectOutputs, wixProject);
+                GenerateFileMappings(projectOutputs, wixProject);
             }
             catch
             {
@@ -237,9 +241,9 @@
             }
         }
 
-        private void GenerateFileMappings([NotNull] IEnumerable<Project> vsProjects, [NotNull] WixProject wixProject)
+        private void GenerateFileMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
         {
-            Contract.Requires(vsProjects != null);
+            Contract.Requires(projectOutputs != null);
             Contract.Requires(wixProject != null);
 
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
@@ -259,9 +263,9 @@
             UnmappedFileNodes = unmappedFileNodes;
         }
 
-        private void GenerateDirectoryMappings([NotNull] IEnumerable<Project> vsProjects, [NotNull] WixProject wixProject)
+        private void GenerateDirectoryMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
         {
-            Contract.Requires(vsProjects != null);
+            Contract.Requires(projectOutputs != null);
             Contract.Requires(wixProject != null);
 
             var directories = vsProjects.SelectMany(project => project.GetProjectOutput(project, DeploySymbols, false))

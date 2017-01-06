@@ -11,17 +11,16 @@
     public class ProjectOutput : IEquatable<ProjectOutput>
     {
         [NotNull]
-        private readonly string _fullName;
-
+        private readonly string _relativeFileName;
         [NotNull]
         private readonly Project _project;
         private readonly bool _isReference;
         public bool RedirectToNonStandardOutput;
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup)
+        public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
-            Contract.Requires(fullName != null);
+            Contract.Requires(relativeFileName != null);
 
             if (buildFileGroup == BuildFileGroups.Built || buildFileGroup == BuildFileGroups.Symbols)
             {
@@ -40,6 +39,20 @@
 
             _fullName = fullName;
             _project = project;
+
+            var prefix = binaryTargetDirectory + @"\";
+
+            if ((buildFileGroup != BuildFileGroups.ContentFiles) && relativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                _relativeFileName = relativeFileName.Substring(prefix.Length);
+            }
+            else
+            {
+                _relativeFileName = relativeFileName;
+            }
+
+            BuildFileGroup = buildFileGroup;
+            _binaryTargetDirectory = binaryTargetDirectory ?? string.Empty;
         }
 
         public ProjectOutput([NotNull] Project project, [NotNull] string fullName)
@@ -50,6 +63,8 @@
             _isReference = true;
             _fullName = fullName;
             _project = project;
+            _relativeFileName = Path.GetFileName(fullPath);
+            _binaryTargetDirectory = binaryTargetDirectory;
         }
 
         public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference)
@@ -70,7 +85,10 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _fullName;
+                if (BuildFileGroup == BuildFileGroups.ContentFiles)
+                    return _relativeFileName;
+
+                return Path.Combine(_binaryTargetDirectory, _relativeFileName);
             }
         }
 
@@ -81,7 +99,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetFileName(_fullName);
+                return Path.GetFileName(_relativeFileName);
             }
         }
 
@@ -100,7 +118,7 @@
 
         public override string ToString()
         {
-            return _fullName;
+            return _relativeFileName;
         }
 
         #region IEquatable implementation
@@ -113,7 +131,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _fullName.ToUpperInvariant().GetHashCode();
+            return _relativeFileName.ToUpperInvariant().GetHashCode();
         }
 
         /// <summary>
@@ -145,7 +163,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return string.Equals(left._fullName, right._fullName, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(left._relativeFileName, right._relativeFileName, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -170,8 +188,9 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_fullName != null);
+            Contract.Invariant(_relativeFileName != null);
             Contract.Invariant(_project != null);
+            Contract.Invariant(_binaryTargetDirectory != null);
         }
 
     }
