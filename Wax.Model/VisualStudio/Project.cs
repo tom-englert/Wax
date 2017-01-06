@@ -66,19 +66,16 @@ namespace tomenglertde.Wax.Model.VisualStudio
         }
 
         [NotNull, ItemNotNull]
-        public static IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, [NotNull, ItemNotNull] ICollection<VSLangProj.Reference> references, [NotNull] string targetDirectory)
+        public IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject)
         {
             Contract.Requires(rootProject != null);
-            Contract.Requires(references != null);
-            Contract.Requires(targetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var localFileReferences = references
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
-                .Select(reference => new ProjectOutput(rootProject, reference, targetDirectory))
-                .Concat(GetSecondTierReferences(references, rootProject, targetDirectory));
-
+                .Select(reference => new ProjectOutput(rootProject, reference))
+                .Concat(GetSecondTierReferences(rootProject));
             return localFileReferences;
         }
 
@@ -151,22 +148,19 @@ namespace tomenglertde.Wax.Model.VisualStudio
             Contract.Requires(rootProject != null);
             Contract.Requires(binaryTargetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
-            var references = References.ToArray();
-
-            var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
-                .Concat(GetLocalFileReferences(rootProject, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, binaryTargetDirectory)));
+            
+            var projectOutput = GetBuildFiles(rootProject, deploySymbols, removeNonStandardOutput)
+                .Concat(GetLocalFileReferences(rootProject))
+                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, removeNonStandardOutput)));
 
             return projectOutput;
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] IEnumerable<VSLangProj.Reference> references, [NotNull] Project rootProject, [NotNull] string targetDirectory)
+        private IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] Project rootProject)
         {
             Contract.Requires(references != null);
             Contract.Requires(rootProject != null);
-            Contract.Requires(targetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             // Try to resolve second-tier references for CopyLocal references
@@ -177,7 +171,7 @@ namespace tomenglertde.Wax.Model.VisualStudio
                 .SelectMany(GetReferencedAssemblyNames)
                 .Distinct()
                 .Where(File.Exists)
-                .Select(file => new ProjectOutput(rootProject, file, targetDirectory));
+                .Select(file => new ProjectOutput(rootProject, file));
         }
 
         [NotNull]

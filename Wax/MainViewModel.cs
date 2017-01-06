@@ -249,7 +249,8 @@
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
             unmappedFileNodes.AddRange(wixProject.FileNodes.Select(node => new UnmappedFile(node, unmappedFileNodes)));
 
-            projectOutputs = projectOutputs
+            var projectOutputs = vsProjects
+                .SelectMany(project => project.GetProjectOutput(project, DeploySymbols, true))
                 .OrderBy(item => item.IsReference ? 1 : 0)
                 .Distinct()
                 .ToArray();
@@ -267,9 +268,9 @@
             Contract.Requires(projectOutputs != null);
             Contract.Requires(wixProject != null);
 
-            var directories = projectOutputs
+            var directories = vsProjects.SelectMany(project => project.GetProjectOutput(project, DeploySymbols, false))
                 .Where(projectOutput => !projectOutput.IsReference)
-                .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
+                .Select(projectOutput => Path.GetDirectoryName(projectOutput.FullName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(item => item)
                 .DefaultIfEmpty(string.Empty)

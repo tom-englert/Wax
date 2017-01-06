@@ -14,14 +14,30 @@
         private readonly string _relativeFileName;
         [NotNull]
         private readonly Project _project;
-        [NotNull]
-        private readonly string _binaryTargetDirectory;
+        private readonly bool _isReference;
+        public bool RedirectToNonStandardOutput;
 
         public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(relativeFileName != null);
 
+            if (buildFileGroup == BuildFileGroups.Built || buildFileGroup == BuildFileGroups.Symbols)
+            {
+                RedirectToNonStandardOutput = true;
+                // Build output should be only a file name, without folder.
+                // => Workaround: In Web API projects (ASP.NET MVC) the build output is always "bin\<targetname>.dll" instead of just "<targetname>.dll",
+                // where "bin" seems to be hard coded.
+                // In this case, Wax needs to only get the file name as source and to remember the specil output dir as target for every dll and pdb files
+                if (removeNonStandardOutput && fullName != Path.GetFileName(fullName))
+                {
+                    project.HasNonStandardOutput = true;
+                    project.NonStandardOutputPath = Path.GetDirectoryName(fullName);
+                    fullName = (Path.GetFileName(fullName));
+                }
+            }
+
+            _fullName = fullName;
             _project = project;
 
             var prefix = binaryTargetDirectory + @"\";
@@ -39,41 +55,31 @@
             _binaryTargetDirectory = binaryTargetDirectory ?? string.Empty;
         }
 
-
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullPath, [NotNull] string binaryTargetDirectory)
+        public ProjectOutput([NotNull] Project project, [NotNull] string fullName)
         {
             Contract.Requires(project != null);
-            Contract.Requires(fullPath != null);
-            Contract.Requires(binaryTargetDirectory != null);
-
+            Contract.Requires(fullName != null);
+            RedirectToNonStandardOutput = true;
+            _isReference = true;
+            _fullName = fullName;
             _project = project;
             _relativeFileName = Path.GetFileName(fullPath);
             _binaryTargetDirectory = binaryTargetDirectory;
         }
 
-        [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string binaryTargetDirectory)
-            : this(project, reference.Path, binaryTargetDirectory)
+        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference)
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
-            Contract.Requires(binaryTargetDirectory != null);
+            RedirectToNonStandardOutput = true;
+            _isReference = true;
+            Contract.Assume(reference.Path != null);
+            _fullName = reference.Path;
+            _project = project;
         }
 
         [NotNull]
-        public string SourceName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _relativeFileName;
-            }
-        }
-
-
-        [NotNull]
-        public string TargetName
+        public string FullName
         {
             get
             {
@@ -108,9 +114,7 @@
             }
         }
 
-        public bool IsReference => BuildFileGroup == BuildFileGroups.None;
-
-        public BuildFileGroups BuildFileGroup { get; }
+        public bool IsReference => _isReference;
 
         public override string ToString()
         {
