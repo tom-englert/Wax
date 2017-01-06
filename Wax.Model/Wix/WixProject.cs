@@ -251,7 +251,7 @@ namespace tomenglertde.Wax.Model.Wix
 
             var name = Path.GetFileName(filePath);
             var id = GetFileId(filePath);
-            var directoryName = Path.GetDirectoryName(filePath);
+            var directoryName = fileMapping.DirectoryName;
             var directoryId = GetDirectoryId(directoryName);
             var directory = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(directoryId, StringComparison.OrdinalIgnoreCase));
             directoryId = directory != null ? directory.Id : "TODO: unknown directory " + directoryName;

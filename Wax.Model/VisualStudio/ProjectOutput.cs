@@ -15,18 +15,26 @@
         [NotNull]
         private readonly Project _project;
         private readonly bool _isReference;
+        public bool RedirectToNonStandardOutput;
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup)
+        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup, bool removeNonStandardOutput = false)
         {
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
 
             if (buildFileGroup == BuildFileGroups.Built || buildFileGroup == BuildFileGroups.Symbols)
             {
+                RedirectToNonStandardOutput = true;
                 // Build output should be only a file name, without folder.
                 // => Workaround: In Web API projects (ASP.NET MVC) the build output is always "bin\<targetname>.dll" instead of just "<targetname>.dll",
                 // where "bin" seems to be hard coded.
-                fullName = Path.GetFileName(fullName);
+                // In this case, Wax needs to only get the file name as source and to remember the specil output dir as target for every dll and pdb files
+                if (removeNonStandardOutput && fullName != Path.GetFileName(fullName))
+                {
+                    project.HasNonStandardOutput = true;
+                    project.NonStandardOutputPath = Path.GetDirectoryName(fullName);
+                    fullName = (Path.GetFileName(fullName));
+                }
             }
 
             _fullName = fullName;
@@ -37,7 +45,7 @@
         {
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
-
+            RedirectToNonStandardOutput = true;
             _isReference = true;
             _fullName = fullName;
             _project = project;
@@ -47,7 +55,7 @@
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
-
+            RedirectToNonStandardOutput = true;
             _isReference = true;
             Contract.Assume(reference.Path != null);
             _fullName = reference.Path;
