@@ -1,8 +1,7 @@
-using System.Diagnostics;
-
 namespace tomenglertde.Wax.Model.Wix
 {
     using System;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;

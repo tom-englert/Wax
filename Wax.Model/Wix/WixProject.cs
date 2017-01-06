@@ -1,4 +1,3 @@
-using System.Diagnostics.Contracts;
 namespace tomenglertde.Wax.Model.Wix
 {
     using System;
@@ -17,7 +16,8 @@ namespace tomenglertde.Wax.Model.Wix
 
     public class WixProject : Project
     {
-        private static readonly string[] WixFileExtensions = { ".wxs", ".wxi" };
+        private static readonly string[] _wixFileExtensions = { ".wxs", ".wxi" };
+        private static readonly string[] _wellKnownPublicMsiProperties = { "x86", "x64" };
         private const string WaxConfigurationFileExtension = ".wax";
 
         [NotNull]
@@ -40,7 +40,7 @@ namespace tomenglertde.Wax.Model.Wix
             _configuration = configurationText.Deserialize<ProjectConfiguration>();
 
             _sourceFiles = AllProjectItems
-                .Where(item => WixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                .Where(item => _wixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
                 .ToList();
@@ -283,6 +283,11 @@ namespace tomenglertde.Wax.Model.Wix
             }
 
             if (char.IsDigit(s[0]))
+            {
+                s.Insert(0, '_');
+            }
+
+            if (_wellKnownPublicMsiProperties.Contains(s.ToString(), StringComparer.OrdinalIgnoreCase))
             {
                 s.Insert(0, '_');
             }
