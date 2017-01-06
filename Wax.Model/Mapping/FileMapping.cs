@@ -37,7 +37,9 @@ namespace tomenglertde.Wax.Model.Mapping
         private readonly FilteredObservableCollection<UnmappedFile> _unmappedFiles;
         [NotNull]
         private readonly string _id;
+
         private bool _redirectToNonStandardOutput;
+
         private WixFileNode _mappedNode;
         private MappingState _mappingState;
 
@@ -51,6 +53,7 @@ namespace tomenglertde.Wax.Model.Mapping
             _allUnmappedProjectOutputs = allUnmappedProjectOutputs;
             _wixProject = wixProject;
             _allUnmappedFiles = allUnmappedFiles;
+
             _redirectToNonStandardOutput = projectOutput.RedirectToNonStandardOutput;
 
             _id = wixProject.GetFileId(SourceName);

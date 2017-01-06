@@ -133,7 +133,7 @@
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
+            
             var projectOutput = GetBuildFiles(rootProject, deploySymbols, removeNonStandardOutput)
                 .Concat(GetLocalFileReferences(rootProject))
                 .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, removeNonStandardOutput)));
