@@ -1,4 +1,3 @@
-using System.Diagnostics.Contracts;
 namespace tomenglertde.Wax.Model.Wix
 {
     using System;
@@ -17,7 +16,8 @@ namespace tomenglertde.Wax.Model.Wix
 
     public class WixProject : Project
     {
-        private static readonly string[] WixFileExtensions = { ".wxs", ".wxi" };
+        private static readonly string[] _wixFileExtensions = { ".wxs", ".wxi" };
+        private static readonly string[] _wellKnownPublicMsiProperties = { "x86", "x64" };
         private const string WaxConfigurationFileExtension = ".wax";
 
         [NotNull]
@@ -40,7 +40,7 @@ namespace tomenglertde.Wax.Model.Wix
             _configuration = configurationText.Deserialize<ProjectConfiguration>();
 
             _sourceFiles = AllProjectItems
-                .Where(item => WixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                .Where(item => _wixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
                 .ToList();
@@ -247,11 +247,11 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(fileMapping != null);
             Contract.Ensures(Contract.Result<WixFileNode>() != null);
 
-            var filePath = fileMapping.SourceName;
+            var targetName = fileMapping.TargetName;
 
-            var name = Path.GetFileName(filePath);
-            var id = GetFileId(filePath);
-            var directoryName = Path.GetDirectoryName(filePath);
+            var name = Path.GetFileName(targetName);
+            var id = GetFileId(targetName);
+            var directoryName = Path.GetDirectoryName(targetName);
             var directoryId = GetDirectoryId(directoryName);
             var directory = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(directoryId, StringComparison.OrdinalIgnoreCase));
             directoryId = directory != null ? directory.Id : "TODO: unknown directory " + directoryName;
@@ -287,6 +287,11 @@ namespace tomenglertde.Wax.Model.Wix
                 s.Insert(0, '_');
             }
 
+            if (_wellKnownPublicMsiProperties.Contains(s.ToString(), StringComparer.OrdinalIgnoreCase))
+            {
+                s.Insert(0, '_');
+            }
+
             return s.ToString();
         }
 
@@ -317,7 +322,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
             Contract.Requires(fileMapping != null);
 
-            var filePath = fileMapping.SourceName;
+            var filePath = fileMapping.TargetName;
             var id = GetFileId(filePath);
             var defaultId = GetDefaultId(filePath);
 

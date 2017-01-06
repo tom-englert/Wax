@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
 
@@ -14,48 +15,59 @@
 
         [NotNull]
         private readonly Project _project;
-        private readonly bool _isReference;
 
         public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup)
         {
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
 
-            if (buildFileGroup == BuildFileGroups.Built || buildFileGroup == BuildFileGroups.Symbols)
-            {
-                // Build output should be only a file name, without folder.
-                // => Workaround: In Web API projects (ASP.NET MVC) the build output is always "bin\<targetname>.dll" instead of just "<targetname>.dll",
-                // where "bin" seems to be hard coded.
-                fullName = Path.GetFileName(fullName);
-            }
-
+            BuildFileGroup = buildFileGroup;
             _fullName = fullName;
             _project = project;
         }
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullName)
+        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, [NotNull] string targetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(fullName != null);
+            Contract.Requires(targetDirectory != null);
 
-            _isReference = true;
-            _fullName = fullName;
+            _fullName = Path.Combine(targetDirectory, Path.GetFileName(fullName));
             _project = project;
         }
 
-        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference)
+        [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string targetDirectory)
+            : this(project, reference.Path, targetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
-
-            _isReference = true;
-            Contract.Assume(reference.Path != null);
-            _fullName = reference.Path;
-            _project = project;
+            Contract.Requires(targetDirectory != null);
         }
 
         [NotNull]
-        public string FullName
+        public string SourceName
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+
+                switch (BuildFileGroup)
+                {
+                    case BuildFileGroups.Built:
+                    case BuildFileGroups.Symbols:
+                    case BuildFileGroups.None: // references...
+                        return FileName;
+
+                    default:
+                        return _fullName;
+                }
+            }
+        }
+
+
+        [NotNull]
+        public string TargetName
         {
             get
             {
@@ -87,7 +99,9 @@
             }
         }
 
-        public bool IsReference => _isReference;
+        public bool IsReference => BuildFileGroup == BuildFileGroups.None;
+
+        public BuildFileGroups BuildFileGroup { get; }
 
         public override string ToString()
         {
