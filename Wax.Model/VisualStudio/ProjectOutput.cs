@@ -11,28 +11,28 @@
     public class ProjectOutput : IEquatable<ProjectOutput>
     {
         [NotNull]
-        private readonly string _reativeFileName;
+        private readonly string _relativeFileName;
         [NotNull]
         private readonly Project _project;
         [NotNull]
         private readonly string _binaryTargetDirectory;
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string reativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
+        public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
-            Contract.Requires(reativeFileName != null);
+            Contract.Requires(relativeFileName != null);
 
             _project = project;
 
             var prefix = binaryTargetDirectory + @"\";
 
-            if ((buildFileGroup != BuildFileGroups.ContentFiles) && reativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            if ((buildFileGroup != BuildFileGroups.ContentFiles) && relativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                _reativeFileName = reativeFileName.Substring(prefix.Length);
+                _relativeFileName = relativeFileName.Substring(prefix.Length);
             }
             else
             {
-                _reativeFileName = reativeFileName;
+                _relativeFileName = relativeFileName;
             }
 
             BuildFileGroup = buildFileGroup;
@@ -47,7 +47,7 @@
             Contract.Requires(binaryTargetDirectory != null);
 
             _project = project;
-            _reativeFileName = Path.GetFileName(fullPath);
+            _relativeFileName = Path.GetFileName(fullPath);
             _binaryTargetDirectory = binaryTargetDirectory;
         }
 
@@ -67,7 +67,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _reativeFileName;
+                return _relativeFileName;
             }
         }
 
@@ -80,9 +80,9 @@
                 Contract.Ensures(Contract.Result<string>() != null);
 
                 if (BuildFileGroup == BuildFileGroups.ContentFiles)
-                    return _reativeFileName;
+                    return _relativeFileName;
 
-                return Path.Combine(_binaryTargetDirectory, _reativeFileName);
+                return Path.Combine(_binaryTargetDirectory, _relativeFileName);
             }
         }
 
@@ -93,7 +93,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetFileName(_reativeFileName);
+                return Path.GetFileName(_relativeFileName);
             }
         }
 
@@ -114,7 +114,7 @@
 
         public override string ToString()
         {
-            return _reativeFileName;
+            return _relativeFileName;
         }
 
         #region IEquatable implementation
@@ -127,7 +127,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _reativeFileName.ToUpperInvariant().GetHashCode();
+            return _relativeFileName.ToUpperInvariant().GetHashCode();
         }
 
         /// <summary>
@@ -159,7 +159,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return string.Equals(left._reativeFileName, right._reativeFileName, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(left._relativeFileName, right._relativeFileName, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_reativeFileName != null);
+            Contract.Invariant(_relativeFileName != null);
             Contract.Invariant(_project != null);
             Contract.Invariant(_binaryTargetDirectory != null);
         }
