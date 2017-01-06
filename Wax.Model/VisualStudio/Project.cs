@@ -1,4 +1,5 @@
-﻿namespace tomenglertde.Wax.Model.VisualStudio
+﻿using System.Diagnostics.Contracts;
+namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Collections.Generic;
@@ -43,33 +44,40 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectReference> ProjectReferences
+        public IEnumerable<ProjectReference> GetProjectReferences()
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<ProjectReference>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<ProjectReference>>() != null);
 
-                var projectReferences = References
-                    .Where(reference => reference.GetSourceProject() != null)
-                    .Where(reference => reference.CopyLocal)
-                    .Select(reference => new ProjectReference(Solution, reference));
-
-                return projectReferences;
-            }
+            return GetProjectReferences(References.ToArray());
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, [NotNull] string targetDirectory)
+        public IEnumerable<ProjectReference> GetProjectReferences([NotNull, ItemNotNull] IEnumerable<VSLangProj.Reference> references)
+        {
+            Contract.Requires(references != null);
+            Contract.Ensures(Contract.Result<IEnumerable<ProjectReference>>() != null);
+
+            var projectReferences = references
+                .Where(reference => reference.GetSourceProject() != null)
+                .Where(reference => reference.CopyLocal)
+                .Select(reference => new ProjectReference(Solution, reference));
+
+            return projectReferences;
+        }
+
+        [NotNull, ItemNotNull]
+        public static IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, [NotNull, ItemNotNull] ICollection<VSLangProj.Reference> references, [NotNull] string targetDirectory)
         {
             Contract.Requires(rootProject != null);
+            Contract.Requires(references != null);
             Contract.Requires(targetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
-            var localFileReferences = References
+            var localFileReferences = references
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
                 .Select(reference => new ProjectOutput(rootProject, reference, targetDirectory))
-                .Concat(GetSecondTierReferences(rootProject, targetDirectory));
+                .Concat(GetSecondTierReferences(references, rootProject, targetDirectory));
 
             return localFileReferences;
         }
@@ -125,34 +133,44 @@
         public bool IsVsProject => _vsProject != null;
 
         [NotNull, ItemNotNull]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols)
+        public IEnumerable<ProjectOutput> GetProjectOutput(bool deploySymbols)
         {
-            Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
-            var projectOutput = GetBuildFiles(rootProject, deploySymbols)
-                .ToArray();
+            var primaryOutput = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
 
-            var targetDirectory = projectOutput
-                .Where(output => output.BuildFileGroup == BuildFileGroups.Built)
-                .Select(output => Path.GetDirectoryName(output.TargetName))
-                .FirstOrDefault() ?? string.Empty;
+            var binaryTargetDirectory = Path.GetDirectoryName(primaryOutput) ?? string.Empty;
 
-            return projectOutput
-                .Concat(GetLocalFileReferences(rootProject, targetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)));
+            return GetProjectOutput(this, deploySymbols, binaryTargetDirectory);
         }
 
         [NotNull, ItemNotNull]
-        private IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] Project rootProject, [NotNull] string targetDirectory)
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, [NotNull] string binaryTargetDirectory)
         {
+            Contract.Requires(rootProject != null);
+            Contract.Requires(binaryTargetDirectory != null);
+            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
+
+            var references = References.ToArray();
+
+            var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
+                .Concat(GetLocalFileReferences(rootProject, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
+                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, binaryTargetDirectory)));
+
+            return projectOutput;
+        }
+
+        [NotNull, ItemNotNull]
+        private static IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] IEnumerable<VSLangProj.Reference> references, [NotNull] Project rootProject, [NotNull] string targetDirectory)
+        {
+            Contract.Requires(references != null);
             Contract.Requires(rootProject != null);
             Contract.Requires(targetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             // Try to resolve second-tier references for CopyLocal references
-            return References
+            return references
                 .Where(r => r.CopyLocal)
                 .Select(r => r.Path)
                 .Where(File.Exists) // Reference can be a project reference but not be built yet.
@@ -211,7 +229,7 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, string binaryTargetDirectory)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -221,25 +239,24 @@
             if (deploySymbols)
                 buildFileGroups |= BuildFileGroups.Symbols;
 
-            return GetBuildFiles(rootProject, buildFileGroups);
+            return GetBuildFiles(rootProject, buildFileGroups, binaryTargetDirectory);
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, string binaryTargetDirectory)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
 
-            var configurationManager = _project.ConfigurationManager;
-            Contract.Assume(configurationManager != null);
-            var activeConfiguration = configurationManager.ActiveConfiguration;
-            Contract.Assume(activeConfiguration != null);
-            var outputGroups = activeConfiguration.OutputGroups;
-            var selectedOutputGroups = groupNames.Select(groupName => outputGroups.Item(groupName.ToString()));
+            var outputGroups = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups;
 
-            var buildFiles = selectedOutputGroups.SelectMany(item => GetProjectOutputForGroup(rootProject, item));
+            var selectedOutputGroups = groupNames
+                .Select(groupName => outputGroups?.Item(groupName.ToString()))
+                .Where(item => item != null);
+
+            var buildFiles = selectedOutputGroups.SelectMany(item => GetProjectOutputForGroup(rootProject, item, binaryTargetDirectory));
 
             return buildFiles;
         }
@@ -386,7 +403,7 @@
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup)
+        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup, string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(outputGroup != null);
@@ -400,7 +417,7 @@
 
             var fileNames = outputGroup.GetFileNames();
 
-            var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup));
+            var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup, binaryTargetDirectory));
 
             return projectOutputForGroup;
         }
@@ -490,7 +507,7 @@
         #endregion
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {

@@ -11,38 +11,53 @@
     public class ProjectOutput : IEquatable<ProjectOutput>
     {
         [NotNull]
-        private readonly string _fullName;
-
+        private readonly string _reativeFileName;
         [NotNull]
         private readonly Project _project;
+        [NotNull]
+        private readonly string _binaryTargetDirectory;
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, BuildFileGroups buildFileGroup)
+        public ProjectOutput([NotNull] Project project, [NotNull] string reativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
-            Contract.Requires(fullName != null);
+            Contract.Requires(reativeFileName != null);
+
+            _project = project;
+
+            var prefix = binaryTargetDirectory + @"\";
+
+            if ((buildFileGroup != BuildFileGroups.ContentFiles) && reativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                _reativeFileName = reativeFileName.Substring(prefix.Length);
+            }
+            else
+            {
+                _reativeFileName = reativeFileName;
+            }
 
             BuildFileGroup = buildFileGroup;
-            _fullName = fullName;
-            _project = project;
+            _binaryTargetDirectory = binaryTargetDirectory ?? string.Empty;
         }
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullName, [NotNull] string targetDirectory)
+
+        public ProjectOutput([NotNull] Project project, [NotNull] string fullPath, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
-            Contract.Requires(fullName != null);
-            Contract.Requires(targetDirectory != null);
+            Contract.Requires(fullPath != null);
+            Contract.Requires(binaryTargetDirectory != null);
 
-            _fullName = Path.Combine(targetDirectory, Path.GetFileName(fullName));
             _project = project;
+            _reativeFileName = Path.GetFileName(fullPath);
+            _binaryTargetDirectory = binaryTargetDirectory;
         }
 
         [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string targetDirectory)
-            : this(project, reference.Path, targetDirectory)
+        public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string binaryTargetDirectory)
+            : this(project, reference.Path, binaryTargetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
-            Contract.Requires(targetDirectory != null);
+            Contract.Requires(binaryTargetDirectory != null);
         }
 
         [NotNull]
@@ -52,16 +67,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                switch (BuildFileGroup)
-                {
-                    case BuildFileGroups.Built:
-                    case BuildFileGroups.Symbols:
-                    case BuildFileGroups.None: // references...
-                        return FileName;
-
-                    default:
-                        return _fullName;
-                }
+                return _reativeFileName;
             }
         }
 
@@ -73,7 +79,10 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _fullName;
+                if (BuildFileGroup == BuildFileGroups.ContentFiles)
+                    return _reativeFileName;
+
+                return Path.Combine(_binaryTargetDirectory, _reativeFileName);
             }
         }
 
@@ -84,7 +93,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetFileName(_fullName);
+                return Path.GetFileName(_reativeFileName);
             }
         }
 
@@ -105,7 +114,7 @@
 
         public override string ToString()
         {
-            return _fullName;
+            return _reativeFileName;
         }
 
         #region IEquatable implementation
@@ -118,7 +127,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _fullName.ToUpperInvariant().GetHashCode();
+            return _reativeFileName.ToUpperInvariant().GetHashCode();
         }
 
         /// <summary>
@@ -150,7 +159,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return string.Equals(left._fullName, right._fullName, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(left._reativeFileName, right._reativeFileName, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -175,8 +184,9 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_fullName != null);
+            Contract.Invariant(_reativeFileName != null);
             Contract.Invariant(_project != null);
+            Contract.Invariant(_binaryTargetDirectory != null);
         }
 
     }
