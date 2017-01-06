@@ -247,11 +247,11 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Requires(fileMapping != null);
             Contract.Ensures(Contract.Result<WixFileNode>() != null);
 
-            var targetName = fileMapping.TargetName;
+            var filePath = fileMapping.SourceName;
 
-            var name = Path.GetFileName(targetName);
-            var id = GetFileId(targetName);
-            var directoryName = Path.GetDirectoryName(targetName);
+            var name = Path.GetFileName(filePath);
+            var id = GetFileId(filePath);
+            var directoryName = fileMapping.DirectoryName;
             var directoryId = GetDirectoryId(directoryName);
             var directory = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(directoryId, StringComparison.OrdinalIgnoreCase));
             directoryId = directory != null ? directory.Id : "TODO: unknown directory " + directoryName;
@@ -322,7 +322,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
             Contract.Requires(fileMapping != null);
 
-            var filePath = fileMapping.TargetName;
+            var filePath = fileMapping.SourceName;
             var id = GetFileId(filePath);
             var defaultId = GetDefaultId(filePath);
 

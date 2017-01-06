@@ -266,7 +266,7 @@
 
             var directories = vsProjects.SelectMany(project => project.GetProjectOutput(project, DeploySymbols, false))
                 .Where(projectOutput => !projectOutput.IsReference)
-                .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
+                .Select(projectOutput => Path.GetDirectoryName(projectOutput.FullName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(item => item)
                 .DefaultIfEmpty(string.Empty)
