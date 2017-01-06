@@ -28,6 +28,10 @@
         [NotNull]
         private readonly string _projectTypeGuids;
 
+        public bool HasNonStandardOutput;
+
+        public string NonStandardOutputPath;
+
         public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
         {
             Contract.Requires(solution != null);
@@ -126,14 +130,14 @@
 
         [NotNull, ItemNotNull]
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols)
+        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool removeNonStandardOutput)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
-            var projectOutput = GetBuildFiles(rootProject, deploySymbols)
+            var projectOutput = GetBuildFiles(rootProject, deploySymbols, removeNonStandardOutput)
                 .Concat(GetLocalFileReferences(rootProject))
-                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols)));
+                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, removeNonStandardOutput)));
 
             return projectOutput;
         }
@@ -204,7 +208,7 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, bool removeNonStandardOutput)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -214,11 +218,11 @@
             if (deploySymbols)
                 buildFileGroups |= BuildFileGroups.Symbols;
 
-            return GetBuildFiles(rootProject, buildFileGroups);
+            return GetBuildFiles(rootProject, buildFileGroups, removeNonStandardOutput);
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, bool removeNonStandardOutput)
         {
             Contract.Requires(rootProject != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
@@ -232,7 +236,7 @@
             var outputGroups = activeConfiguration.OutputGroups;
             var selectedOutputGroups = groupNames.Select(groupName => outputGroups.Item(groupName.ToString()));
 
-            var buildFiles = selectedOutputGroups.SelectMany(item => GetProjectOutputForGroup(rootProject, item));
+            var buildFiles = selectedOutputGroups.SelectMany(item => GetProjectOutputForGroup(rootProject, item, removeNonStandardOutput));
 
             return buildFiles;
         }
@@ -379,7 +383,7 @@
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup)
+        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup, bool removeNonStandardOutput)
         {
             Contract.Requires(project != null);
             Contract.Requires(outputGroup != null);
@@ -393,7 +397,7 @@
 
             var fileNames = outputGroup.GetFileNames();
 
-            var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup));
+            var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup, removeNonStandardOutput));
 
             return projectOutputForGroup;
         }
