@@ -1,10 +1,9 @@
-using System.Diagnostics;
-
 namespace tomenglertde.Wax.Model.Wix
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
