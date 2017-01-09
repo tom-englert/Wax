@@ -221,19 +221,15 @@
             GenerateMappings(vsProjects.Cast<Project>().ToArray(), wixProject);
         }
 
-        private void GenerateMappings([ItemNotNull] IList<Project> vsProjects, WixProject wixProject)
+        private void GenerateMappings(IList<Project> vsProjects, WixProject wixProject)
         {
             if ((vsProjects == null) || (wixProject == null))
                 return;
 
             try
             {
-                var projectOutputs = vsProjects
-                    .SelectMany(project => project.GetProjectOutput(DeploySymbols))
-                    .ToArray();
-
-                GenerateDirectoryMappings(projectOutputs, wixProject);
-                GenerateFileMappings(projectOutputs, wixProject);
+                GenerateDirectoryMappings(vsProjects, wixProject);
+                GenerateFileMappings(vsProjects, wixProject);
             }
             catch
             {
@@ -241,15 +237,16 @@
             }
         }
 
-        private void GenerateFileMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
+        private void GenerateFileMappings([NotNull] IEnumerable<Project> vsProjects, [NotNull] WixProject wixProject)
         {
-            Contract.Requires(projectOutputs != null);
+            Contract.Requires(vsProjects != null);
             Contract.Requires(wixProject != null);
 
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
             unmappedFileNodes.AddRange(wixProject.FileNodes.Select(node => new UnmappedFile(node, unmappedFileNodes)));
 
-            projectOutputs = projectOutputs
+            var projectOutputs = vsProjects
+                .SelectMany(project => project.GetProjectOutput(project, DeploySymbols, true))
                 .OrderBy(item => item.IsReference ? 1 : 0)
                 .Distinct()
                 .ToArray();
@@ -262,14 +259,14 @@
             UnmappedFileNodes = unmappedFileNodes;
         }
 
-        private void GenerateDirectoryMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
+        private void GenerateDirectoryMappings([NotNull] IEnumerable<Project> vsProjects, [NotNull] WixProject wixProject)
         {
-            Contract.Requires(projectOutputs != null);
+            Contract.Requires(vsProjects != null);
             Contract.Requires(wixProject != null);
 
-            var directories = projectOutputs
+            var directories = vsProjects.SelectMany(project => project.GetProjectOutput(project, DeploySymbols, false))
                 .Where(projectOutput => !projectOutput.IsReference)
-                .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
+                .Select(projectOutput => Path.GetDirectoryName(projectOutput.FullName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(item => item)
                 .DefaultIfEmpty(string.Empty)

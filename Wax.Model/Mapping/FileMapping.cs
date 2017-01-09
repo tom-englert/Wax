@@ -1,11 +1,12 @@
-﻿namespace tomenglertde.Wax.Model.Mapping
+﻿using System.Diagnostics;
+
+namespace tomenglertde.Wax.Model.Mapping
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-    using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
@@ -37,6 +38,8 @@
         [NotNull]
         private readonly string _id;
 
+        private bool _redirectToNonStandardOutput;
+
         private WixFileNode _mappedNode;
         private MappingState _mappingState;
 
@@ -51,7 +54,9 @@
             _wixProject = wixProject;
             _allUnmappedFiles = allUnmappedFiles;
 
-            _id = wixProject.GetFileId(TargetName);
+            _redirectToNonStandardOutput = projectOutput.RedirectToNonStandardOutput;
+
+            _id = wixProject.GetFileId(SourceName);
 
             MappedNode = wixProject.FileNodes.FirstOrDefault(node => node.Id == _id);
 
@@ -93,7 +98,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _projectOutput.TargetName;
+                return _projectOutput.FullName;
             }
         }
 
@@ -104,20 +109,9 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetExtension(_projectOutput.TargetName);
+                return Path.GetExtension(_projectOutput.FullName);
             }
 
-        }
-
-        [NotNull]
-        public string TargetName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _projectOutput.TargetName;
-            }
         }
 
         [NotNull]
@@ -127,10 +121,19 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _projectOutput.SourceName;
+                var fileName = _projectOutput.FullName;
+
+                return Path.IsPathRooted(fileName) ? Path.GetFileName(fileName) : fileName;
             }
         }
 
+        public string DirectoryName
+        {
+            get
+            {
+                return (_redirectToNonStandardOutput && Project.HasNonStandardOutput)?Project.NonStandardOutputPath : Path.GetDirectoryName(SourceName); ;
+            }
+        }
 
         [NotNull]
         public IList<UnmappedFile> UnmappedNodes
@@ -227,7 +230,7 @@
             if (oldValue != null)
             {
                 _allUnmappedFiles.Add(new UnmappedFile(oldValue, _allUnmappedFiles));
-                _wixProject.UnmapFile(TargetName);
+                _wixProject.UnmapFile(SourceName);
                 _allUnmappedProjectOutputs.Add(_projectOutput);
             }
 
@@ -235,7 +238,7 @@
             {
                 var unmappedFile = _allUnmappedFiles.FirstOrDefault(file => Equals(file.Node, newValue));
                 _allUnmappedFiles.Remove(unmappedFile);
-                _wixProject.MapFile(TargetName, newValue);
+                _wixProject.MapFile(SourceName, newValue);
                 _allUnmappedProjectOutputs.Remove(_projectOutput);
             }
 

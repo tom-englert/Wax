@@ -38,7 +38,7 @@
             {
                 Contract.Assume(project != null);
 
-                foreach (var dependency in project.GetProjectReferences())
+                foreach (var dependency in project.ProjectReferences)
                 {
                     Contract.Assume(dependency != null);
                     dependency.SourceProject.ReferencedBy.Add(project);
