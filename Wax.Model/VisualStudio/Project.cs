@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-namespace tomenglertde.Wax.Model.VisualStudio
+﻿namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
     using System.Collections.Generic;
@@ -229,9 +228,10 @@ namespace tomenglertde.Wax.Model.VisualStudio
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, string binaryTargetDirectory)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(rootProject != null);
+            Contract.Requires(binaryTargetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls;
@@ -243,9 +243,10 @@ namespace tomenglertde.Wax.Model.VisualStudio
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, string binaryTargetDirectory)
+        public IEnumerable<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(rootProject != null);
+            Contract.Requires(binaryTargetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
@@ -403,10 +404,11 @@ namespace tomenglertde.Wax.Model.VisualStudio
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup, string binaryTargetDirectory)
+        private static IEnumerable<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(outputGroup != null);
+            Contract.Requires(binaryTargetDirectory != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
             BuildFileGroups buildFileGroup;

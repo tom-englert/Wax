@@ -11,16 +11,17 @@
     public class ProjectOutput : IEquatable<ProjectOutput>
     {
         [NotNull]
-        private readonly string _relativeFileName;
+        private readonly string _sourceName;
+        [NotNull]
+        private readonly string _targetName;
         [NotNull]
         private readonly Project _project;
-        [NotNull]
-        private readonly string _binaryTargetDirectory;
 
         public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(relativeFileName != null);
+            Contract.Requires(binaryTargetDirectory != null);
 
             _project = project;
 
@@ -28,17 +29,17 @@
 
             if ((buildFileGroup != BuildFileGroups.ContentFiles) && relativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                _relativeFileName = relativeFileName.Substring(prefix.Length);
+                _sourceName = relativeFileName.Substring(prefix.Length);
             }
             else
             {
-                _relativeFileName = relativeFileName;
+                _sourceName = relativeFileName;
             }
 
             BuildFileGroup = buildFileGroup;
-            _binaryTargetDirectory = binaryTargetDirectory ?? string.Empty;
-        }
 
+            _targetName = (BuildFileGroup == BuildFileGroups.ContentFiles) ? _sourceName : Path.Combine(binaryTargetDirectory, _sourceName);
+        }
 
         public ProjectOutput([NotNull] Project project, [NotNull] string fullPath, [NotNull] string binaryTargetDirectory)
         {
@@ -47,8 +48,8 @@
             Contract.Requires(binaryTargetDirectory != null);
 
             _project = project;
-            _relativeFileName = Path.GetFileName(fullPath);
-            _binaryTargetDirectory = binaryTargetDirectory;
+            _sourceName = Path.GetFileName(fullPath);
+            _targetName = Path.Combine(binaryTargetDirectory, _sourceName);
         }
 
         [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
@@ -67,10 +68,9 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _relativeFileName;
+                return _sourceName;
             }
         }
-
 
         [NotNull]
         public string TargetName
@@ -79,10 +79,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                if (BuildFileGroup == BuildFileGroups.ContentFiles)
-                    return _relativeFileName;
-
-                return Path.Combine(_binaryTargetDirectory, _relativeFileName);
+                return _targetName;
             }
         }
 
@@ -93,7 +90,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetFileName(_relativeFileName);
+                return Path.GetFileName(_sourceName);
             }
         }
 
@@ -114,7 +111,7 @@
 
         public override string ToString()
         {
-            return _relativeFileName;
+            return _targetName;
         }
 
         #region IEquatable implementation
@@ -127,7 +124,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _relativeFileName.ToUpperInvariant().GetHashCode();
+            return _targetName.ToUpperInvariant().GetHashCode();
         }
 
         /// <summary>
@@ -159,7 +156,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return string.Equals(left._relativeFileName, right._relativeFileName, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(left._targetName, right._targetName, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -180,13 +177,13 @@
         #endregion
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_relativeFileName != null);
+            Contract.Invariant(_sourceName != null);
             Contract.Invariant(_project != null);
-            Contract.Invariant(_binaryTargetDirectory != null);
+            Contract.Invariant(_targetName != null);
         }
 
     }

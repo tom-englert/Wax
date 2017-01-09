@@ -84,7 +84,7 @@
         /// Identifies the InstallDirectoryMapping dependency property
         /// </summary>
         public static readonly DependencyProperty InstallDirectoryMappingProperty =
-            DependencyProperty.Register("InstallDirectoryMapping", typeof (DirectoryMapping), typeof (MainViewModel));
+            DependencyProperty.Register("InstallDirectoryMapping", typeof(DirectoryMapping), typeof(MainViewModel));
 
 
         public IList<DirectoryMapping> DirectoryMappings
@@ -120,7 +120,7 @@
         /// Identifies the CanHideReferencedProjects dependency property
         /// </summary>
         public static readonly DependencyProperty CanHideReferencedProjectsProperty =
-            DependencyProperty.Register("CanHideReferencedProjects", typeof (bool), typeof (MainViewModel));
+            DependencyProperty.Register("CanHideReferencedProjects", typeof(bool), typeof(MainViewModel));
 
 
         public bool DeploySymbols
@@ -171,7 +171,7 @@
             {
                 Contract.Ensures(Contract.Result<IEnumerable<BuildFileGroups>>() != null);
 
-                return Enum.GetValues(typeof (BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
+                return Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
             }
         }
 
