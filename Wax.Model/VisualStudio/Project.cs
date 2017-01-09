@@ -155,8 +155,10 @@ namespace tomenglertde.Wax.Model.VisualStudio
             var references = References.ToArray();
 
             var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
-                .Concat(GetLocalFileReferences(rootProject, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, binaryTargetDirectory)));
+                .Concat(GetLocalFileReferences(rootProject, references, binaryTargetDirectory))
+                .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, binaryTargetDirectory)))
+                .GroupBy(po => po.FileName)
+                .Select(pog => pog.First());
 
             return projectOutput;
         }
