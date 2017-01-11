@@ -94,6 +94,21 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull, ItemNotNull]
+        public WixProductNode ProductNode
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable<WixFeatureNode>>() != null);
+                var firstFeature = FeatureNodes.FirstOrDefault();
+
+                if (firstFeature == null)
+                    return null;
+
+                return new WixProductNode(firstFeature.SourceFile,firstFeature.Node.Parent);
+            }
+        }
+
+        [NotNull, ItemNotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroups
         {
             get

@@ -18,7 +18,7 @@
 
     using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-    internal static class DteExtensions
+    public static class DteExtensions
     {
         /// <summary>
         /// Gets all projects in the solution.
