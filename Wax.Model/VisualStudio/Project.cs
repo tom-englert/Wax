@@ -175,7 +175,6 @@
                 .Where(File.Exists) // Reference can be a project reference but not be built yet.
                 .SelectMany(GetReferencedAssemblyNames)
                 .Distinct()
-                .Where(File.Exists)
                 .Select(file => new ProjectOutput(rootProject, file, targetDirectory));
         }
 
@@ -190,10 +189,20 @@
             {
                 var directory = Path.GetDirectoryName(assemblyFileName);
 
-                return AssemblyDefinition.ReadAssembly(assemblyFileName)
+                var referencedAssemblyNames = AssemblyDefinition.ReadAssembly(assemblyFileName)
                     .MainModule
                     .AssemblyReferences
-                    .Select(reference => Path.Combine(directory, reference.Name + ".dll"));
+                    .Select(reference => reference.Name)
+                    .Where(assemblyName => File.Exists(Path.Combine(directory, assemblyName + ".dll")))
+                    .ToArray();
+
+                var satteliteDlls = referencedAssemblyNames
+                    .SelectMany(assemblyName => Directory.GetFiles(directory, assemblyName + ".resources.dll", SearchOption.AllDirectories))
+                    .Select(file => file.Substring(directory.Length + 1));
+
+                return referencedAssemblyNames
+                    .Select(assemblyName => assemblyName + ".dll")
+                    .Concat(satteliteDlls);
             }
             catch
             {
