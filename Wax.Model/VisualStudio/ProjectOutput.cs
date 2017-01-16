@@ -11,7 +11,7 @@
     public class ProjectOutput : IEquatable<ProjectOutput>
     {
         [NotNull]
-        private readonly string _sourceName;
+        private readonly string _relativeFileName;
         [NotNull]
         private readonly string _targetName;
         [NotNull]
@@ -29,32 +29,32 @@
 
             if ((buildFileGroup != BuildFileGroups.ContentFiles) && relativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                _sourceName = relativeFileName.Substring(prefix.Length);
+                _relativeFileName = relativeFileName.Substring(prefix.Length);
             }
             else
             {
-                _sourceName = relativeFileName;
+                _relativeFileName = relativeFileName;
             }
 
             BuildFileGroup = buildFileGroup;
 
-            _targetName = (BuildFileGroup == BuildFileGroups.ContentFiles) ? _sourceName : Path.Combine(binaryTargetDirectory, _sourceName);
+            _targetName = (BuildFileGroup == BuildFileGroups.ContentFiles) ? _relativeFileName : Path.Combine(binaryTargetDirectory, _relativeFileName);
         }
 
-        public ProjectOutput([NotNull] Project project, [NotNull] string fullPath, [NotNull] string binaryTargetDirectory)
+        public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(project != null);
-            Contract.Requires(fullPath != null);
+            Contract.Requires(relativeFileName != null);
             Contract.Requires(binaryTargetDirectory != null);
 
             _project = project;
-            _sourceName = Path.GetFileName(fullPath);
-            _targetName = Path.Combine(binaryTargetDirectory, _sourceName);
+            _relativeFileName = relativeFileName;
+            _targetName = Path.Combine(binaryTargetDirectory, relativeFileName);
         }
 
         [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string binaryTargetDirectory)
-            : this(project, reference.Path, binaryTargetDirectory)
+            : this(project, Path.GetFileName(reference.Path), binaryTargetDirectory)
         {
             Contract.Requires(project != null);
             Contract.Requires(reference != null);
@@ -68,7 +68,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return _sourceName;
+                return _relativeFileName;
             }
         }
 
@@ -90,7 +90,7 @@
             {
                 Contract.Ensures(Contract.Result<string>() != null);
 
-                return Path.GetFileName(_sourceName);
+                return Path.GetFileName(_relativeFileName);
             }
         }
 
@@ -181,7 +181,7 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_sourceName != null);
+            Contract.Invariant(_relativeFileName != null);
             Contract.Invariant(_project != null);
             Contract.Invariant(_targetName != null);
         }
