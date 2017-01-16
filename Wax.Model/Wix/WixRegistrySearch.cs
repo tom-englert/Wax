@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace tomenglertde.Wax.Model.Wix
+﻿namespace tomenglertde.Wax.Model.Wix
 {
     /// <summary>
     /// http://wixtoolset.org/documentation/manual/v3/xsd/wix/registrysearch.html

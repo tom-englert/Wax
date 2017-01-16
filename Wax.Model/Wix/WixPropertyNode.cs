@@ -1,5 +1,7 @@
 ﻿namespace tomenglertde.Wax.Model.Wix
 {
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
@@ -9,8 +11,54 @@
 
     public class WixProperty
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
+        [NotNull]
+        private readonly string _name;
+        [NotNull]
+        private string _value;
+
+        public WixProperty([NotNull] string name, [NotNull] string value)
+        {
+            Contract.Requires(name != null);
+            Contract.Requires(value != null);
+
+            _name = name;
+            _value = value;
+        }
+
+        [NotNull]
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _name;
+            }
+        }
+
+        [NotNull]
+        public string Value
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _value;
+            }
+            set
+            {
+                Contract.Requires(value != null);
+                _value = value;
+            }
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_name != null);
+            Contract.Invariant(_value != null);
+        }
+
     }
 
     public class WixPropertyNode : WixNode
@@ -22,16 +70,22 @@
             Contract.Requires(node != null);
         }
 
+        [NotNull]
         public WixProperty Property
         {
             get
             {
-                return new WixProperty { Name = this.Name, Value = this.GetAttribute("Value") };
+                Contract.Ensures(Contract.Result<WixProperty>() != null);
+
+                return new WixProperty(Id, GetAttribute("Value") ?? string.Empty);
             }
         }
 
-        public void AddRegistrySearch(WixRegistrySearch registrySearch)
+        [ContractVerification(false)] // TODO: add contracts to WixRegistrySearch...
+        public void AddRegistrySearch([NotNull] WixRegistrySearch registrySearch)
         {
+            Contract.Requires(registrySearch != null);
+
             var newNode = new XElement(WixNames.RegistrySearch,
                 new XAttribute("Id", registrySearch.Id),
                 new XAttribute("Root", registrySearch.Root.ToString()),
@@ -40,7 +94,9 @@
                 new XAttribute("Root", registrySearch.Type.ToString()),
                 new XAttribute("Win64", registrySearch.Win64 ? "yes" : "no")
             );
+
             Node.AddWithFormatting(newNode);
+
             SourceFile.Save();
         }
 

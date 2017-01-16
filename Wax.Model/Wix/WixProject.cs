@@ -13,7 +13,6 @@ namespace tomenglertde.Wax.Model.Wix
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
-    using System.Xml.Linq;
 
     public class WixProject : Project
     {
@@ -94,7 +93,6 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
         public WixProductNode ProductNode
         {
             get
@@ -104,7 +102,10 @@ namespace tomenglertde.Wax.Model.Wix
                 if (firstFeature == null)
                     return null;
 
-                return new WixProductNode(firstFeature.SourceFile, firstFeature.Node.Parent);
+                var parent = firstFeature.Node.Parent;
+                Contract.Assume(parent != null);
+
+                return new WixProductNode(firstFeature.SourceFile, parent);
             }
         }
 
