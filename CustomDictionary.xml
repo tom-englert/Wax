@@ -29,6 +29,11 @@
     <CasingExceptions>
       <Acronym>tomenglertde</Acronym>
       <Acronym>vsix</Acronym>
+      <Acronym>HKLM</Acronym>
+      <Acronym>HKCU</Acronym>
+      <Acronym>HKCR</Acronym>
+      <Acronym>HKMU</Acronym>
+      <Acronym>DWORD</Acronym>
     </CasingExceptions>
   </Acronyms>
 </Dictionary>
