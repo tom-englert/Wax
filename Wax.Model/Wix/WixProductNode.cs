@@ -1,16 +1,14 @@
-﻿using JetBrains.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using tomenglertde.Wax.Model.Tools;
-using TomsToolbox.Desktop;
-
-namespace tomenglertde.Wax.Model.Wix
+﻿namespace tomenglertde.Wax.Model.Wix
 {
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Xml.Linq;
+
+    using JetBrains.Annotations;
+
+    using tomenglertde.Wax.Model.Tools;
+
     public class WixProductNode : WixNode
     {
         public WixProductNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
@@ -26,7 +24,8 @@ namespace tomenglertde.Wax.Model.Wix
             get
             {
                 Contract.Ensures(Contract.Result<IEnumerable<WixPropertyNode>>() != null);
-                return Node.Descendants(WixNames.PropertyNode).Select(node => new WixPropertyNode(SourceFile,node));
+
+                return Node.Descendants(WixNames.PropertyNode).Select(node => new WixPropertyNode(SourceFile, node));
             }
         }
 
