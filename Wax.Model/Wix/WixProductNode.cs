@@ -30,12 +30,14 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public void AddProperty([NotNull] WixProperty property)
+        public WixPropertyNode AddProperty([NotNull] WixProperty property)
         {
             Contract.Requires(property != null);
             Contract.Requires(property.Name != null);
-            var newNode = new XElement(WixNames.PropertyNode, new XAttribute("Name", property.Name), new XAttribute("Value", property.Value));
+            var newNode = new XElement(WixNames.PropertyNode, new XAttribute("Id", property.Name), new XAttribute("Value", property.Value));
             Node.AddWithFormatting(newNode);
+            SourceFile.Save();
+            return PropertyNodes.First(pn => pn.Id == property.Name);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace tomenglertde.Wax.Model.Wix
         public string Name => GetAttribute("Name");
 
         [NotNull]
-        public XElement Node
+        internal XElement Node
         {
             get
             {

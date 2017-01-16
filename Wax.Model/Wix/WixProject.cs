@@ -13,6 +13,7 @@ namespace tomenglertde.Wax.Model.Wix
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
+    using System.Xml.Linq;
 
     public class WixProject : Project
     {
@@ -319,7 +320,7 @@ namespace tomenglertde.Wax.Model.Wix
             return ComponentGroups.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.First().AddComponentGroup(directoryId);
         }
 
-        private void ForceFeatureRef([NotNull] string componentGroupId)
+        public void ForceFeatureRef([NotNull] string componentGroupId)
         {
             Contract.Requires(componentGroupId != null);
 
@@ -331,6 +332,7 @@ namespace tomenglertde.Wax.Model.Wix
                 return;
 
             firstFeature.AddComponentGroupRef(componentGroupId);
+            firstFeature.SourceFile.Save();
         }
 
         public bool HasDefaultFileId([NotNull] FileMapping fileMapping)
