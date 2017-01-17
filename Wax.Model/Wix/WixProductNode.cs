@@ -29,15 +29,9 @@
             }
         }
 
-        [NotNull]
-        public IEnumerable<string> CustomActionRefs
+        public IEnumerable<string> EnumerateCustomActionRefs()
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
-
-                return Node.Descendants(WixNames.CustomActionRefNode).Select(node=>node.Attribute("Id").Value);
-            }
+             return Node.Descendants(WixNames.CustomActionRefNode).Select(node=>node.Attribute("Id").Value);
         }
 
         public WixPropertyNode AddProperty([NotNull] WixProperty property)
