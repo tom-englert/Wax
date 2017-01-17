@@ -41,5 +41,16 @@
 
             return new WixPropertyNode(SourceFile, newNode);
         }
+
+        public void AddCustomActionRef(string id)
+        {
+            Contract.Requires(!string.IsNullOrWhiteSpace(id));
+
+            var newNode = new XElement(WixNames.CustomActionRefNode, new XAttribute("Id", id));
+
+            Node.AddWithFormatting(newNode);
+
+            SourceFile.Save();
+        }
     }
 }
