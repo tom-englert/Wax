@@ -1,13 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-    VS SDK Notes: This resx file contains the resources that will be consumed directly by your package.
-    For example, if you chose to create a tool window, there is a resource with ID 'CanNotCreateWindow'. This
-    is used in VsPkg.cs to determine the string to show the user if there is an error when attempting to create
-    the tool window.
-
-    Resources that are accessed directly from your package *by Visual Studio* are stored in the VSPackage.resx 
-    file.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -126,88 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CanNotCreateWindow" xml:space="preserve">
-    <value>Can not create tool window.</value>
+  <data name="110" xml:space="preserve">
+    <value>Wax</value>
   </data>
-  <data name="ToolWindowTitle" xml:space="preserve">
-    <value>WiX Setup Editor</value>
-  </data>
-  <data name="DeploySymbols" xml:space="preserve">
-    <value>Deploy symbols</value>
-  </data>
-  <data name="SetupProjectToEdit" xml:space="preserve">
-    <value>Setup project to edit:</value>
-  </data>
-  <data name="RootDirectory" xml:space="preserve">
-    <value>Root directory</value>
-  </data>
-  <data name="ProjectsToInstall" xml:space="preserve">
-    <value>Projects to install:</value>
-  </data>
-  <data name="ShowAllProjects" xml:space="preserve">
-    <value>Show all projects</value>
-  </data>
-  <data name="DirectoryMappings" xml:space="preserve">
-    <value>Directory mappings</value>
-  </data>
-  <data name="Directory" xml:space="preserve">
-    <value>Directory</value>
-  </data>
-  <data name="WiXDefinition" xml:space="preserve">
-    <value>WiX definition</value>
-  </data>
-  <data name="RemoveTheCustomMapping" xml:space="preserve">
-    <value>Remove the custom mapping.</value>
-  </data>
-  <data name="CreateANewDirectoryNode" xml:space="preserve">
-    <value>Create a new directory node.</value>
-  </data>
-  <data name="File" xml:space="preserve">
-    <value>File</value>
-  </data>
-  <data name="Ext" xml:space="preserve">
-    <value>Ext.</value>
-  </data>
-  <data name="State" xml:space="preserve">
-    <value>State</value>
-  </data>
-  <data name="UnmappedFiles" xml:space="preserve">
-    <value>Unmapped Files</value>
-  </data>
-  <data name="Id" xml:space="preserve">
-    <value>Id</value>
-  </data>
-  <data name="Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="Source" xml:space="preserve">
-    <value>Source</value>
-  </data>
-  <data name="RemoveUnmappedFile" xml:space="preserve">
-    <value>Remove unmapped file.</value>
-  </data>
-  <data name="FileMappings" xml:space="preserve">
-    <value>File mappings</value>
-  </data>
-  <data name="RemoveCustomFileMapping" xml:space="preserve">
-    <value>Remove custom file mapping.</value>
-  </data>
-  <data name="CreateANewFileNode" xml:space="preserve">
-    <value>Create a new file node.</value>
-  </data>
-  <data name="ConfirmUniqueFileMapping" xml:space="preserve">
-    <value>Confirm unique file mapping.</value>
-  </data>
-  <data name="Refresh" xml:space="preserve">
-    <value>Refresh</value>
-  </data>
-  <data name="SupportTheProjectByWritingAShortReview" xml:space="preserve">
-    <value>Support the project by writing a short review.</value>
-  </data>
-  <data name="Documentation" xml:space="preserve">
-    <value>Documentation</value>
-  </data>
-  <data name="SupportTheProject" xml:space="preserve">
-    <value>Support the project.</value>
+  <data name="112" xml:space="preserve">
+    <value>Wix安装编辑器</value>
   </data>
 </root>
