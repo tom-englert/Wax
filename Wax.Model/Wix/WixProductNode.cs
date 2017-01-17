@@ -29,7 +29,7 @@
             }
         }
 
-        public void AddProperty([NotNull] WixProperty property)
+        public WixPropertyNode AddProperty([NotNull] WixProperty property)
         {
             Contract.Requires(property != null);
 
@@ -38,6 +38,8 @@
             Node.AddWithFormatting(newNode);
 
             SourceFile.Save();
+
+            return new WixPropertyNode(SourceFile, newNode);
         }
     }
 }
