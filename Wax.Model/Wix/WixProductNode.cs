@@ -29,6 +29,17 @@
             }
         }
 
+        [NotNull]
+        public IEnumerable<string> CustomActionRefs
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
+
+                return Node.Descendants(WixNames.CustomActionRefNode).Select(node=>node.Attribute("Id").Value);
+            }
+        }
+
         public WixPropertyNode AddProperty([NotNull] WixProperty property)
         {
             Contract.Requires(property != null);
