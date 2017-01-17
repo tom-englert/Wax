@@ -1,13 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-    VS SDK Notes: This resx file contains the resources that will be consumed directly by your package.
-    For example, if you chose to create a tool window, there is a resource with ID 'CanNotCreateWindow'. This
-    is used in VsPkg.cs to determine the string to show the user if there is an error when attempting to create
-    the tool window.
-
-    Resources that are accessed directly from your package *by Visual Studio* are stored in the VSPackage.resx 
-    file.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -127,87 +118,87 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CanNotCreateWindow" xml:space="preserve">
-    <value>Can not create tool window.</value>
+    <value>无法创建工具窗口</value>
   </data>
   <data name="ToolWindowTitle" xml:space="preserve">
-    <value>WiX Setup Editor</value>
+    <value>Wix安装编辑器</value>
   </data>
   <data name="DeploySymbols" xml:space="preserve">
-    <value>Deploy symbols</value>
+    <value>部署调试符号</value>
   </data>
   <data name="SetupProjectToEdit" xml:space="preserve">
-    <value>Setup project to edit:</value>
+    <value>安装项目编辑:</value>
   </data>
   <data name="RootDirectory" xml:space="preserve">
-    <value>Root directory</value>
+    <value>根目录</value>
   </data>
   <data name="ProjectsToInstall" xml:space="preserve">
-    <value>Projects to install:</value>
+    <value>项目安装至:</value>
   </data>
   <data name="ShowAllProjects" xml:space="preserve">
-    <value>Show all projects</value>
+    <value>显示所有项目</value>
   </data>
   <data name="DirectoryMappings" xml:space="preserve">
-    <value>Directory mappings</value>
+    <value>目录映射</value>
   </data>
   <data name="Directory" xml:space="preserve">
-    <value>Directory</value>
+    <value>目录</value>
   </data>
   <data name="WiXDefinition" xml:space="preserve">
-    <value>WiX definition</value>
+    <value>Wix定义</value>
   </data>
   <data name="RemoveTheCustomMapping" xml:space="preserve">
-    <value>Remove the custom mapping.</value>
+    <value>移除自动以映射。</value>
   </data>
   <data name="CreateANewDirectoryNode" xml:space="preserve">
-    <value>Create a new directory node.</value>
+    <value>创建新目录节点。</value>
   </data>
   <data name="File" xml:space="preserve">
-    <value>File</value>
+    <value>文件</value>
   </data>
   <data name="Ext" xml:space="preserve">
-    <value>Ext.</value>
+    <value>扩展名</value>
   </data>
   <data name="State" xml:space="preserve">
-    <value>State</value>
+    <value>状态</value>
   </data>
   <data name="UnmappedFiles" xml:space="preserve">
-    <value>Unmapped Files</value>
+    <value>未映射文件</value>
   </data>
   <data name="Id" xml:space="preserve">
-    <value>Id</value>
+    <value>标识</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Name</value>
+    <value>名称</value>
   </data>
   <data name="Source" xml:space="preserve">
-    <value>Source</value>
+    <value>源</value>
   </data>
   <data name="RemoveUnmappedFile" xml:space="preserve">
-    <value>Remove unmapped file.</value>
+    <value>移除未映射文件。</value>
   </data>
   <data name="FileMappings" xml:space="preserve">
-    <value>File mappings</value>
+    <value>文件映射</value>
   </data>
   <data name="RemoveCustomFileMapping" xml:space="preserve">
-    <value>Remove custom file mapping.</value>
+    <value>移除自定义文件映射。</value>
   </data>
   <data name="CreateANewFileNode" xml:space="preserve">
-    <value>Create a new file node.</value>
+    <value>创建一个文件节点。</value>
   </data>
   <data name="ConfirmUniqueFileMapping" xml:space="preserve">
-    <value>Confirm unique file mapping.</value>
+    <value>确认唯一文件映射。</value>
   </data>
   <data name="Refresh" xml:space="preserve">
-    <value>Refresh</value>
+    <value>刷新</value>
   </data>
   <data name="SupportTheProjectByWritingAShortReview" xml:space="preserve">
-    <value>Support the project by writing a short review.</value>
+    <value>写短评支持此项目。</value>
   </data>
   <data name="Documentation" xml:space="preserve">
-    <value>Documentation</value>
+    <value>文档</value>
   </data>
   <data name="SupportTheProject" xml:space="preserve">
-    <value>Support the project.</value>
+    <value>支持此项目。</value>
   </data>
 </root>

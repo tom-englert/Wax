@@ -7,6 +7,8 @@
              xmlns:wax="urn:wax"
              xmlns:toms="urn:TomsToolbox"
              xmlns:local="clr-namespace:tomenglertde.Wax"
+              xmlns:properties="clr-namespace:tomenglertde.Wax"
+         
              Name="Wax"
              d:DataContext="{d:DesignInstance local:MainViewModel}">
   <!-- TODO:
@@ -81,17 +83,17 @@
     <DockPanel Background="{x:Static SystemColors.ControlBrush}">
     <ToolBarTray DockPanel.Dock="Top" Margin="0">
       <ToolBar>
-        <Button ToolTip="Refresh" Click="Refresh_Click">
+        <Button ToolTip="{x:Static properties:Resources.Refresh}" Click="Refresh_Click">
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/refresh.png" />
         </Button>
         <Separator />
-        <CheckBox Content="Deploy symbols" IsChecked="{Binding DeploySymbols}" />
+        <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" />
         <Separator />
-        <Button x:Name="LikeButton" ToolTip="Support the project by writing a short review."
+        <Button x:Name="LikeButton" ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"
                 Tag="https://visualstudiogallery.msdn.microsoft.com/ab48d869-8f75-4e02-8e7d-577346065aa6/view/Reviews">
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/like.png" />
         </Button>
-        <Button x:Name="HelpButton" ToolTip="Documentation"
+        <Button x:Name="HelpButton" ToolTip="{x:Static properties:Resources.Documentation}"
                 Tag="https://waxsetupeditor.codeplex.com/documentation">
           <Grid Width="16" Height="16">
             <TextBlock Text="?" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
@@ -107,7 +109,7 @@
       </Grid.ColumnDefinitions>
       <DockPanel Grid.Column="0">
         <Grid DockPanel.Dock="Top">
-          <local:GroupBox Ordinal="1" Header="Setup project to edit:">
+          <local:GroupBox Ordinal="1" Header="{x:Static properties:Resources.SetupProjectToEdit}">
             <ListBox x:Name="SetupProjectListBox"
                      ItemsSource="{Binding Solution.WixProjects}"
                      SelectedItem="{Binding SelectedWixProject}"
@@ -137,7 +139,7 @@
         </Grid>
         <Decorator Height="10" DockPanel.Dock="Top" />
         <Grid DockPanel.Dock="Top">
-          <local:GroupBox Ordinal="2" Header="Root directory"
+          <local:GroupBox Ordinal="2" Header="{x:Static properties:Resources.RootDirectory}"
                           DataContext="{Binding InstallDirectoryMapping}"
                           VerticalAlignment="Top">
             <Grid Margin="1">
@@ -175,7 +177,7 @@
         <Grid DockPanel.Dock="Bottom" Background="{x:Static SystemColors.ControlBrush}">
           <Button Margin="3" HorizontalAlignment="Left"
                   Background="Transparent" BorderBrush="Transparent"
-                  BorderThickness="0" ToolTip="Support the project."
+                  BorderThickness="0" ToolTip="{x:Static properties:Resources.SupportTheProject}"
                   Tag="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=799WX673GPQM8">
             <Button.Style>
               <Style TargetType="Button">
@@ -202,9 +204,9 @@
           </Button>
         </Grid>
         <Grid>
-          <local:GroupBox Ordinal="3" Header="Projects to install:">
+          <local:GroupBox Ordinal="3" Header="{x:Static properties:Resources.ProjectsToInstall}">
             <DockPanel>
-              <CheckBox x:Name="ShowAllProjects" DockPanel.Dock="Top" Content="Show all projects" Margin="0,5"
+              <CheckBox x:Name="ShowAllProjects" DockPanel.Dock="Top" Content="{x:Static properties:Resources.ShowAllProjects}" Margin="0,5"
                         IsEnabled="{Binding CanHideReferencedProjects}">
                 <CheckBox.Style>
                   <Style TargetType="CheckBox">
@@ -266,12 +268,12 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <local:GroupBox Grid.Row="0" Ordinal="4" Header="Directory mappings" IsOk="{Binding AreAllDirectoriesMapped}">
+        <local:GroupBox Grid.Row="0" Ordinal="4" Header="{x:Static properties:Resources.DirectoryMappings}" IsOk="{Binding AreAllDirectoriesMapped}">
           <DataGrid x:Name="DirectoryDataGrid" ItemsSource="{Binding DirectoryMappings}"
                     Style="{StaticResource DirectoryDataGridStyle}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Directory" Binding="{Binding Directory, StringFormat='.\\{0}'}" Width="200" IsReadOnly="True" />
-              <DataGridTemplateColumn Header="WiX definition" Width="*" IsReadOnly="True">
+              <DataGridTextColumn Header="{x:Static properties:Resources.Directory}" Binding="{Binding Directory, StringFormat='.\\{0}'}" Width="200" IsReadOnly="True" />
+              <DataGridTemplateColumn Header="{x:Static properties:Resources.WiXDefinition}" Width="*" IsReadOnly="True">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate DataType="wax:DirectoryMapping">
                     <Border VerticalAlignment="Center">
@@ -303,10 +305,10 @@
                     <Grid d:DataContext="{d:DesignInstance wax:DirectoryMapping}">
                       <Button Content="-" Command="{Binding ClearMappingCommand}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="Remove the custom mapping." />
+                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.RemoveTheCustomMapping}" />
                       <Button Content="+" Command="{Binding AddDirectoryCommand}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="Create a new directory node." />
+                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.CreateANewDirectoryNode}" />
                     </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
@@ -315,17 +317,17 @@
           </DataGrid>
         </local:GroupBox>
         <GridSplitter Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="5" />
-        <local:GroupBox Grid.Row="2" Ordinal="5" Header="File mappings" IsOk="{Binding AreAllFilesMapped}">
+        <local:GroupBox Grid.Row="2" Ordinal="5" Header="{x:Static properties:Resources.FileMappings}" IsOk="{Binding AreAllFilesMapped}">
           <DataGrid x:Name="FileMappingsGrid" dgx:Tools.ApplyInitialSorting="True"
                     ItemsSource="{Binding FileMappings}"
                     Style="{StaticResource DefaultDataGridStyle}"
                     IsEnabled="{Binding AreAllDirectoriesMapped}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="File" Binding="{Binding UniqueName}" Width="200" IsReadOnly="True" />
-              <DataGridTextColumn Header="Ext." Binding="{Binding Extension}" Width="50" IsReadOnly="True" />
-              <DataGridTextColumn Header="State" Binding="{Binding MappingState}" Width="100" IsReadOnly="True"
+              <DataGridTextColumn Header="{x:Static properties:Resources.File}" Binding="{Binding UniqueName}" Width="200" IsReadOnly="True" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Ext}" Binding="{Binding Extension}" Width="50" IsReadOnly="True" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.State}" Binding="{Binding MappingState}" Width="100" IsReadOnly="True"
                                   SortDirection="Ascending" />
-              <DataGridTemplateColumn Header="WiX definition" Width="*" SortMemberPath="MappedNode.Id"
+              <DataGridTemplateColumn Header="{x:Static properties:Resources.WiXDefinition}" Width="*" SortMemberPath="MappedNode.Id"
                                       IsReadOnly="True">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate DataType="wax:FileMapping">
@@ -374,15 +376,15 @@
                       <Button Content="-" Command="{Binding ClearMappingCommand}"
                               CommandParameter="{Binding Path=SelectedItems, ElementName=FileMappingsGrid}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="Remove custom file mapping." />
+                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.RemoveCustomFileMapping}" />
                       <Button Content="+" Command="{Binding AddFileCommand}"
                               CommandParameter="{Binding Path=SelectedItems, ElementName=FileMappingsGrid}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="Create a new file node." />
+                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.CreateANewFileNode}" />
                       <Button Content="?" Command="{Binding ResolveFileCommand}"
                               CommandParameter="{Binding Path=SelectedItems, ElementName=FileMappingsGrid}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="Confirm unique file mapping." />
+                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.ConfirmUniqueFileMapping}" />
                     </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
@@ -407,18 +409,18 @@
           </DataGrid>
         </local:GroupBox>
         <GridSplitter Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="5" />
-        <GroupBox Grid.Row="4" Header="Unmapped Files">
+        <GroupBox Grid.Row="4" Header="{x:Static properties:Resources.UnmappedFiles}">
           <DataGrid ItemsSource="{Binding UnmappedFileNodes}" Style="{StaticResource DefaultDataGridStyle}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Id" Binding="{Binding Node.Id}" IsReadOnly="True" />
-              <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
-              <DataGridTextColumn Header="Source" Binding="{Binding Node.Source, Mode=OneWay}" Width="*" IsReadOnly="True" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Id}" Binding="{Binding Node.Id}" IsReadOnly="True" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Name}" Binding="{Binding Name}" IsReadOnly="True" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Source}" Binding="{Binding Node.Source, Mode=OneWay}" Width="*" IsReadOnly="True" />
               <DataGridTemplateColumn Width="25">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Grid d:DataContext="{d:DesignInstance wax:UnmappedFile}">
                       <Button Content="-" Command="{Binding DeleteCommand}" Style="{StaticResource SquareControlStyle}"
-                              ToolTip="Remove unmapped file." />
+                              ToolTip="{x:Static properties:Resources.RemoveUnmappedFile}" />
                     </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
