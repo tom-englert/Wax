@@ -91,7 +91,7 @@
                 new XAttribute("Root", registrySearch.Root.ToString()),
                 new XAttribute("Key", registrySearch.Key),
                 new XAttribute("Name", registrySearch.Name),
-                new XAttribute("Root", registrySearch.SearchType.ToString()),
+                new XAttribute("Type", registrySearch.SearchType.ToString()),
                 new XAttribute("Win64", registrySearch.Win64 ? "yes" : "no")
             );
 
