@@ -268,7 +268,6 @@
             Contract.Requires(wixProject != null);
 
             var directories = projectOutputs
-                .Where(projectOutput => !projectOutput.IsReference)
                 .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(item => item)
