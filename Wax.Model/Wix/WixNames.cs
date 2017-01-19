@@ -15,6 +15,7 @@
         public static readonly XName FeatureNode = XName.Get("Feature", Namespace);
         public static readonly XName PropertyNode = XName.Get("Property", Namespace);
         public static readonly XName RegistrySearch = XName.Get("RegistrySearch", Namespace);
+        public static readonly XName CustomActionRefNode = XName.Get("CustomActionRef", Namespace);
 
         public const string Define = "define";
     }
