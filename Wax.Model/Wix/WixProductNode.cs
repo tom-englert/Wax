@@ -32,7 +32,7 @@
         [NotNull]
         public IEnumerable<string> EnumerateCustomActionRefs()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<WixPropertyNode>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
 
             return Node.Descendants(WixNames.CustomActionRefNode).Select(node => node.Attribute("Id").Value);
         }
