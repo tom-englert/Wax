@@ -1,3 +1,11 @@
+1.0.20.0:
+* #13, #21: Corectly handle output folder for non-default output locations, e.g. WebApi projects.
+* #15, #26, #29: Include second tier references and their sattelite dlls.
+* #17, #20: Improve readablity in dark theme.
+* #19: Prefix names of directories if they match well known property names to avoid conflicts.
+* #23: Generated ComponentGroupRef nodes sometimes do not appear.
+* Added Chinese and German translation.
+
 1.0.19.0:
 * Fix #11: Handle deep directory structures
 * Fix #12: Allow DirectoryNodes without name to support merge modules with the "MergeRedirectFolder"
