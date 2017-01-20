@@ -306,7 +306,7 @@
     <Compile Include="Wix\WixSourceFile.cs" />
     <Compile Include="Wix\WixProject.cs" />
   </ItemGroup>
- <ItemGroup>
+  <ItemGroup>
     <None Include="..\CodeContracts.ruleset">
       <Link>CodeContracts.ruleset</Link>
     </None>
