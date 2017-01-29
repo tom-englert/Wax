@@ -210,4 +210,13 @@
   <data name="SupportTheProject" xml:space="preserve">
     <value>Support the project.</value>
   </data>
+  <data name="ExternalLocalizations" xml:space="preserve">
+    <value>Ext. Localizations</value>
+  </data>
+  <data name="DeploySymbolsToolTip" xml:space="preserve">
+    <value>Include the debug symbols in the setup project.</value>
+  </data>
+  <data name="ExternalLocalizationsToolTip" xml:space="preserve">
+    <value>Include also external/3rd party localizations in the setup project.</value>
+  </data>
 </root>

@@ -97,6 +97,9 @@ namespace tomenglertde.Wax.Model.Wix
         [XmlElement("DeploySymbols")]
         public bool DeploySymbols { get; set; }
 
+        [XmlElement("DeployExternalLocalizations")]
+        public bool DeployExternalLocalizations { get; set; }
+
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
