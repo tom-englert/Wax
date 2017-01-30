@@ -1,3 +1,7 @@
+1.0.21.0:
+* Added french translation
+* Make second tier sattelite dlls optional.
+
 1.0.20.0:
 * #13, #21: Corectly handle output folder for non-default output locations, e.g. WebApi projects.
 * #15, #26, #29: Include second tier references and their sattelite dlls.
