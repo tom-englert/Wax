@@ -135,6 +135,18 @@
             DependencyProperty.Register("DeploySymbols", typeof(bool), typeof(MainViewModel), new FrameworkPropertyMetadata(false, (sender, e) => ((MainViewModel)sender).DeploySymbols_Changed((bool)e.NewValue)));
 
 
+        public bool DeployExternalLocalizations
+        {
+            get { return (bool)GetValue(DeployExternalLocalizationsProperty); }
+            set { SetValue(DeployExternalLocalizationsProperty, value); }
+        }
+        /// <summary>
+        /// Identifies the <see cref="DeployExternalLocalizations"/> dependency property
+        /// </summary>
+        public static readonly DependencyProperty DeployExternalLocalizationsProperty =
+            DependencyProperty.Register("DeployExternalLocalizations", typeof(bool), typeof(MainViewModel), new FrameworkPropertyMetadata(false, (sender, e) => ((MainViewModel)sender).DeployExternalLocalizations_Changed((bool)e.NewValue)));
+
+
         public IList<UnmappedFile> UnmappedFileNodes
         {
             get { return (IList<UnmappedFile>)GetValue(UnmappedFileNodesProperty); }
@@ -183,6 +195,7 @@
             _wixProjectChanging = true;
 
             DeploySymbols = newValue.DeploySymbols;
+            DeployExternalLocalizations = newValue.DeployExternalLocalizations;
 
             var deployedProjects = newValue.DeployedProjects.ToArray();
 
@@ -229,7 +242,7 @@
             try
             {
                 var projectOutputs = vsProjects
-                    .SelectMany(project => project.GetProjectOutput(DeploySymbols))
+                    .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployExternalLocalizations))
                     .ToArray();
 
                 GenerateDirectoryMappings(projectOutputs, wixProject);
@@ -303,6 +316,22 @@
 
             GenerateMappings(SelectedVSProjects, wixProject);
         }
+
+        private void DeployExternalLocalizations_Changed(bool newValue)
+        {
+            if (_wixProjectChanging)
+                return;
+
+            var wixProject = SelectedWixProject;
+
+            if (wixProject == null)
+                return;
+
+            wixProject.DeployExternalLocalizations = newValue;
+
+            GenerateMappings(SelectedVSProjects, wixProject);
+        }
+
 
         private void CommandManager_RequerySuggested(object sender, EventArgs e)
         {

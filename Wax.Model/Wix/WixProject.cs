@@ -157,6 +157,19 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
+        public bool DeployExternalLocalizations
+        {
+            get
+            {
+                return _configuration.DeployExternalLocalizations;
+            }
+            set
+            {
+                _configuration.DeployExternalLocalizations = value;
+            }
+        }
+
+
         public bool HasChanges => HasConfigurationChanges | HasSourceFileChanges;
 
         [NotNull]

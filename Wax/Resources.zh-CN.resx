@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -200,5 +200,14 @@
   </data>
   <data name="SupportTheProject" xml:space="preserve">
     <value>支持此项目。</value>
+  </data>
+  <data name="ExternalLocalizations" xml:space="preserve">
+    <value>外部本地化</value>
+  </data>
+  <data name="DeploySymbolsToolTip" xml:space="preserve">
+    <value>在安装项目中包含调试符号。</value>
+  </data>
+  <data name="ExternalLocalizationsToolTip" xml:space="preserve">
+    <value>在安装项目中包含外部或第三方的本地化。</value>
   </data>
 </root>

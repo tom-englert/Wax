@@ -65,7 +65,7 @@
         }
 
         [NotNull, ItemNotNull]
-        public static IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, [NotNull, ItemNotNull] ICollection<VSLangProj.Reference> references, [NotNull] string targetDirectory)
+        public static IEnumerable<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull, ItemNotNull] ICollection<VSLangProj.Reference> references, [NotNull] string targetDirectory)
         {
             Contract.Requires(rootProject != null);
             Contract.Requires(references != null);
@@ -76,7 +76,7 @@
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
                 .Select(reference => new ProjectOutput(rootProject, reference, targetDirectory))
-                .Concat(GetSecondTierReferences(references, rootProject, targetDirectory));
+                .Concat(GetSecondTierReferences(references, rootProject, deployExternalLocalizations, targetDirectory));
 
             return localFileReferences;
         }
@@ -132,7 +132,7 @@
         public bool IsVsProject => _vsProject != null;
 
         [NotNull, ItemNotNull]
-        public IEnumerable<ProjectOutput> GetProjectOutput(bool deploySymbols)
+        public IEnumerable<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployExternalLocalizations)
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
 
@@ -140,12 +140,12 @@
 
             var binaryTargetDirectory = Path.GetDirectoryName(primaryOutput) ?? string.Empty;
 
-            return GetProjectOutput(this, deploySymbols, binaryTargetDirectory);
+            return GetProjectOutput(this, deploySymbols, deployExternalLocalizations, binaryTargetDirectory);
         }
 
         [NotNull, ItemNotNull]
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, [NotNull] string binaryTargetDirectory)
+        public IEnumerable<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployExternalLocalizations, [NotNull] string binaryTargetDirectory)
         {
             Contract.Requires(rootProject != null);
             Contract.Requires(binaryTargetDirectory != null);
@@ -154,14 +154,14 @@
             var references = References.ToArray();
 
             var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
-                .Concat(GetLocalFileReferences(rootProject, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, binaryTargetDirectory)));
+                .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
+                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, deployExternalLocalizations, binaryTargetDirectory)));
 
             return projectOutput;
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] IEnumerable<VSLangProj.Reference> references, [NotNull] Project rootProject, [NotNull] string targetDirectory)
+        private static IEnumerable<ProjectOutput> GetSecondTierReferences([NotNull] IEnumerable<VSLangProj.Reference> references, [NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull] string targetDirectory)
         {
             Contract.Requires(references != null);
             Contract.Requires(rootProject != null);
@@ -173,14 +173,14 @@
                 .Where(r => r.CopyLocal)
                 .Select(r => r.Path)
                 .Where(File.Exists) // Reference can be a project reference but not be built yet.
-                .SelectMany(GetReferencedAssemblyNames)
+                .SelectMany(file => GetReferencedAssemblyNames(file, deployExternalLocalizations))
                 .Distinct()
                 .Select(file => new ProjectOutput(rootProject, file, targetDirectory));
         }
 
         [NotNull]
         [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        private static IEnumerable<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName)
+        private static IEnumerable<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName, bool deployExternalLocalizations)
         {
             Contract.Requires(assemblyFileName != null);
             Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
@@ -196,12 +196,19 @@
                     .Where(assemblyName => File.Exists(Path.Combine(directory, assemblyName + ".dll")))
                     .ToArray();
 
+                var referencedAssemblyFileNames = referencedAssemblyNames
+                    .Select(assemblyName => assemblyName + ".dll");
+
+                if (!deployExternalLocalizations)
+                {
+                    return referencedAssemblyFileNames;
+                }
+
                 var satteliteDlls = referencedAssemblyNames
                     .SelectMany(assemblyName => Directory.GetFiles(directory, assemblyName + ".resources.dll", SearchOption.AllDirectories))
                     .Select(file => file.Substring(directory.Length + 1));
 
-                return referencedAssemblyNames
-                    .Select(assemblyName => assemblyName + ".dll")
+                return referencedAssemblyFileNames
                     .Concat(satteliteDlls);
             }
             catch

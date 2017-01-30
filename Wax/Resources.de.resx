@@ -201,4 +201,13 @@
   <data name="SupportTheProject" xml:space="preserve">
     <value>Das Projekt unterstützen</value>
   </data>
+  <data name="ExternalLocalizations" xml:space="preserve">
+    <value>Ext. Lokalisierungen</value>
+  </data>
+  <data name="DeploySymbolsToolTip" xml:space="preserve">
+    <value>Debug-Symbole mitinstallieren</value>
+  </data>
+  <data name="ExternalLocalizationsToolTip" xml:space="preserve">
+    <value>Lokalisierungen externer Komponenten mitinstallieren</value>
+  </data>
 </root>

@@ -87,10 +87,11 @@
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/refresh.png" />
         </Button>
         <Separator />
-        <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" />
+        <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" ToolTip="{x:Static properties:Resources.DeploySymbolsToolTip}"/>
+        <CheckBox Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}"/>
         <Separator />
         <Button x:Name="LikeButton" ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"
-                Tag="https://visualstudiogallery.msdn.microsoft.com/ab48d869-8f75-4e02-8e7d-577346065aa6/view/Reviews">
+                Tag="https://marketplace.visualstudio.com/vsgallery/ab48d869-8f75-4e02-8e7d-577346065aa6">
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/like.png" />
         </Button>
         <Button x:Name="HelpButton" ToolTip="{x:Static properties:Resources.Documentation}"
