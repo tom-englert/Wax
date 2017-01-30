@@ -133,7 +133,7 @@
     <value>Répertoire racine</value>
   </data>
   <data name="ProjectsToInstall" xml:space="preserve">
-    <value>Projets à installer</value>
+    <value>Projets à installer :</value>
   </data>
   <data name="ShowAllProjects" xml:space="preserve">
     <value>Afficher tous les projets</value>
@@ -148,10 +148,10 @@
     <value>Définition Wix</value>
   </data>
   <data name="RemoveTheCustomMapping" xml:space="preserve">
-    <value>Supprimer le mappage personnalisé</value>
+    <value>Supprimer le mappage personnalisé.</value>
   </data>
   <data name="CreateANewDirectoryNode" xml:space="preserve">
-    <value>Créer un nouveau noeud de type répertoire</value>
+    <value>Créer un nouveau noeud de type répertoire.</value>
   </data>
   <data name="File" xml:space="preserve">
     <value>Fichier</value>
@@ -175,30 +175,39 @@
     <value>Source</value>
   </data>
   <data name="RemoveUnmappedFile" xml:space="preserve">
-    <value>Supprimer les fichiers non mappés</value>
+    <value>Supprimer les fichiers non mappés.</value>
   </data>
   <data name="FileMappings" xml:space="preserve">
     <value>Mappages de fichiers</value>
   </data>
   <data name="RemoveCustomFileMapping" xml:space="preserve">
-    <value>Supprimer le mappage de fichier personnalisé</value>
+    <value>Supprimer le mappage de fichier personnalisé.</value>
   </data>
   <data name="CreateANewFileNode" xml:space="preserve">
-    <value>Créer un nouveau noeud de type fichier</value>
+    <value>Créer un nouveau noeud de type fichier.</value>
   </data>
   <data name="ConfirmUniqueFileMapping" xml:space="preserve">
-    <value>Confirmer le mappage unique de fichier</value>
+    <value>Confirmer le mappage unique de fichier.</value>
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>Rafraîchir</value>
   </data>
   <data name="SupportTheProjectByWritingAShortReview" xml:space="preserve">
-    <value>Supporter le projet en écrivant un bref avis</value>
+    <value>Supporter le projet en écrivant un bref avis.</value>
   </data>
   <data name="Documentation" xml:space="preserve">
     <value>Documentation</value>
   </data>
   <data name="SupportTheProject" xml:space="preserve">
-    <value>Supporter le projet</value>
+    <value>Supporter le projet.</value>
+  </data>
+  <data name="ExternalLocalizations" xml:space="preserve">
+    <value>Localisations externes</value>
+  </data>
+  <data name="DeploySymbolsToolTip" xml:space="preserve">
+    <value>Ajouter les symboles dans le projet d'installation.</value>
+  </data>
+  <data name="ExternalLocalizationsToolTip" xml:space="preserve">
+    <value>Ajouter aussi les librairies satellites des références externes dans le projet d'installation.</value>
   </data>
 </root>
