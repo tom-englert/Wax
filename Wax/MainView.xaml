@@ -91,7 +91,7 @@
         <CheckBox Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}"/>
         <Separator />
         <Button x:Name="LikeButton" ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"
-                Tag="https://marketplace.visualstudio.com/vsgallery/ab48d869-8f75-4e02-8e7d-577346065aa6">
+                Tag="https://marketplace.visualstudio.com/vsgallery/ab48d869-8f75-4e02-8e7d-577346065aa6#review-details">
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/like.png" />
         </Button>
         <Button x:Name="HelpButton" ToolTip="{x:Static properties:Resources.Documentation}"

@@ -19,7 +19,7 @@ The file grid supports multiple selection, so you can apply all commands to many
 
 ## Installation
 
-This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Gallery](https://visualstudiogallery.msdn.microsoft.com/ab48d869-8f75-4e02-8e7d-577346065aa6), or download the binaries and double click the Wax.vsix in the windows explorer.
+This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Gallery](https://marketplace.visualstudio.com/ab48d869-8f75-4e02-8e7d-577346065aa6), or download the binaries and double click the Wax.vsix in the windows explorer.
 
 The Wax editor is a tool to maintain WiX projects, so you should have installed the [WiX Toolset](http://wix.codeplex.com/).
 
