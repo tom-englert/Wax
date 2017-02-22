@@ -75,6 +75,7 @@
             var localFileReferences = references
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
+                .Where(reference => !string.IsNullOrEmpty(reference.Path))
                 .Select(reference => new ProjectOutput(rootProject, reference, targetDirectory))
                 .Concat(GetSecondTierReferences(references, rootProject, deployExternalLocalizations, targetDirectory));
 
@@ -559,9 +560,21 @@
             Contract.Requires(outputGroup != null);
             Contract.Ensures(Contract.Result<string[]>() != null);
 
-            Contract.Assume(outputGroup.FileNames != null);
+            return InternalGetFileNames(outputGroup) ?? new string[0];
+        }
 
-            return ((Array)outputGroup.FileNames).OfType<string>().ToArray();
+        private static string[] InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        {
+            Contract.Requires(outputGroup != null);
+
+            try
+            {
+                return ((Array)outputGroup.FileNames)?.OfType<string>().ToArray();
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
