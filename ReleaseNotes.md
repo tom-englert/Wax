@@ -1,3 +1,6 @@
+1.0.22.0:
+* Fix undefined behavior when not all projects have been built yet and project output is not available.
+
 1.0.21.0:
 * Added french translation
 * Make second tier sattelite dlls optional.
