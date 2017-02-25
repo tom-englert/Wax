@@ -1,9 +1,10 @@
 # Wax ![Badge](https://tom-englert.visualstudio.com/_apis/public/build/definitions/75bf84d2-d359-404a-a712-07c9f693f635/6/badge)
-An interactive editor for WiX setup projects.
+An interactive editor for [WiX Toolset](http://wixtoolset.org/) setup projects.
 
 _Wax keeps your candle burning_
 
-While it's an easy task to create an empty setup project with the WiX toolkit, populating the list of deployable files and even more keeping the list up to date can be a very fumbling task.
+While it's an easy task to create an empty setup project with the [WiX Toolset](http://wixtoolset.org/), populating the list of deployable 
+files and even more keeping the list up to date can be a very fumbling task.
 This tool is a Visual Studio Extension that helps you to create, verify and maintain the list of the deployed files in an interactive GUI.
 
 Just select the projects that you want to install in the list box on the left side.
@@ -21,7 +22,7 @@ The file grid supports multiple selection, so you can apply all commands to many
 
 This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Gallery](https://marketplace.visualstudio.com/ab48d869-8f75-4e02-8e7d-577346065aa6), or download the binaries and double click the Wax.vsix in the windows explorer.
 
-The Wax editor is a tool to maintain WiX projects, so you should have installed the [WiX Toolset](http://wix.codeplex.com/).
+The Wax editor is a tool to maintain WiX projects, so you should have installed the [WiX Toolset](http://wixtoolset.org/).
 
 ## Usage
 
