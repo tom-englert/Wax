@@ -27,13 +27,13 @@
         [NotNull]
         private readonly ObservableCollection<ProjectOutput> _allUnmappedProjectOutputs;
         [NotNull]
-        private readonly FilteredObservableCollection<ProjectOutput> _unmappedProjectOutputs;
+        private readonly ObservableFilteredCollection<ProjectOutput> _unmappedProjectOutputs;
         [NotNull]
         private readonly WixProject _wixProject;
         [NotNull]
         private readonly IList<UnmappedFile> _allUnmappedFiles;
         [NotNull]
-        private readonly FilteredObservableCollection<UnmappedFile> _unmappedFiles;
+        private readonly ObservableFilteredCollection<UnmappedFile> _unmappedFiles;
         [NotNull]
         private readonly string _id;
 
@@ -55,10 +55,10 @@
 
             MappedNode = wixProject.FileNodes.FirstOrDefault(node => node.Id == _id);
 
-            _unmappedProjectOutputs = new FilteredObservableCollection<ProjectOutput>(_allUnmappedProjectOutputs, item => string.Equals(item.FileName, DisplayName, StringComparison.OrdinalIgnoreCase));
+            _unmappedProjectOutputs = new ObservableFilteredCollection<ProjectOutput>(_allUnmappedProjectOutputs, item => string.Equals(item.FileName, DisplayName, StringComparison.OrdinalIgnoreCase));
             _unmappedProjectOutputs.CollectionChanged += UnmappedProjectOutputs_CollectionChanged;
 
-            _unmappedFiles = new FilteredObservableCollection<UnmappedFile>(allUnmappedFiles, item => string.Equals(item.Node.Name, DisplayName, StringComparison.OrdinalIgnoreCase));
+            _unmappedFiles = new ObservableFilteredCollection<UnmappedFile>(allUnmappedFiles, item => string.Equals(item.Node.Name, DisplayName, StringComparison.OrdinalIgnoreCase));
             _unmappedFiles.CollectionChanged += UnmappedNodes_CollectionChanged;
 
             UpdateMappingState();

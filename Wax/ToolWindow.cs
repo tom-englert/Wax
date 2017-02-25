@@ -39,7 +39,7 @@
             : base(null)
         {
             // Just to reference something to force load of referenced libraries.
-            BindingErrorTracer.Error += (_, e) => { Debug.Fail(e.Text); };
+            BindingErrorTracer.Start(msg => { Debug.WriteLine(msg); });
 
             Caption = Resources.ToolWindowTitle;
 
