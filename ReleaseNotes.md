@@ -1,3 +1,6 @@
+1.0.23.0:
+* Update packages to align with other extensions (to avoid https://connect.microsoft.com/VisualStudio/feedback/details/2993889/)
+
 1.0.22.0:
 * Fix undefined behavior when not all projects have been built yet and project output is not available.
 
