@@ -1,3 +1,6 @@
+1.0.24.0:
+* Fix #42: EnvDTE.ProjectItem throws null ref exception when item has been removed
+
 1.0.23.0:
 * Update packages to align with other extensions (to avoid https://connect.microsoft.com/VisualStudio/feedback/details/2993889/)
 
