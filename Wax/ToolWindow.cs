@@ -68,11 +68,9 @@
 
         private void Navigate_Click(object sender, RoutedEventArgs e)
         {
-            var source = e.OriginalSource as FrameworkElement;
-            if (source == null)
-                return;
+            var source = e?.OriginalSource as FrameworkElement;
 
-            var button = source.TryFindAncestorOrSelf<ButtonBase>();
+            var button = source?.TryFindAncestorOrSelf<ButtonBase>();
             if (button == null)
                 return;
 

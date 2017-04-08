@@ -30,7 +30,7 @@
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(ToolWindow))]
     [Guid(GuidList.guidWaxPkgString)]
-    public sealed class WaxPackage : Package
+    public sealed class VsPackage : Package
     {
         /// <summary>
         /// Default constructor of the package.
@@ -39,7 +39,7 @@
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public WaxPackage()
+        public VsPackage()
         {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
@@ -55,18 +55,13 @@
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
             var window = this.FindToolWindow(typeof(ToolWindow), 0, true);
-            if ((null == window) || (null == window.Frame))
+            if (window?.Frame == null)
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             var windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
-
-
-        /////////////////////////////////////////////////////////////////////////////
-        // Overriden Package Implementation
-        #region Package Members
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -87,6 +82,5 @@
                 mcs.AddCommand( menuToolWin );
             }
         }
-        #endregion
     }
 }

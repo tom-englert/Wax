@@ -2,9 +2,11 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
+    using System.Windows.Controls;
     using System.Windows.Interactivity;
 
     using DataGridExtensions;
@@ -44,7 +46,7 @@
             }
         }
 
-        void Self_Loaded(object sender, RoutedEventArgs e)
+        private void Self_Loaded(object sender, RoutedEventArgs e)
         {
             var viewModel = ViewModel;
 
@@ -102,9 +104,11 @@
 
         private void SetupProjectListBox_Loaded(object sender, RoutedEventArgs e)
         {
-            if ((SetupProjectListBox.Items.Count == 1) && (SetupProjectListBox.SelectedIndex == -1))
+            var listBox = (ListBox)sender;
+
+            if ((listBox != null) && (listBox.Items.Count == 1) && (listBox.SelectedIndex == -1))
             {
-                SetupProjectListBox.SelectedIndex = 0;
+                listBox.SelectedIndex = 0;
             }
         }
 
@@ -128,12 +132,11 @@
         }
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_dte != null);
-            Contract.Invariant(SetupProjectListBox != null);
         }
     }
 }
