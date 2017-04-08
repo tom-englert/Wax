@@ -203,8 +203,9 @@
                     return projectItem.FileNames[0];
                 }
             }
-            catch (ArgumentException)
+            catch (Exception)
             {
+                // s.a.
             }
 
             return null;
@@ -246,7 +247,7 @@
 
                 return File.ReadAllText(fileName);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 return string.Empty;
             }
