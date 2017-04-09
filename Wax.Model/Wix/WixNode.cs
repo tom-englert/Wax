@@ -72,7 +72,10 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        public string GetAttribute([NotNull] string name)
+        [NotNull]
+        public WixNames WixNames => SourceFile.WixNames;
+
+        protected string GetAttribute([NotNull] string name)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 

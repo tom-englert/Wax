@@ -28,15 +28,19 @@ namespace tomenglertde.Wax.Model.Wix
         private XDocument _rawXmlFile;
         [NotNull]
         private readonly XElement _root;
-
         [NotNull]
         private readonly List<WixFileNode> _fileNodes;
         [NotNull]
         private readonly List<WixDirectoryNode> _directoryNodes;
         [NotNull]
         private readonly List<WixComponentGroupNode> _componentGroups;
+        [NotNull]
         private readonly List<WixFeatureNode> _featureNodes;
+        [NotNull]
         private readonly List<WixDefine> _defines;
+
+        [NotNull]
+        public WixNames WixNames { get; }
 
         public WixSourceFile([NotNull] WixProject project, [NotNull] EnvDTE.ProjectItem projectItem)
         {
@@ -51,6 +55,8 @@ namespace tomenglertde.Wax.Model.Wix
             _root = _xmlFile.Root;
 
             Contract.Assume(_root != null);
+
+            WixNames = new WixNames(_root.GetDefaultNamespace().NamespaceName);
 
             _defines = _root.Nodes().OfType<XProcessingInstruction>()
                 .Where(p => p.Target.Equals(WixNames.Define, StringComparison.Ordinal))
@@ -293,6 +299,9 @@ namespace tomenglertde.Wax.Model.Wix
             Contract.Invariant(_root != null);
             Contract.Invariant(_xmlFile != null);
             Contract.Invariant(_rawXmlFile != null);
+            Contract.Invariant(_featureNodes != null);
+            Contract.Invariant(_defines != null);
+            Contract.Invariant(WixNames != null);
         }
     }
 }

@@ -1,22 +1,55 @@
 ﻿namespace tomenglertde.Wax.Model.Wix
 {
+    using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
-    public static class WixNames
-    {
-        public const string Namespace = "http://schemas.microsoft.com/wix/2006/wi";
-        public static readonly XName FileNode = XName.Get("File", Namespace);
-        public static readonly XName DirectoryNode = XName.Get("Directory", Namespace);
-        public static readonly XName FragmentNode = XName.Get("Fragment", Namespace);
-        public static readonly XName DirectoryRefNode = XName.Get("DirectoryRef", Namespace);
-        public static readonly XName ComponentNode = XName.Get("Component", Namespace);
-        public static readonly XName ComponentGroupNode = XName.Get("ComponentGroup", Namespace);
-        public static readonly XName ComponentGroupRefNode = XName.Get("ComponentGroupRef", Namespace);
-        public static readonly XName FeatureNode = XName.Get("Feature", Namespace);
-        public static readonly XName PropertyNode = XName.Get("Property", Namespace);
-        public static readonly XName RegistrySearch = XName.Get("RegistrySearch", Namespace);
-        public static readonly XName CustomActionRefNode = XName.Get("CustomActionRef", Namespace);
+    using JetBrains.Annotations;
 
-        public const string Define = "define";
+    public class WixNames
+    {
+        [NotNull] private readonly string _namespace;
+
+        public WixNames([NotNull] string @namespace)
+        {
+            Contract.Requires(@namespace != null);
+
+            _namespace = @namespace;
+        }
+
+        [NotNull]
+        public XName FileNode => XName.Get("File", _namespace);
+
+        [NotNull]
+        public XName DirectoryNode => XName.Get("Directory", _namespace);
+
+        [NotNull]
+        public XName FragmentNode => XName.Get("Fragment", _namespace);
+
+        [NotNull]
+        public XName DirectoryRefNode => XName.Get("DirectoryRef", _namespace);
+
+        [NotNull]
+        public XName ComponentNode => XName.Get("Component", _namespace);
+
+        [NotNull]
+        public XName ComponentGroupNode => XName.Get("ComponentGroup", _namespace);
+
+        [NotNull]
+        public XName ComponentGroupRefNode => XName.Get("ComponentGroupRef", _namespace);
+
+        [NotNull]
+        public XName FeatureNode => XName.Get("Feature", _namespace);
+
+        [NotNull]
+        public XName PropertyNode => XName.Get("Property", _namespace);
+
+        [NotNull]
+        public XName RegistrySearch => XName.Get("RegistrySearch", _namespace);
+
+        [NotNull]
+        public XName CustomActionRefNode => XName.Get("CustomActionRef", _namespace);
+
+        [NotNull]
+        public string Define => "define";
     }
 }
