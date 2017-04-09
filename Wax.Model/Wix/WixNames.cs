@@ -50,6 +50,6 @@
         public XName CustomActionRefNode => XName.Get("CustomActionRef", _namespace);
 
         [NotNull]
-        public string Define => "define";
+        public const string Define = "define";
     }
 }
