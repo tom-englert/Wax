@@ -1,3 +1,7 @@
+1.0.25.0:
+* Fix #6: Another flavor of this issue occured.
+* Fix #41: support WiX v4 templates.
+
 1.0.24.0:
 * Fix #42: EnvDTE.ProjectItem throws null ref exception when item has been removed
 
