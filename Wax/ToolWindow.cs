@@ -66,9 +66,9 @@
             Content = new MainView(_dte);
         }
 
-        private void Navigate_Click(object sender, RoutedEventArgs e)
+        private void Navigate_Click(object sender, [NotNull] RoutedEventArgs e)
         {
-            var source = e?.OriginalSource as FrameworkElement;
+            var source = e.OriginalSource as FrameworkElement;
 
             var button = source?.TryFindAncestorOrSelf<ButtonBase>();
             if (button == null)

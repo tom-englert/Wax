@@ -6,6 +6,7 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Xml;
     using System.Xml.Linq;
@@ -40,7 +41,7 @@ namespace tomenglertde.Wax.Model.Wix
         private readonly List<WixDefine> _defines;
 
         [NotNull]
-        public WixNames WixNames { get; }
+        public WixNames WixNames { get; private set; }
 
         public WixSourceFile([NotNull] WixProject project, [NotNull] EnvDTE.ProjectItem projectItem)
         {
@@ -52,9 +53,12 @@ namespace tomenglertde.Wax.Model.Wix
 
             _xmlFile = _projectItem.GetXmlContent(LoadOptions.PreserveWhitespace);
             _rawXmlFile = _projectItem.GetXmlContent(LoadOptions.None);
-            _root = _xmlFile.Root;
 
-            Contract.Assume(_root != null);
+            var root = _xmlFile.Root;
+            if (root == null)
+                throw new InvalidDataException("Invalid source file: " + projectItem.TryGetFileName());
+
+            _root = root;
 
             WixNames = new WixNames(_root.GetDefaultNamespace().NamespaceName);
 

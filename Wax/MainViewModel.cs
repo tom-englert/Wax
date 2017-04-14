@@ -137,7 +137,7 @@
 
         public bool DeployExternalLocalizations
         {
-            get { return (bool)GetValue(DeployExternalLocalizationsProperty); }
+            get { return this.GetValue<bool>(DeployExternalLocalizationsProperty); }
             set { SetValue(DeployExternalLocalizationsProperty, value); }
         }
         /// <summary>
