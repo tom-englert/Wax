@@ -26,7 +26,7 @@
         /// <param name="solution">The solution.</param>
         /// <returns>The projects.</returns>
         [NotNull]
-        public static IEnumerable<EnvDTE.Project> GetProjects([NotNull] this EnvDTE.Solution solution)
+        public static IReadOnlyCollection<EnvDTE.Project> GetProjects([NotNull] this EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
@@ -84,7 +84,7 @@
         }
 
         [NotNull, ItemNotNull]
-        public static IEnumerable<EnvDTE.ProjectItem> GetAllProjectItems([NotNull] this EnvDTE.Project project)
+        public static IEnumerable<EnvDTE.ProjectItem> EnumerateAllProjectItems([NotNull] this EnvDTE.Project project)
         {
             Contract.Requires(project != null);
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.ProjectItem>>() != null);
@@ -96,7 +96,7 @@
             {
                 yield return item;
 
-                foreach (var subItem in GetProjectItems(item))
+                foreach (var subItem in EnumerateProjectItems(item))
                 {
                     yield return subItem;
                 }
@@ -104,7 +104,7 @@
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<EnvDTE.ProjectItem> GetProjectItems([NotNull] EnvDTE.ProjectItem projectItem)
+        private static IEnumerable<EnvDTE.ProjectItem> EnumerateProjectItems([NotNull] EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(projectItem != null);
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.ProjectItem>>() != null);
@@ -116,7 +116,7 @@
             {
                 yield return item;
 
-                foreach (var subItem in GetProjectItems(item))
+                foreach (var subItem in EnumerateProjectItems(item))
                 {
                     yield return subItem;
                 }

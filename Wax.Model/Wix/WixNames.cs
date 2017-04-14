@@ -7,7 +7,8 @@
 
     public class WixNames
     {
-        [NotNull] private readonly string _namespace;
+        [NotNull]
+        private readonly string _namespace;
 
         public WixNames([NotNull] string @namespace)
         {

@@ -39,7 +39,7 @@ namespace tomenglertde.Wax.Model.Wix
 
             _configuration = configurationText.Deserialize<ProjectConfiguration>();
 
-            _sourceFiles = AllProjectItems
+            _sourceFiles = GetAllProjectItems()
                 .Where(item => _wixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
@@ -401,7 +401,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
             Contract.Ensures(Contract.Result<EnvDTE.ProjectItem>() != null);
 
-            var configurationFileProjectItem = AllProjectItems.FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
+            var configurationFileProjectItem = GetAllProjectItems().FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
 
             if (configurationFileProjectItem != null)
                 return configurationFileProjectItem;
