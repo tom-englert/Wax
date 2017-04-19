@@ -1,3 +1,6 @@
+1.0.26.0:
+* Fix #6: null reference exception on project with invalid project references
+
 1.0.25.0:
 * Fix #6: Another flavor of this issue occured.
 * Fix #41: support WiX v4 templates.
