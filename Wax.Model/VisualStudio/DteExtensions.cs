@@ -25,7 +25,7 @@
         /// </summary>
         /// <param name="solution">The solution.</param>
         /// <returns>The projects.</returns>
-        [NotNull]
+        [NotNull, ItemNotNull]
         public static IReadOnlyCollection<EnvDTE.Project> GetProjects([NotNull] this EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
@@ -34,6 +34,7 @@
             var items = new List<EnvDTE.Project>();
 
             var projects = solution.Projects;
+
             if (projects == null)
                 return items;
 

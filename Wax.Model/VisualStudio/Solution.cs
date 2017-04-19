@@ -20,8 +20,6 @@
         [NotNull, ItemNotNull]
         private readonly IEnumerable<WixProject> _wixProjects;
 
-        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute", Justification = "No contracts for VS objects")]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException", Justification = "No contracts for VS objects")]
         public Solution([NotNull] EnvDTE.Solution solution)
         {
             Contract.Requires(solution != null);
@@ -48,7 +46,7 @@
 
             // Microsoft.Tools.WindowsInstallerXml.VisualStudio.OAWixProject
             _wixProjects = _solution.GetProjects()
-                .Where(project => project.Kind.Equals("{930c7802-8a8c-48f9-8165-68863bccd9dd}", StringComparison.OrdinalIgnoreCase))
+                .Where(project => "{930c7802-8a8c-48f9-8165-68863bccd9dd}".Equals(project.Kind, StringComparison.OrdinalIgnoreCase))
                 .Select(project => new WixProject(this, project))
                 .OrderBy(project => project.Name)
                 .ToArray();
