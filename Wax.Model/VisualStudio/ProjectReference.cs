@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
 
@@ -24,16 +25,12 @@
             _reference = reference;
         }
 
-        [NotNull]
+        [CanBeNull]
         public Project SourceProject
         {
             get
             {
-                Contract.Ensures(Contract.Result<Project>() != null);
-
-                var project = _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, _reference.SourceProject.UniqueName, StringComparison.OrdinalIgnoreCase));
-                
-                Contract.Assume(project != null);
+                var project = _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, _reference.SourceProject?.UniqueName, StringComparison.OrdinalIgnoreCase));
 
                 return project;
             }
@@ -45,13 +42,13 @@
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
             var identity = _reference.Identity;
-            Contract.Assume(identity != null);
-            return identity.GetHashCode();
+
+            return identity?.GetHashCode() ?? 0;
         }
 
         /// <summary>
@@ -76,11 +73,11 @@
 
         private static bool InternalEquals(ProjectReference left, ProjectReference right)
         {
-            if (object.ReferenceEquals(left, right))
+            if (ReferenceEquals(left, right))
                 return true;
-            if (object.ReferenceEquals(left, null))
+            if (ReferenceEquals(left, null))
                 return false;
-            if (object.ReferenceEquals(right, null))
+            if (ReferenceEquals(right, null))
                 return false;
 
             return left._reference.Identity == right._reference.Identity;
@@ -104,7 +101,7 @@
         #endregion
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {

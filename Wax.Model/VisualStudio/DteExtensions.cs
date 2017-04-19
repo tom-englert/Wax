@@ -34,14 +34,16 @@
             var items = new List<EnvDTE.Project>();
 
             var projects = solution.Projects;
-            Contract.Assume(projects != null);
+            if (projects == null)
+                return items;
 
             for (var i = 1; i <= projects.Count; i++)
             {
                 try
                 {
                     var project = projects.Item(i);
-                    Contract.Assume(project != null);
+                    if (project == null)
+                        continue;
 
                     items.Add(project);
 
@@ -237,7 +239,7 @@
                 if (document != null)
                 {
                     // ReSharper disable once AssignNullToNotNullAttribute
-                    return GetContent((EnvDTE.TextDocument) document.Object("TextDocument"));
+                    return GetContent((EnvDTE.TextDocument)document.Object("TextDocument"));
                 }
 
                 var fileName = projectItem.TryGetFileName();

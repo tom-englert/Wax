@@ -36,12 +36,13 @@
 
             foreach (var project in _projects)
             {
-                Contract.Assume(project != null);
+                if (project == null)
+                    continue;
 
                 foreach (var dependency in project.GetProjectReferences())
                 {
                     Contract.Assume(dependency != null);
-                    dependency.SourceProject.ReferencedBy.Add(project);
+                    dependency.SourceProject?.ReferencedBy.Add(project);
                 }
             }
 

@@ -156,7 +156,7 @@
 
             var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
                 .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject.GetProjectOutput(rootProject, deploySymbols, deployExternalLocalizations, binaryTargetDirectory)));
+                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployExternalLocalizations, binaryTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
             return projectOutput.ToArray();
         }
@@ -361,9 +361,8 @@
                         return _vsProject.References;
 
                     var projectItems = _project.ProjectItems;
-                    Contract.Assume(projectItems != null);
 
-                    return projectItems
+                    return projectItems?
                         .OfType<EnvDTE.ProjectItem>()
                         .Select(p => p.Object)
                         .OfType<VSLangProj.References>()

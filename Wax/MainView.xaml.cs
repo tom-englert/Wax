@@ -52,24 +52,24 @@
 
             var solution = _dte.Solution;
 
-            Contract.Assume(solution != null);
-
-            if ((viewModel == null) || (viewModel.Solution.FullName != solution.FullName) || (viewModel.HasExternalChanges) || !viewModel.Solution.Projects.Any())
+            if ((solution == null) || (viewModel == null) || (viewModel.Solution.FullName != solution.FullName) || (viewModel.HasExternalChanges) || !viewModel.Solution.Projects.Any())
             {
-                Refresh();
+                Refresh(solution);
             }
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            Refresh();
+            Refresh(_dte.Solution);
         }
 
-        private void Refresh()
+        private void Refresh(EnvDTE.Solution solution)
         {
-            var solution = _dte.Solution;
-
-            Contract.Assume(solution != null);
+            if (solution == null)
+            {
+                ViewModel = null;
+                return;
+            }
 
             try
             {

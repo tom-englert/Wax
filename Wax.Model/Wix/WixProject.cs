@@ -16,7 +16,9 @@ namespace tomenglertde.Wax.Model.Wix
 
     public class WixProject : Project
     {
+        [NotNull]
         private static readonly string[] _wixFileExtensions = { ".wxs", ".wxi" };
+        [NotNull]
         private static readonly string[] _wellKnownPublicMsiProperties = { "x86", "x64" };
         private const string WaxConfigurationFileExtension = ".wax";
 
@@ -44,9 +46,6 @@ namespace tomenglertde.Wax.Model.Wix
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
                 .ToList();
-
-            Contract.Assume(_sourceFiles.Any());
-            Contract.Assume(_sourceFiles.First() != null);
         }
 
         [NotNull, ItemNotNull]
@@ -270,11 +269,10 @@ namespace tomenglertde.Wax.Model.Wix
             MapElement(filePath, node, _configuration.FileMappings);
         }
 
-        [NotNull]
+        [CanBeNull]
         public WixFileNode AddFileNode([NotNull] FileMapping fileMapping)
         {
             Contract.Requires(fileMapping != null);
-            Contract.Ensures(Contract.Result<WixFileNode>() != null);
 
             var targetName = fileMapping.TargetName;
 
@@ -286,6 +284,9 @@ namespace tomenglertde.Wax.Model.Wix
             directoryId = directory != null ? directory.Id : "TODO: unknown directory " + directoryName;
 
             var componentGroup = ForceComponentGroup(directoryId);
+
+            if (componentGroup == null)
+                return null;
 
             ForceFeatureRef(componentGroup.Id);
 
@@ -324,13 +325,12 @@ namespace tomenglertde.Wax.Model.Wix
             return s.ToString();
         }
 
-        [NotNull]
+        [CanBeNull]
         private WixComponentGroupNode ForceComponentGroup([NotNull] string directoryId)
         {
             Contract.Requires(directoryId != null);
-            Contract.Ensures(Contract.Result<WixComponentGroupNode>() != null);
 
-            return ComponentGroups.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.First().AddComponentGroup(directoryId);
+            return ComponentGroups.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.FirstOrDefault()?.AddComponentGroup(directoryId);
         }
 
         public void ForceFeatureRef([NotNull] string componentGroupId)
@@ -420,8 +420,6 @@ namespace tomenglertde.Wax.Model.Wix
         private void ObjectInvariant()
         {
             Contract.Invariant(_sourceFiles != null);
-            Contract.Invariant(_sourceFiles.Any());
-            Contract.Invariant(_sourceFiles.First() != null);
             Contract.Invariant(_configuration != null);
             Contract.Invariant(_configurationFileProjectItem != null);
         }
