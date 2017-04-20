@@ -95,7 +95,7 @@
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/like.png" />
         </Button>
         <Button x:Name="HelpButton" ToolTip="{x:Static properties:Resources.Documentation}"
-                Tag="https://waxsetupeditor.codeplex.com/documentation">
+                Tag="https://github.com/tom-englert/Wax">
           <Grid Width="16" Height="16">
             <TextBlock Text="?" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
           </Grid>
