@@ -134,23 +134,22 @@
 
             try
             {
-                Contract.Assume(proj.DTE != null);
-                var solution = GetService<IVsSolution>(proj.DTE);
+                var dte = proj.TryGetDte();
+                if (dte == null)
+                    return string.Empty;
+
+                var solution = GetService<IVsSolution>(dte);
 
                 if (solution == null)
                     return string.Empty;
 
-                IVsHierarchy hierarchy;
-                var result = solution.GetProjectOfUniqueName(proj.UniqueName, out hierarchy);
+                var result = solution.GetProjectOfUniqueName(proj.UniqueName, out IVsHierarchy hierarchy);
 
                 if (result == 0)
                 {
-                    var aggregatableProject = hierarchy as IVsAggregatableProjectCorrected;
-
-                    if (aggregatableProject != null)
+                    if (hierarchy is IVsAggregatableProjectCorrected aggregatableProject)
                     {
-                        string projectTypeGuids;
-                        result = aggregatableProject.GetAggregateProjectTypeGuids(out projectTypeGuids);
+                        result = aggregatableProject.GetAggregateProjectTypeGuids(out string projectTypeGuids);
 
                         if ((result == 0) && (projectTypeGuids != null))
                             return projectTypeGuids;
@@ -158,8 +157,9 @@
                     }
                 }
             }
-            catch (ExternalException)
+            catch
             {
+                // internal error
             }
 
             return string.Empty;
@@ -310,6 +310,19 @@
             try
             {
                 return project?.Object;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        [CanBeNull]
+        public static EnvDTE.DTE TryGetDte([CanBeNull] this EnvDTE.Project project)
+        {
+            try
+            {
+                return project?.DTE;
             }
             catch
             {
