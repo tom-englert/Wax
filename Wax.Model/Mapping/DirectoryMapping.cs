@@ -18,6 +18,7 @@
     {
         [NotNull]
         private readonly string _directory;
+        [NotNull]
         private readonly string _id;
         [NotNull]
         private readonly IList<WixDirectoryNode> _unmappedNodes;

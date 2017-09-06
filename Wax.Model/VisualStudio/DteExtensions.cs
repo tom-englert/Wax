@@ -59,7 +59,7 @@
             return items;
         }
 
-        private static void GetSubProjects(this IEnumerable projectItems, [NotNull] ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects([CanBeNull] this IEnumerable projectItems, [NotNull] ICollection<EnvDTE.Project> items)
         {
             Contract.Requires(items != null);
 
@@ -72,7 +72,7 @@
             }
         }
 
-        private static void GetSubProjects(this EnvDTE.ProjectItem projectItem, [NotNull] ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects([CanBeNull] this EnvDTE.ProjectItem projectItem, [NotNull] ICollection<EnvDTE.Project> items)
         {
             Contract.Requires(items != null);
 
@@ -165,6 +165,7 @@
             return string.Empty;
         }
 
+        [CanBeNull]
         private static T GetService<T>([NotNull] object serviceProvider) where T : class
         {
             Contract.Requires(serviceProvider != null);
@@ -172,6 +173,7 @@
             return (T)GetService((IServiceProvider)serviceProvider, typeof(T).GUID);
         }
 
+        [CanBeNull]
         private static object GetService([NotNull] IServiceProvider serviceProvider, Guid guid)
         {
             Contract.Requires(serviceProvider != null);
@@ -193,6 +195,7 @@
             return null;
         }
 
+        [CanBeNull]
         public static string TryGetFileName([NotNull] this EnvDTE.ProjectItem projectItem)
         {
             Contract.Requires(projectItem != null);
@@ -292,13 +295,26 @@
         }
 
         [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        private static void SetContent([NotNull] EnvDTE.Document document, string text)
+        private static void SetContent([NotNull] EnvDTE.Document document, [CanBeNull] string text)
         {
             Contract.Requires(document != null);
 
             var textDocument = (EnvDTE.TextDocument)document.Object("TextDocument");
 
             textDocument.StartPoint.CreateEditPoint().ReplaceText(textDocument.EndPoint, text, 0);
+        }
+
+        [CanBeNull]
+        public static object TryGetObject([CanBeNull] this EnvDTE.Project project)
+        {
+            try
+            {
+                return project?.Object;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

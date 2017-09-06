@@ -40,7 +40,7 @@
         private WixFileNode _mappedNode;
         private MappingState _mappingState;
 
-        public FileMapping([NotNull] ProjectOutput projectOutput, ObservableCollection<ProjectOutput> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
+        public FileMapping([NotNull] ProjectOutput projectOutput, [NotNull] ObservableCollection<ProjectOutput> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
         {
             Contract.Requires(projectOutput != null);
             Contract.Requires(wixProject != null);

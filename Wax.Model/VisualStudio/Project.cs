@@ -34,7 +34,7 @@
 
             _solution = solution;
             _project = project;
-            _vsProject = project.Object as VSLangProj.VSProject;
+            _vsProject = project.TryGetObject() as VSLangProj.VSProject;
 
             Contract.Assume(_project.UniqueName != null);
             _uniqueName = _project.UniqueName;
