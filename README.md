@@ -20,6 +20,10 @@ The file grid supports multiple selection, so you can apply all commands to many
 
 ## Installation
 
+---
+### Make sure you have installed the [WiX Toolset](http://wixtoolset.org/) before installing Wax!
+---
+
 This tool is a Visual Studio Extension. Use the Visual Studio Extension Manager, install from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=TomEnglert.Wax), or download the binaries and double click the Wax.vsix in the windows explorer.
 
 The Wax editor is a tool to maintain WiX projects, so you should have installed the [WiX Toolset](http://wixtoolset.org/).
