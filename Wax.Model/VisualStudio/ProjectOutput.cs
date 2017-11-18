@@ -6,12 +6,16 @@
     using System.Diagnostics.Contracts;
     using System.IO;
 
+    using Equatable;
+
     using JetBrains.Annotations;
 
-    public class ProjectOutput : IEquatable<ProjectOutput>
+    [ImplementsEquatable]
+    public class ProjectOutput
     {
         [NotNull]
         private readonly string _relativeFileName;
+        [Equals(StringComparison.OrdinalIgnoreCase)]
         [NotNull]
         private readonly string _targetName;
         [NotNull]
@@ -113,68 +117,6 @@
         {
             return _targetName;
         }
-
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
-        {
-            return _targetName.ToUpperInvariant().GetHashCode();
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as ProjectOutput);
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="ProjectOutput"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="ProjectOutput"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="ProjectOutput"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProjectOutput other)
-        {
-            return InternalEquals(this, other);
-        }
-
-        private static bool InternalEquals(ProjectOutput left, ProjectOutput right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return string.Equals(left._targetName, right._targetName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==(ProjectOutput left, ProjectOutput right)
-        {
-            return InternalEquals(left, right);
-        }
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=(ProjectOutput left, ProjectOutput right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
