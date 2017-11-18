@@ -31,7 +31,9 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull, ItemNotNull]
         private readonly List<WixDirectoryNode> _directoryNodes;
         [NotNull, ItemNotNull]
-        private readonly List<WixComponentGroupNode> _componentGroups;
+        private readonly List<WixComponentGroupNode> _componentGroupNodes;
+        [NotNull, ItemNotNull]
+        private readonly List<WixComponentNode> _componentNodes;
         [NotNull, ItemNotNull]
         private readonly List<WixFeatureNode> _featureNodes;
         [NotNull, ItemNotNull]
@@ -56,9 +58,14 @@ namespace tomenglertde.Wax.Model.Wix
                 .Select(p => new WixDefine(this, p))
                 .ToList();
 
-            _componentGroups = root.Descendants(WixNames.ComponentGroupNode)
+            _componentGroupNodes = root.Descendants(WixNames.ComponentGroupNode)
                 // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixComponentGroupNode(this, node))
+                .ToList();
+
+            _componentNodes = root.Descendants(WixNames.ComponentNode)
+                // ReSharper disable once AssignNullToNotNullAttribute
+                .Select(node => new WixComponentNode(this, node))
                 .ToList();
 
             _fileNodes = new List<WixFileNode>();
@@ -92,10 +99,13 @@ namespace tomenglertde.Wax.Model.Wix
         public IEnumerable<WixDirectoryNode> DirectoryNodes => new ReadOnlyCollection<WixDirectoryNode>(_directoryNodes);
 
         [NotNull]
-        public IEnumerable<WixComponentGroupNode> ComponentGroups => new ReadOnlyCollection<WixComponentGroupNode>(_componentGroups);
+        public IEnumerable<WixComponentGroupNode> ComponentGroupNodes => new ReadOnlyCollection<WixComponentGroupNode>(_componentGroupNodes);
 
         [NotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes => new ReadOnlyCollection<WixFeatureNode>(_featureNodes);
+
+        [NotNull]
+        public IEnumerable<WixComponentNode> ComponentNodes => new ReadOnlyCollection<WixComponentNode>(_componentNodes);
 
         [NotNull]
         public WixProject Project { get; }
@@ -158,7 +168,7 @@ namespace tomenglertde.Wax.Model.Wix
             Save();
 
             var componentGroup = new WixComponentGroupNode(this, componentGroupElement);
-            _componentGroups.Add(componentGroup);
+            _componentGroupNodes.Add(componentGroup);
             return componentGroup;
         }
 

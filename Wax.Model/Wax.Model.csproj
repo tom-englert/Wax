@@ -209,6 +209,7 @@
     <Compile Include="Wix\ProjectConfiguration.cs" />
     <Compile Include="Wix\WixProductNode.cs" />
     <Compile Include="Wix\WixComponentGroupNode.cs" />
+    <Compile Include="Wix\WixComponentNode.cs" />
     <Compile Include="Wix\WixDefine.cs" />
     <Compile Include="Wix\WixDirectoryNode.cs" />
     <Compile Include="Wix\WixFeatureNode.cs" />

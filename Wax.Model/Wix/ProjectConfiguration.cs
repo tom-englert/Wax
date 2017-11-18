@@ -51,6 +51,9 @@ namespace tomenglertde.Wax.Model.Wix
         [XmlElement("DeploySymbols")]
         public bool DeploySymbols { get; set; }
 
+        [XmlElement("DeployLocalizations")]
+        public bool DeployLocalizations { get; set; } = true;
+
         [XmlElement("DeployExternalLocalizations")]
         public bool DeployExternalLocalizations { get; set; }
     }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -208,6 +208,12 @@
     <value>Debug-Symbole mitinstallieren</value>
   </data>
   <data name="ExternalLocalizationsToolTip" xml:space="preserve">
-    <value>Lokalisierungen externer Komponenten mitinstallieren</value>
+    <value>Lokalisierungen externer Komponenten installieren</value>
+  </data>
+  <data name="Localizations" xml:space="preserve">
+    <value>Lokalisierungen</value>
+  </data>
+  <data name="LocalizationsToolTip" xml:space="preserve">
+    <value>Lokalisierungen installieren</value>
   </data>
 </root>

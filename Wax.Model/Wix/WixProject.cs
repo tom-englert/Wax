@@ -56,6 +56,9 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull, ItemNotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.FeatureNodes);
 
+        [NotNull, ItemNotNull]
+        public IEnumerable<WixComponentNode> ComponentNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentNodes);
+
         [CanBeNull]
         public WixProductNode ProductNode
         {
@@ -74,7 +77,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<WixComponentGroupNode> ComponentGroups => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroups);
+        public IEnumerable<WixComponentGroupNode> ComponentGroups => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroupNodes);
 
         [NotNull, ItemNotNull]
         public IEnumerable<Project> DeployedProjects
@@ -102,6 +105,12 @@ namespace tomenglertde.Wax.Model.Wix
         {
             get => _configuration.DeploySymbols;
             set => _configuration.DeploySymbols = value;
+        }
+
+        public bool DeployLocalizations
+        {
+            get => _configuration.DeployLocalizations;
+            set => _configuration.DeployLocalizations = value;
         }
 
         public bool DeployExternalLocalizations

@@ -87,6 +87,7 @@
         </Button>
         <Separator />
         <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" ToolTip="{x:Static properties:Resources.DeploySymbolsToolTip}"/>
+        <CheckBox Content="{x:Static properties:Resources.Localizations}" IsChecked="{Binding DeployLocalizations}" ToolTip="{x:Static properties:Resources.LocalizationsToolTip}"/>
         <CheckBox Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}"/>
         <Separator />
         <Button x:Name="LikeButton" ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"

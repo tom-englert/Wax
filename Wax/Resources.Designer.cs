@@ -19,7 +19,7 @@ namespace tomenglertde.Wax {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -97,7 +97,7 @@ namespace tomenglertde.Wax {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deploy symbols.
+        ///   Looks up a localized string similar to Symbols.
         /// </summary>
         public static string DeploySymbols {
             get {
@@ -192,6 +192,24 @@ namespace tomenglertde.Wax {
         public static string Id {
             get {
                 return ResourceManager.GetString("Id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Localizations.
+        /// </summary>
+        public static string Localizations {
+            get {
+                return ResourceManager.GetString("Localizations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Include localizations in the setup project..
+        /// </summary>
+        public static string LocalizationsToolTip {
+            get {
+                return ResourceManager.GetString("LocalizationsToolTip", resourceCulture);
             }
         }
         

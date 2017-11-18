@@ -13,6 +13,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
         }
 
+        [CanBeNull]
         public string Directory => GetAttribute("Directory");
 
         [NotNull]

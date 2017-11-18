@@ -88,23 +88,23 @@
         public bool IsVsProject => _vsProject != null;
 
         [NotNull, ItemNotNull]
-        public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployExternalLocalizations)
+        public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations)
         {
             var primaryOutput = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
 
             var binaryTargetDirectory = Path.GetDirectoryName(primaryOutput) ?? string.Empty;
 
-            return GetProjectOutput(this, deploySymbols, deployExternalLocalizations, binaryTargetDirectory);
+            return GetProjectOutput(this, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory);
         }
 
         [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployExternalLocalizations, [NotNull] string binaryTargetDirectory)
+        private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, [NotNull] string binaryTargetDirectory)
         {
             var references = GetReferences();
 
-            var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
+            var projectOutput = GetBuildFiles(rootProject, deploySymbols, deployLocalizations, binaryTargetDirectory)
                 .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployExternalLocalizations, binaryTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
+                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
             return projectOutput.ToArray();
         }
@@ -117,7 +117,7 @@
                 .Where(reference => reference.CopyLocal)
                 .Select(reference => reference.Path)
                 .Where(File.Exists) // Reference can be a project reference, but project has not been built yet.
-                // ReSharper disable once AssignNullToNotNullAttribute
+                                    // ReSharper disable once AssignNullToNotNullAttribute
                 .SelectMany(file => GetReferencedAssemblyNames(file, deployExternalLocalizations))
                 .Distinct()
                 // ReSharper disable once AssignNullToNotNullAttribute
@@ -181,9 +181,12 @@
         protected Solution Solution { get; }
 
         [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, [NotNull] string binaryTargetDirectory)
+        private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, [NotNull] string binaryTargetDirectory)
         {
-            var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls;
+            var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles;
+
+            if (deployLocalizations)
+                buildFileGroups |= BuildFileGroups.LocalizedResourceDlls;
 
             if (deploySymbols)
                 buildFileGroups |= BuildFileGroups.Symbols;

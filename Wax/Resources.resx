@@ -133,7 +133,7 @@
     <value>WiX Setup Editor</value>
   </data>
   <data name="DeploySymbols" xml:space="preserve">
-    <value>Deploy symbols</value>
+    <value>Symbols</value>
   </data>
   <data name="SetupProjectToEdit" xml:space="preserve">
     <value>Setup project to edit:</value>
@@ -218,5 +218,11 @@
   </data>
   <data name="ExternalLocalizationsToolTip" xml:space="preserve">
     <value>Include also external/3rd party localizations in the setup project.</value>
+  </data>
+  <data name="Localizations" xml:space="preserve">
+    <value>Localizations</value>
+  </data>
+  <data name="LocalizationsToolTip" xml:space="preserve">
+    <value>Include localizations in the setup project.</value>
   </data>
 </root>

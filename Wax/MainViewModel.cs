@@ -95,6 +95,24 @@
             GenerateMappings(SelectedVSProjects, wixProject);
         }
 
+        public bool DeployLocalizations { get; set; }
+
+        [UsedImplicitly]
+        private void OnDeployLocalizationsChanged()
+        {
+            if (_wixProjectChanging)
+                return;
+
+            var wixProject = SelectedWixProject;
+
+            if (wixProject == null)
+                return;
+
+            wixProject.DeployLocalizations = DeployLocalizations;
+
+            GenerateMappings(SelectedVSProjects, wixProject);
+        }
+
         public bool DeployExternalLocalizations { get; set; }
 
         [UsedImplicitly]
@@ -157,7 +175,7 @@
             try
             {
                 var projectOutputs = vsProjects
-                    .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployExternalLocalizations))
+                    .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployLocalizations, DeployExternalLocalizations))
                     .ToArray();
 
                 GenerateDirectoryMappings(projectOutputs, wixProject);
