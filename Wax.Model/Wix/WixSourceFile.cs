@@ -55,35 +55,33 @@ namespace tomenglertde.Wax.Model.Wix
             _rawXmlFile = _projectItem.GetXmlContent(LoadOptions.None);
 
             var root = _xmlFile.Root;
-            if (root == null)
-                throw new InvalidDataException("Invalid source file: " + projectItem.TryGetFileName());
 
-            _root = root;
+            _root = root ?? throw new InvalidDataException("Invalid source file: " + projectItem.TryGetFileName());
 
-            WixNames = new WixNames(_root.GetDefaultNamespace().NamespaceName);
+            WixNames = new WixNames(root.GetDefaultNamespace().NamespaceName);
 
-            _defines = _root.Nodes().OfType<XProcessingInstruction>()
+            _defines = root.Nodes().OfType<XProcessingInstruction>()
                 .Where(p => p.Target.Equals(WixNames.Define, StringComparison.Ordinal))
                 .Select(p => new WixDefine(this, p))
                 .ToList();
 
-            _componentGroups = _root.Descendants(WixNames.ComponentGroupNode)
+            _componentGroups = root.Descendants(WixNames.ComponentGroupNode)
                 .Select(node => new WixComponentGroupNode(this, node))
                 .ToList();
 
             _fileNodes = new List<WixFileNode>();
 
-            _fileNodes.AddRange(_root
+            _fileNodes.AddRange(root
                 .Descendants(WixNames.FileNode)
                 .Select(node => new WixFileNode(this, node, _fileNodes)));
 
-            _directoryNodes = _root
+            _directoryNodes = root
                 .Descendants(WixNames.DirectoryNode)
                 .Select(node => new WixDirectoryNode(this, node))
                 .Where(node => node.Id != "TARGETDIR")
                 .ToList();
 
-            _featureNodes = _root
+            _featureNodes = root
                 .Descendants(WixNames.FeatureNode)
                 .Select(node => new WixFeatureNode(this, node))
                 .ToList();
