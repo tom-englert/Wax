@@ -2,8 +2,7 @@ namespace tomenglertde.Wax.Model.Wix
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Xml.Serialization;
 
@@ -13,101 +12,47 @@ namespace tomenglertde.Wax.Model.Wix
     [XmlType("Configuration")]
     public class ProjectConfiguration
     {
-        [NotNull]
-        private Dictionary<string, string> _directoryMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        [NotNull]
-        private Dictionary<string, string> _fileMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private string[] _deployProjectNames;
 
         [XmlArray("DeployedProjects")]
         [NotNull]
         public string[] DeployedProjectNames
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<string[]>() != null);
-
-                return _deployProjectNames ?? new string[0];
-            }
-            set
-            {
-                _deployProjectNames = value;
-            }
+            get => _deployProjectNames ?? new string[0];
+            set => _deployProjectNames = value;
         }
 
         [XmlArray("DirectoryMappings")]
         [NotNull]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public MappingItem[] DirectoryMappingNames
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<MappingItem[]>() != null);
-
-                return _directoryMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
-            }
-            set
-            {
-                Contract.Requires(value != null);
-
-                _directoryMappings = value.ToDictionary(_ => _.Key, _ => _.Value, StringComparer.OrdinalIgnoreCase);
-            }
+            get => DirectoryMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
+            set => DirectoryMappings = value.ToDictionary(item => item.Key, item => item.Value, StringComparer.OrdinalIgnoreCase);
         }
 
         [XmlArray("FileMappings")]
         [NotNull]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public MappingItem[] FileMappingNames
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<MappingItem[]>() != null);
-
-                return _fileMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
-            }
-            set
-            {
-                Contract.Requires(value != null);
-                _fileMappings = value.ToDictionary(_ => _.Key, _ => _.Value, StringComparer.OrdinalIgnoreCase);
-            }
+            get => FileMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
+            set => FileMappings = value.ToDictionary(item => item.Key, item => item.Value, StringComparer.OrdinalIgnoreCase);
         }
 
         [XmlIgnore]
         [NotNull]
-        public Dictionary<string, string> DirectoryMappings
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Dictionary<string, string>>() != null);
-
-                return _directoryMappings;
-            }
-        }
+        public Dictionary<string, string> DirectoryMappings { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         [XmlIgnore]
         [NotNull]
-        public Dictionary<string, string> FileMappings
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Dictionary<string, string>>() != null);
-
-                return _fileMappings;
-            }
-        }
+        public Dictionary<string, string> FileMappings { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         [XmlElement("DeploySymbols")]
         public bool DeploySymbols { get; set; }
 
         [XmlElement("DeployExternalLocalizations")]
         public bool DeployExternalLocalizations { get; set; }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_directoryMappings != null);
-            Contract.Invariant(_fileMappings != null);
-        }
     }
 
     [Serializable]

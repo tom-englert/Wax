@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -19,28 +18,22 @@
     public class Project
     {
         [NotNull]
-        private readonly Solution _solution;
-        [NotNull]
         private readonly EnvDTE.Project _project;
         private readonly VSLangProj.VSProject _vsProject;
         [NotNull, ItemNotNull]
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
-        [NotNull]
-        private readonly string _uniqueName;
+
         [NotNull]
         private readonly string _projectTypeGuids;
 
         public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
         {
-            Contract.Requires(solution != null);
-            Contract.Requires(project != null);
-
-            _solution = solution;
+            Solution = solution;
             _project = project;
             _vsProject = project.TryGetObject() as VSLangProj.VSProject;
 
-            Contract.Assume(_project.UniqueName != null);
-            _uniqueName = _project.UniqueName;
+            Debug.Assert(_project.UniqueName != null);
+            UniqueName = _project.UniqueName;
 
             _projectTypeGuids = _project.GetProjectTypeGuids();
         }
@@ -48,17 +41,12 @@
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectReference> GetProjectReferences()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectReference>>() != null);
-
             return GetProjectReferences(GetReferences());
         }
 
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectReference> GetProjectReferences([NotNull, ItemNotNull] IEnumerable<VSLangProj.Reference> references)
         {
-            Contract.Requires(references != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectReference>>() != null);
-
             var projectReferences = references
                 .Where(reference => reference.GetSourceProject() != null)
                 .Where(reference => reference.CopyLocal)
@@ -70,11 +58,6 @@
         [NotNull, ItemNotNull]
         private static IReadOnlyCollection<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull, ItemNotNull] IReadOnlyCollection<VSLangProj.Reference> references, [NotNull] string targetDirectory)
         {
-            Contract.Requires(rootProject != null);
-            Contract.Requires(references != null);
-            Contract.Requires(targetDirectory != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
             var localFileReferences = references
                 .Where(reference => reference.GetSourceProject() == null)
                 .Where(reference => reference.CopyLocal)
@@ -86,51 +69,19 @@
         }
 
         [NotNull, ItemNotNull]
-        public ICollection<Project> ReferencedBy
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ICollection<Project>>() != null);
-
-                return _referencedBy;
-            }
-        }
+        public ICollection<Project> ReferencedBy => _referencedBy;
 
         [NotNull]
-        public string FullName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                var fullName = _project.FullName;
-                Contract.Assume(fullName != null);
-                return fullName;
-            }
-        }
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        protected string FullName => _project.FullName;
 
         [Equals(StringComparison.OrdinalIgnoreCase)]
         [NotNull]
-        public string UniqueName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _uniqueName;
-            }
-        }
+        public string UniqueName { get; }
 
         [NotNull]
-        public string RelativeFolder
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return Path.GetDirectoryName(_uniqueName);
-            }
-        }
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        public string RelativeFolder => Path.GetDirectoryName(UniqueName);
 
         public bool IsTestProject => _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}");
 
@@ -139,8 +90,6 @@
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployExternalLocalizations)
         {
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
             var primaryOutput = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
 
             var binaryTargetDirectory = Path.GetDirectoryName(primaryOutput) ?? string.Empty;
@@ -149,13 +98,8 @@
         }
 
         [NotNull, ItemNotNull]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployExternalLocalizations, [NotNull] string binaryTargetDirectory)
         {
-            Contract.Requires(rootProject != null);
-            Contract.Requires(binaryTargetDirectory != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
             var references = GetReferences();
 
             var projectOutput = GetBuildFiles(rootProject, deploySymbols, binaryTargetDirectory)
@@ -168,29 +112,24 @@
         [NotNull, ItemNotNull]
         private static IReadOnlyCollection<ProjectOutput> GetSecondTierReferences([NotNull, ItemNotNull] IEnumerable<VSLangProj.Reference> references, [NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull] string targetDirectory)
         {
-            Contract.Requires(references != null);
-            Contract.Requires(rootProject != null);
-            Contract.Requires(targetDirectory != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
             // Try to resolve second-tier references for CopyLocal references
             return references
                 .Where(reference => reference.CopyLocal)
                 .Select(reference => reference.Path)
                 .Where(File.Exists) // Reference can be a project reference, but project has not been built yet.
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .SelectMany(file => GetReferencedAssemblyNames(file, deployExternalLocalizations))
                 .Distinct()
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(file => new ProjectOutput(rootProject, file, targetDirectory))
                 .ToArray();
         }
 
         [NotNull, ItemNotNull]
-        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static IReadOnlyCollection<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName, bool deployExternalLocalizations)
         {
-            Contract.Requires(assemblyFileName != null);
-            Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
-
             try
             {
                 var directory = Path.GetDirectoryName(assemblyFileName);
@@ -232,32 +171,18 @@
         {
             get
             {
-                Contract.Ensures(Contract.Result<string>() != null);
-
                 var name = _project.Name;
-                Contract.Assume(name != null);
+                Debug.Assert(name != null);
                 return name;
             }
         }
 
         [NotNull]
-        public Solution Solution
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Solution>() != null);
-
-                return _solution;
-            }
-        }
+        protected Solution Solution { get; }
 
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, [NotNull] string binaryTargetDirectory)
         {
-            Contract.Requires(rootProject != null);
-            Contract.Requires(binaryTargetDirectory != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
             var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls;
 
             if (deploySymbols)
@@ -269,10 +194,6 @@
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, [NotNull] string binaryTargetDirectory)
         {
-            Contract.Requires(rootProject != null);
-            Contract.Requires(binaryTargetDirectory != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
             var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
 
             var outputGroups = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups;
@@ -289,23 +210,17 @@
         [NotNull, ItemNotNull]
         protected IReadOnlyCollection<EnvDTE.ProjectItem> GetAllProjectItems()
         {
-            Contract.Ensures(Contract.Result<IReadOnlyCollection<EnvDTE.ProjectItem>>() != null);
-
             return _project.EnumerateAllProjectItems().ToArray();
         }
 
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<VSLangProj.Reference> GetReferences()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
-
             return GetVsProjectReferences() ?? GetMpfProjectReferences() ?? new VSLangProj.Reference[0];
         }
 
         protected void AddProjectReferences([NotNull] params Project[] projects)
         {
-            Contract.Requires(projects != null);
-
             var referencesCollection = ReferencesCollection;
 
             if (referencesCollection == null)
@@ -316,6 +231,8 @@
                 .ToArray();
 
             var newProjects = projects
+                // ReSharper disable once AssignNullToNotNullAttribute
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 .Where(project => projectReferences.All(reference => !Equals(reference.GetSourceProject(), project)))
                 .ToArray();
 
@@ -328,13 +245,13 @@
             }
         }
 
-        protected internal void RemoveProjectReferences([NotNull] params Project[] projects)
+        protected void RemoveProjectReferences([NotNull] params Project[] projects)
         {
-            Contract.Requires(projects != null);
-
             var references = GetReferences();
 
             var projectReferences = projects
+                // ReSharper disable once AssignNullToNotNullAttribute
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 .Select(project => references.FirstOrDefault(reference => Equals(reference.GetSourceProject(), project)))
                 .ToArray();
 
@@ -345,16 +262,14 @@
         }
 
         [NotNull]
-        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException", Justification = "No contracts for EnvDTE"), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         protected EnvDTE.ProjectItem AddItemFromFile([NotNull] string fileName)
         {
-            Contract.Requires(fileName != null);
-            Contract.Ensures(Contract.Result<EnvDTE.ProjectItem>() != null);
-
+            // ReSharper disable once AssignNullToNotNullAttribute
+            // ReSharper disable once PossibleNullReferenceException
             return _project.ProjectItems.AddFromFile(fileName);
         }
 
-        [ContractVerification(false)]
+        [CanBeNull]
         private VSLangProj.References ReferencesCollection
         {
             get
@@ -380,7 +295,7 @@
             }
         }
 
-        [ContractVerification(false)]
+        [CanBeNull]
         private IReadOnlyCollection<VSLangProj.Reference> GetMpfProjectReferences()
         {
             try
@@ -392,6 +307,7 @@
                     .Select(p => p.Object)
                     .OfType<VSLangProj.References>()
                     .Take(1)
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     .SelectMany(references => references.OfType<VSLangProj.Reference>())
                     .ToArray();
             }
@@ -401,7 +317,7 @@
             }
         }
 
-        [ContractVerification(false)]
+        [CanBeNull]
         private IReadOnlyCollection<VSLangProj.Reference> GetVsProjectReferences()
         {
             try
@@ -420,15 +336,9 @@
         [NotNull, ItemNotNull]
         private static IReadOnlyCollection<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup, [NotNull] string binaryTargetDirectory)
         {
-            Contract.Requires(project != null);
-            Contract.Requires(outputGroup != null);
-            Contract.Requires(binaryTargetDirectory != null);
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectOutput>>() != null);
-
-            BuildFileGroups buildFileGroup;
             var canonicalName = outputGroup.CanonicalName;
 
-            if (!Enum.TryParse(canonicalName, out buildFileGroup))
+            if (!Enum.TryParse(canonicalName, out BuildFileGroups buildFileGroup))
                 throw new InvalidOperationException("Unknown output group: " + canonicalName);
 
             var fileNames = outputGroup.GetFileNames();
@@ -442,26 +352,13 @@
         {
             return UniqueName;
         }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_solution != null);
-            Contract.Invariant(_project != null);
-            Contract.Invariant(_projectTypeGuids != null);
-            Contract.Invariant(_referencedBy != null);
-            Contract.Invariant(_uniqueName != null);
-        }
     }
 
     internal static class ProjectExtension
     {
+        [CanBeNull]
         public static EnvDTE.Project GetSourceProject([NotNull] this VSLangProj.Reference reference)
         {
-            Contract.Requires(reference != null);
-
             try
             {
                 return reference.SourceProject;
@@ -475,16 +372,12 @@
         [NotNull, ItemNotNull]
         public static string[] GetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
         {
-            Contract.Requires(outputGroup != null);
-            Contract.Ensures(Contract.Result<string[]>() != null);
-
             return InternalGetFileNames(outputGroup) ?? new string[0];
         }
 
+        [CanBeNull]
         private static string[] InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
         {
-            Contract.Requires(outputGroup != null);
-
             try
             {
                 return ((Array)outputGroup.FileNames)?.OfType<string>().ToArray();

@@ -7,9 +7,7 @@
              xmlns:wax="urn:wax"
              xmlns:toms="urn:TomsToolbox"
              xmlns:local="clr-namespace:tomenglertde.Wax"
-              xmlns:properties="clr-namespace:tomenglertde.Wax"
-         
-             Name="Wax"
+             xmlns:properties="clr-namespace:tomenglertde.Wax"
              d:DataContext="{d:DesignInstance local:MainViewModel}">
   <!-- TODO:
     xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
@@ -38,6 +36,7 @@
         <Setter.Value>
           <Style TargetType="DataGridRow">
             <Style.Triggers>
+              <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
               <DataTrigger Binding="{Binding MappedNode}" Value="{x:Null}">
                 <Setter Property="Background" Value="LightCoral" />
               </DataTrigger>
@@ -80,7 +79,7 @@
       </Setter>
     </Style>
   </UserControl.Resources>
-    <DockPanel Background="{x:Static SystemColors.ControlBrush}">
+  <DockPanel Background="{x:Static SystemColors.ControlBrush}">
     <ToolBarTray DockPanel.Dock="Top" Margin="0">
       <ToolBar>
         <Button ToolTip="{x:Static properties:Resources.Refresh}" Click="Refresh_Click">
@@ -395,12 +394,15 @@
               <Style TargetType="DataGridRow">
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Style.Triggers>
+                  <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
                   <DataTrigger Binding="{Binding MappingState}" Value="{x:Static wax:MappingState.Unmapped}">
                     <Setter Property="Background" Value="LightCoral" />
                   </DataTrigger>
+                  <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
                   <DataTrigger Binding="{Binding MappingState}" Value="{x:Static wax:MappingState.Ambiguous}">
                     <Setter Property="Background" Value="DarkOrange" />
                   </DataTrigger>
+                  <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
                   <DataTrigger Binding="{Binding MappingState}" Value="{x:Static wax:MappingState.Unique}">
                     <Setter Property="Background" Value="Yellow" />
                   </DataTrigger>
@@ -414,6 +416,7 @@
           <DataGrid ItemsSource="{Binding UnmappedFileNodes}" Style="{StaticResource DefaultDataGridStyle}">
             <DataGrid.Columns>
               <DataGridTextColumn Header="{x:Static properties:Resources.Id}" Binding="{Binding Node.Id}" IsReadOnly="True" />
+              <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
               <DataGridTextColumn Header="{x:Static properties:Resources.Name}" Binding="{Binding Name}" IsReadOnly="True" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Source}" Binding="{Binding Node.Source, Mode=OneWay}" Width="*" IsReadOnly="True" />
               <DataGridTemplateColumn Width="25">

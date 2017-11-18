@@ -1,6 +1,5 @@
 ﻿namespace tomenglertde.Wax.Model.Tools
 {
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -12,10 +11,8 @@
     public static class SerializerExtensions
     {
         [NotNull]
-        public static T Deserialize<T>(this string data) where T : class, new()
+        public static T Deserialize<T>([CanBeNull] this string data) where T : class, new()
         {
-            Contract.Ensures(Contract.Result<T>() != null);
-
             if (string.IsNullOrEmpty(data))
                 return new T();
 
@@ -37,10 +34,8 @@
         }
 
         [NotNull]
-        public static string Serialize<T>(this T value)
+        public static string Serialize<T>([NotNull] this T value)
         {
-            Contract.Ensures(Contract.Result<string>() != null);
-
             var result = new StringBuilder();
 
             var serializer = new XmlSerializer(typeof(T));

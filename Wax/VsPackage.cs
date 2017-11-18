@@ -6,6 +6,7 @@
     using System.Globalization;
     using System.Runtime.InteropServices;
 
+    using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
 
@@ -41,7 +42,7 @@
         /// </summary>
         public VsPackage()
         {
-            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
         }
 
         /// <summary>
@@ -54,13 +55,13 @@
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
-            var window = this.FindToolWindow(typeof(ToolWindow), 0, true);
+            var window = FindToolWindow(typeof(ToolWindow), 0, true);
             if (window?.Frame == null)
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
             var windowFrame = (IVsWindowFrame)window.Frame;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
         /// <summary>
@@ -69,7 +70,7 @@
         /// </summary>
         protected override void Initialize()
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)

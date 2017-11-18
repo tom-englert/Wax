@@ -1,6 +1,5 @@
 namespace tomenglertde.Wax.Model.Wix
 {
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
@@ -18,10 +17,9 @@ namespace tomenglertde.Wax.Model.Wix
         public WixDirectoryNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
             : base(sourceFile, node)
         {
-            Contract.Requires(sourceFile != null);
-            Contract.Requires(node != null);
         }
 
+        [CanBeNull]
         public WixDirectoryNode Parent => _parent ?? (_parent = ResolveParent());
 
         [NotNull]
@@ -37,10 +35,6 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public WixDirectoryNode AddSubdirectory([NotNull] string id, [NotNull] string name)
         {
-            Contract.Requires(id != null);
-            Contract.Requires(name != null);
-            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
-
             var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
 
             Node.AddWithFormatting(directoryElement);
@@ -50,7 +44,7 @@ namespace tomenglertde.Wax.Model.Wix
             return SourceFile.AddDirectoryNode(directoryElement);
         }
 
-        [ContractVerification(false)] // because of switch(string) 
+        [CanBeNull]
         private WixDirectoryNode ResolveParent()
         {
             var parentElement = Node.Parent;

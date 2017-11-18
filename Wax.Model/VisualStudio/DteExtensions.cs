@@ -5,7 +5,6 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -28,9 +27,6 @@
         [NotNull, ItemNotNull]
         public static IReadOnlyCollection<EnvDTE.Project> GetProjects([NotNull] this EnvDTE.Solution solution)
         {
-            Contract.Requires(solution != null);
-            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
-
             var items = new List<EnvDTE.Project>();
 
             var projects = solution.Projects;
@@ -61,8 +57,6 @@
 
         private static void GetSubProjects([CanBeNull] this IEnumerable projectItems, [NotNull] ICollection<EnvDTE.Project> items)
         {
-            Contract.Requires(items != null);
-
             if (projectItems == null)
                 return;
 
@@ -74,8 +68,6 @@
 
         private static void GetSubProjects([CanBeNull] this EnvDTE.ProjectItem projectItem, [NotNull] ICollection<EnvDTE.Project> items)
         {
-            Contract.Requires(items != null);
-
             var subProject = projectItem?.SubProject;
 
             if (subProject == null)
@@ -89,9 +81,6 @@
         [NotNull, ItemNotNull]
         public static IEnumerable<EnvDTE.ProjectItem> EnumerateAllProjectItems([NotNull] this EnvDTE.Project project)
         {
-            Contract.Requires(project != null);
-            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.ProjectItem>>() != null);
-
             if (project.ProjectItems == null)
                 yield break;
 
@@ -109,9 +98,6 @@
         [NotNull, ItemNotNull]
         private static IEnumerable<EnvDTE.ProjectItem> EnumerateProjectItems([NotNull] EnvDTE.ProjectItem projectItem)
         {
-            Contract.Requires(projectItem != null);
-            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.ProjectItem>>() != null);
-
             if (projectItem.ProjectItems == null)
                 yield break;
 
@@ -129,9 +115,6 @@
         [NotNull]
         public static string GetProjectTypeGuids([NotNull] this EnvDTE.Project proj)
         {
-            Contract.Requires(proj != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
             try
             {
                 var dte = proj.TryGetDte();
@@ -168,18 +151,13 @@
         [CanBeNull]
         private static T GetService<T>([NotNull] object serviceProvider) where T : class
         {
-            Contract.Requires(serviceProvider != null);
-
             return (T)GetService((IServiceProvider)serviceProvider, typeof(T).GUID);
         }
 
         [CanBeNull]
         private static object GetService([NotNull] IServiceProvider serviceProvider, Guid guid)
         {
-            Contract.Requires(serviceProvider != null);
-
-            IntPtr serviceHandle;
-            var hr = serviceProvider.QueryService(guid, guid, out serviceHandle);
+            var hr = serviceProvider.QueryService(guid, guid, out var serviceHandle);
 
             if (hr != 0)
             {
@@ -198,8 +176,6 @@
         [CanBeNull]
         public static string TryGetFileName([NotNull] this EnvDTE.ProjectItem projectItem)
         {
-            Contract.Requires(projectItem != null);
-
             try
             {
                 // some items report a file count > 0 but don't return a file name!
@@ -220,19 +196,12 @@
         [NotNull]
         public static XDocument GetXmlContent([NotNull] this EnvDTE.ProjectItem projectItem, LoadOptions loadOptions)
         {
-            Contract.Requires(projectItem != null);
-            Contract.Ensures(Contract.Result<XDocument>() != null);
-
             return XDocument.Parse(projectItem.GetContent(), loadOptions);
         }
 
         [NotNull]
-        [ContractVerification(false)]
         public static string GetContent([NotNull] this EnvDTE.ProjectItem projectItem)
         {
-            Contract.Requires(projectItem != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
             try
             {
                 if (!projectItem.IsOpen)
@@ -260,20 +229,15 @@
         }
 
         [NotNull]
-        [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute"), SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private static string GetContent([NotNull] EnvDTE.TextDocument document)
         {
-            Contract.Requires(document != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
             return document.StartPoint.CreateEditPoint().GetText(document.EndPoint);
         }
 
         public static void SetContent([NotNull] this EnvDTE.ProjectItem projectItem, [NotNull] string text)
         {
-            Contract.Requires(projectItem != null);
-            Contract.Requires(text != null);
-
             if (!projectItem.IsOpen)
                 projectItem.Open(EnvDTE.Constants.vsViewKindCode);
 
@@ -294,11 +258,9 @@
             }
         }
 
-        [ContractVerification(false), SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static void SetContent([NotNull] EnvDTE.Document document, [CanBeNull] string text)
         {
-            Contract.Requires(document != null);
-
             var textDocument = (EnvDTE.TextDocument)document.Object("TextDocument");
 
             textDocument.StartPoint.CreateEditPoint().ReplaceText(textDocument.EndPoint, text, 0);

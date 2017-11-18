@@ -3,6 +3,7 @@
     public interface IMapping
     {
         bool IsResolved { get; }
+
         bool HasSelectableItems { get; }
     }
 }

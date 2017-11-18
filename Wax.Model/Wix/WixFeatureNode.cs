@@ -1,7 +1,6 @@
 ﻿namespace tomenglertde.Wax.Model.Wix
 {
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Xml.Linq;
 
@@ -16,31 +15,18 @@
         public WixFeatureNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node) 
             : base(sourceFile, node)
         {
-            Contract.Requires(sourceFile != null);
-            Contract.Requires(node != null);
         }
 
         [NotNull]
-        public IEnumerable<string> ComponentGroupRefs
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<string>>() != null);
-
-                return Node
-                    .Descendants(WixNames.ComponentGroupRefNode)
-                    .Select(node => node.GetAttribute("Id"))
-                    .Where(id => !string.IsNullOrEmpty(id));
-            }
-        }
+        public IEnumerable<string> ComponentGroupRefs => Node
+            .Descendants(WixNames.ComponentGroupRefNode)
+            // ReSharper disable once AssignNullToNotNullAttribute
+            .Select(node => node.GetAttribute("Id"))
+            .Where(id => !string.IsNullOrEmpty(id));
 
         public void AddComponentGroupRef([NotNull] string id)
         {
-            Contract.Requires(id != null);
-
-            var newNode = new XElement(WixNames.ComponentGroupRefNode, new XAttribute("Id", id));
-
-            Node.AddWithFormatting(newNode);
+            Node.AddWithFormatting(new XElement(WixNames.ComponentGroupRefNode, new XAttribute("Id", id)));
         }
     }
 }

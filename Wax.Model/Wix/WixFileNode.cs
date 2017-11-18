@@ -1,8 +1,6 @@
 namespace tomenglertde.Wax.Model.Wix
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
@@ -22,15 +20,13 @@ namespace tomenglertde.Wax.Model.Wix
         public WixFileNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node, [NotNull] IList<WixFileNode> collection)
             : base(sourceFile, node)
         {
-            Contract.Requires(sourceFile != null);
-            Contract.Requires(node != null);
-            Contract.Requires(collection != null);
-
             _collection = collection;
         }
 
+        [CanBeNull]
         public string Source => GetAttribute("Source");
 
+        [CanBeNull]
         public WixComponentGroupNode ComponentGroup => _componentGroup ?? (_componentGroup = ResolveComponentGroup());
 
         public void Remove()
@@ -54,6 +50,7 @@ namespace tomenglertde.Wax.Model.Wix
             return string.Format(CultureInfo.CurrentCulture, "{0} ({1}, {2})", Id, Name, Source);
         }
 
+        [CanBeNull]
         private WixComponentGroupNode ResolveComponentGroup()
         {
             var componentNode = Node.Parent;
@@ -75,14 +72,6 @@ namespace tomenglertde.Wax.Model.Wix
             }
 
             return null;
-        }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_collection != null);
         }
     }
 }

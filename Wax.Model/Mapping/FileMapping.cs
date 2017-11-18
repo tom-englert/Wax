@@ -5,202 +5,109 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Windows.Input;
 
     using JetBrains.Annotations;
 
+    using PropertyChanged;
+
     using tomenglertde.Wax.Model.VisualStudio;
     using tomenglertde.Wax.Model.Wix;
 
-    using TomsToolbox.Desktop;
+    using TomsToolbox.Core;
     using TomsToolbox.ObservableCollections;
     using TomsToolbox.Wpf;
 
-    public class FileMapping : ObservableObject
+    [ImplementPropertyChanged]
+    public class FileMapping
     {
         [NotNull]
         private readonly ProjectOutput _projectOutput;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly ObservableCollection<ProjectOutput> _allUnmappedProjectOutputs;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly ObservableFilteredCollection<ProjectOutput> _unmappedProjectOutputs;
         [NotNull]
         private readonly WixProject _wixProject;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly IList<UnmappedFile> _allUnmappedFiles;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly ObservableFilteredCollection<UnmappedFile> _unmappedFiles;
-        [NotNull]
-        private readonly string _id;
-
-        private WixFileNode _mappedNode;
-        private MappingState _mappingState;
 
         public FileMapping([NotNull] ProjectOutput projectOutput, [NotNull] ObservableCollection<ProjectOutput> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
         {
-            Contract.Requires(projectOutput != null);
-            Contract.Requires(wixProject != null);
-            Contract.Requires(allUnmappedFiles != null);
-
             _projectOutput = projectOutput;
             _allUnmappedProjectOutputs = allUnmappedProjectOutputs;
             _wixProject = wixProject;
             _allUnmappedFiles = allUnmappedFiles;
 
-            _id = wixProject.GetFileId(TargetName);
+            Id = wixProject.GetFileId(TargetName);
 
-            MappedNode = wixProject.FileNodes.FirstOrDefault(node => node.Id == _id);
+            MappedNode = wixProject.FileNodes.FirstOrDefault(node => node.Id == Id);
 
-            _unmappedProjectOutputs = new ObservableFilteredCollection<ProjectOutput>(_allUnmappedProjectOutputs, item => string.Equals(item.FileName, DisplayName, StringComparison.OrdinalIgnoreCase));
+            _unmappedProjectOutputs = new ObservableFilteredCollection<ProjectOutput>(_allUnmappedProjectOutputs, item => string.Equals(item?.FileName, DisplayName, StringComparison.OrdinalIgnoreCase));
             _unmappedProjectOutputs.CollectionChanged += UnmappedProjectOutputs_CollectionChanged;
 
-            _unmappedFiles = new ObservableFilteredCollection<UnmappedFile>(allUnmappedFiles, item => string.Equals(item.Node.Name, DisplayName, StringComparison.OrdinalIgnoreCase));
+            _unmappedFiles = new ObservableFilteredCollection<UnmappedFile>(allUnmappedFiles, item => string.Equals(item?.Node.Name, DisplayName, StringComparison.OrdinalIgnoreCase));
             _unmappedFiles.CollectionChanged += UnmappedNodes_CollectionChanged;
 
             UpdateMappingState();
         }
 
         [NotNull]
-        public string DisplayName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _projectOutput.FileName;
-            }
-        }
+        public string DisplayName => _projectOutput.FileName;
 
         [NotNull]
-        public string Id
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _id;
-            }
-        }
+        public string Id { get; }
 
         [NotNull]
-        public string UniqueName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _projectOutput.TargetName;
-            }
-        }
+        public string UniqueName => _projectOutput.TargetName;
 
         [NotNull]
-        public string Extension
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return Path.GetExtension(_projectOutput.TargetName);
-            }
-
-        }
+        public string Extension => Path.GetExtension(_projectOutput.TargetName);
 
         [NotNull]
-        public string TargetName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _projectOutput.TargetName;
-            }
-        }
+        public string TargetName => _projectOutput.TargetName;
 
         [NotNull]
-        public string SourceName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _projectOutput.SourceName;
-            }
-        }
-
+        public string SourceName => _projectOutput.SourceName;
 
         [NotNull]
-        public IList<UnmappedFile> UnmappedNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IList<UnmappedFile>>() != null);
+        public IList<UnmappedFile> UnmappedNodes => _unmappedFiles;
 
-                return _unmappedFiles;
-            }
-        }
+        [NotNull, DoNotNotify]
+        public ICommand AddFileCommand => new DelegateCommand<IEnumerable>(
+            _ => CanAddFile(),
+            // ReSharper disable once AssignNullToNotNullAttribute
+            // ReSharper disable once PossibleNullReferenceException
+            selectedItems =>
+            {
+                selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.AddFile());
+            });
+
+        [NotNull, DoNotNotify]
+        public ICommand ClearMappingCommand => new DelegateCommand<IEnumerable>(
+            _ => CanClearMapping(),
+            // ReSharper disable once AssignNullToNotNullAttribute
+            // ReSharper disable once PossibleNullReferenceException
+            selectedItems => selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.ClearMapping()));
+
+        [NotNull, DoNotNotify]
+        public ICommand ResolveFileCommand => new DelegateCommand<IEnumerable>(
+            _ => CanResolveFile(),
+            // ReSharper disable once AssignNullToNotNullAttribute
+            // ReSharper disable once PossibleNullReferenceException
+            selectedItems => selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.ResolveFile()));
 
         [NotNull]
-        public ICommand AddFileCommand
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ICommand>() != null);
+        public Project Project => _projectOutput.Project;
 
-                return new DelegateCommand<IEnumerable>(
-                    _ => CanAddFile(),
-                    selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.AddFile()));
-            }
-        }
-
-        [NotNull]
-        public ICommand ClearMappingCommand
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ICommand>() != null);
-
-                return new DelegateCommand<IEnumerable>(
-                    _ => CanClearMapping(),
-                    selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ClearMapping()));
-            }
-        }
-
-        [NotNull]
-        public ICommand ResolveFileCommand
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ICommand>() != null);
-
-                return new DelegateCommand<IEnumerable>(
-                    _ => CanResolveFile(),
-                    selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ResolveFile()));
-            }
-        }
-
-        [NotNull]
-        public Project Project
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Project>() != null);
-
-                return _projectOutput.Project;
-            }
-        }
-
+        [CanBeNull]
         public WixFileNode MappedNodeSetter
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<WixFileNode>() == null);
-
-                return null;
-            }
+            get => null;
             set
             {
                 if (value != null)
@@ -210,19 +117,16 @@
             }
         }
 
-        public WixFileNode MappedNode
+        [CanBeNull]
+        public WixFileNode MappedNode { get; set; }
+
+        [UsedImplicitly]
+        private void OnMappedNodeChanged([CanBeNull] object oldValue, [CanBeNull] object newValue)
         {
-            get
-            {
-                return _mappedNode;
-            }
-            set
-            {
-                SetProperty(ref _mappedNode, value, () => MappedNode, MappedNode_Changed);
-            }
+            OnMappedNodeChanged(oldValue as WixFileNode, newValue as WixFileNode);
         }
 
-        private void MappedNode_Changed(WixFileNode oldValue, WixFileNode newValue)
+        private void OnMappedNodeChanged([CanBeNull] WixFileNode oldValue, [CanBeNull] WixFileNode newValue)
         {
             if (oldValue != null)
             {
@@ -242,24 +146,14 @@
             UpdateMappingState();
         }
 
-        public MappingState MappingState
-        {
-            get
-            {
-                return _mappingState;
-            }
-            set
-            {
-                SetProperty(ref _mappingState, value, () => MappingState);
-            }
-        }
+        public MappingState MappingState { get; set; }
 
-        private void UnmappedNodes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void UnmappedNodes_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
         {
             UpdateMappingState();
         }
 
-        void UnmappedProjectOutputs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void UnmappedProjectOutputs_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
         {
             UpdateMappingState();
         }
@@ -292,8 +186,6 @@
 
         private bool CanResolveFile()
         {
-            Contract.Ensures((Contract.Result<bool>() == false) || (_unmappedFiles.Count == 1));
-
             return (MappedNode == null) && (_unmappedFiles.Count == 1);
         }
 
@@ -332,15 +224,7 @@
         }
 
         [NotNull]
-        public static IEqualityComparer<FileMapping> Comparer
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEqualityComparer<FileMapping>>() != null);
-
-                return new EqualityComparer();
-            }
-        }
+        public static IEqualityComparer<FileMapping> Comparer { get; } = new EqualityComparer();
 
         private class EqualityComparer : IEqualityComparer<FileMapping>
         {
@@ -371,20 +255,6 @@
 
                 return obj.UniqueName.GetHashCode();
             }
-        }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_id != null);
-            Contract.Invariant(_projectOutput != null);
-            Contract.Invariant(_wixProject != null);
-            Contract.Invariant(_unmappedFiles != null);
-            Contract.Invariant(_allUnmappedFiles != null);
-            Contract.Invariant(_unmappedProjectOutputs != null);
-            Contract.Invariant(_allUnmappedProjectOutputs != null);
         }
     }
 }

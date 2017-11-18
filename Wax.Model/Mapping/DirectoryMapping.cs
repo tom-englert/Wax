@@ -1,109 +1,52 @@
 ﻿namespace tomenglertde.Wax.Model.Mapping
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows.Input;
 
     using JetBrains.Annotations;
 
+    using PropertyChanged;
+
     using tomenglertde.Wax.Model.Wix;
 
-    using TomsToolbox.Desktop;
     using TomsToolbox.Wpf;
 
-    public class DirectoryMapping : ObservableObject
+    [ImplementPropertyChanged]
+    public class DirectoryMapping
     {
-        [NotNull]
-        private readonly string _directory;
-        [NotNull]
-        private readonly string _id;
-        [NotNull]
-        private readonly IList<WixDirectoryNode> _unmappedNodes;
         [NotNull]
         private readonly WixProject _wixProject;
 
-        private WixDirectoryNode _mappedNode;
-
         public DirectoryMapping([NotNull] string directory, [NotNull] WixProject wixProject, [NotNull] IList<WixDirectoryNode> unmappedNodes)
         {
-            Contract.Requires(directory != null);
-            Contract.Requires(wixProject != null);
-            Contract.Requires(unmappedNodes != null);
-
-            _directory = directory;
+            Directory = directory;
             _wixProject = wixProject;
-            _id = wixProject.GetDirectoryId(directory);
-            _unmappedNodes = unmappedNodes;
+            Id = wixProject.GetDirectoryId(directory);
+            UnmappedNodes = unmappedNodes;
 
-            MappedNode = wixProject.DirectoryNodes.FirstOrDefault(node => node.Id == _id);
+            MappedNode = wixProject.DirectoryNodes.FirstOrDefault(node => node.Id == Id);
         }
 
         [NotNull]
-        public string Directory
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _directory;
-            }
-        }
+        public string Directory { get; }
 
         [NotNull]
-        public string Id
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _id;
-            }
-        }
+        public string Id { get; }
 
         [NotNull]
-        public IList<WixDirectoryNode> UnmappedNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IList<WixDirectoryNode>>() != null);
-
-                return _unmappedNodes;
-            }
-        }
+        public IList<WixDirectoryNode> UnmappedNodes { get; }
 
         [NotNull]
-        public ICommand AddDirectoryCommand
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ICommand>() != null);
-
-                return new DelegateCommand(CanAddDirectory, AddDirectory);
-            }
-        }
+        public ICommand AddDirectoryCommand => new DelegateCommand(CanAddDirectory, AddDirectory);
 
         [NotNull]
-        public ICommand ClearMappingCommand
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ICommand>() != null);
+        public ICommand ClearMappingCommand => new DelegateCommand(CanClearMapping, ClearMapping);
 
-                return new DelegateCommand(CanClearMapping, ClearMapping);
-            }
-        }
-
+        [CanBeNull]
         public WixDirectoryNode MappedNodeSetter
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<WixDirectoryNode>() == null);
-
-                return null;
-            }
+            get => null;
             set
             {
                 if (value != null)
@@ -113,19 +56,16 @@
             }
         }
 
-        public WixDirectoryNode MappedNode
+        [CanBeNull]
+        public WixDirectoryNode MappedNode { get; set; }
+
+        [UsedImplicitly]
+        private void OnMappedNodeChanged([CanBeNull] object oldValue, [CanBeNull] object newValue)
         {
-            get
-            {
-                return _mappedNode;
-            }
-            set
-            {
-                SetProperty(ref _mappedNode, value, () => MappedNode, MappedNode_Changed);
-            }
+            OnMappedNodeChanged(oldValue as WixDirectoryNode, newValue as WixDirectoryNode);
         }
 
-        private void MappedNode_Changed(WixDirectoryNode oldValue, WixDirectoryNode newValue)
+        private void OnMappedNodeChanged([CanBeNull] WixDirectoryNode oldValue, [CanBeNull] WixDirectoryNode newValue)
         {
             if (oldValue != null)
             {
@@ -142,7 +82,7 @@
 
         private void AddDirectory()
         {
-            MappedNode = _wixProject.AddDirectoryNode(_directory);
+            MappedNode = _wixProject.AddDirectoryNode(Directory);
         }
 
         private bool CanAddDirectory()
@@ -158,16 +98,6 @@
         private bool CanClearMapping()
         {
             return (MappedNode != null) && (!_wixProject.HasDefaultDirectoryId(this));
-        }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_wixProject != null);
-            Contract.Invariant(_unmappedNodes != null);
-            Contract.Invariant(_directory != null);
         }
     }
 }

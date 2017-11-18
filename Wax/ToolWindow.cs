@@ -51,6 +51,7 @@
         {
             base.OnCreate();
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             EventManager.RegisterClassHandler(typeof(MainView), ButtonBase.ClickEvent, new RoutedEventHandler(Navigate_Click));
 
             var t = typeof(Solution);
@@ -61,12 +62,12 @@
 
             _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
-            Contract.Assume(_dte != null);
+            Debug.Assert(_dte != null);
 
             Content = new MainView(_dte);
         }
 
-        private void Navigate_Click(object sender, [NotNull] RoutedEventArgs e)
+        private void Navigate_Click([NotNull] object sender, [NotNull] RoutedEventArgs e)
         {
             var source = e.OriginalSource as FrameworkElement;
 
@@ -90,8 +91,7 @@
             var webBrowsingService = (IVsWebBrowsingService)GetService(typeof(SVsWebBrowsingService));
             if (webBrowsingService != null)
             {
-                IVsWindowFrame pFrame;
-                var hr = webBrowsingService.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_WebURLOnly, out pFrame);
+                var hr = webBrowsingService.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_WebURLOnly, out var pFrame);
                 if (ErrorHandler.Succeeded(hr) && (pFrame != null))
                 {
                     hr = pFrame.Show();

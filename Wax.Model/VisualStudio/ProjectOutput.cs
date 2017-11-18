@@ -1,9 +1,6 @@
 ﻿namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     using Equatable;
@@ -18,16 +15,10 @@
         [Equals(StringComparison.OrdinalIgnoreCase)]
         [NotNull]
         private readonly string _targetName;
-        [NotNull]
-        private readonly Project _project;
 
         public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
-            Contract.Requires(project != null);
-            Contract.Requires(relativeFileName != null);
-            Contract.Requires(binaryTargetDirectory != null);
-
-            _project = project;
+            Project = project;
 
             var prefix = binaryTargetDirectory + @"\";
 
@@ -47,67 +38,28 @@
 
         public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, [NotNull] string binaryTargetDirectory)
         {
-            Contract.Requires(project != null);
-            Contract.Requires(relativeFileName != null);
-            Contract.Requires(binaryTargetDirectory != null);
-
-            _project = project;
+            Project = project;
             _relativeFileName = relativeFileName;
             _targetName = Path.Combine(binaryTargetDirectory, relativeFileName);
         }
 
-        [ContractVerification(false), SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string binaryTargetDirectory)
+            // ReSharper disable once AssignNullToNotNullAttribute
             : this(project, Path.GetFileName(reference.Path), binaryTargetDirectory)
         {
-            Contract.Requires(project != null);
-            Contract.Requires(reference != null);
-            Contract.Requires(binaryTargetDirectory != null);
         }
 
         [NotNull]
-        public string SourceName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _relativeFileName;
-            }
-        }
+        public string SourceName => _relativeFileName;
 
         [NotNull]
-        public string TargetName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return _targetName;
-            }
-        }
+        public string TargetName => _targetName;
 
         [NotNull]
-        public string FileName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return Path.GetFileName(_relativeFileName);
-            }
-        }
+        public string FileName => Path.GetFileName(_relativeFileName);
 
         [NotNull]
-        public Project Project
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Project>() != null);
-
-                return _project;
-            }
-        }
+        public Project Project { get; }
 
         public bool IsReference => BuildFileGroup == BuildFileGroups.None;
 
@@ -117,16 +69,5 @@
         {
             return _targetName;
         }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_relativeFileName != null);
-            Contract.Invariant(_project != null);
-            Contract.Invariant(_targetName != null);
-        }
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace tomenglertde.Wax.Model.Tools
 {
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Xml;
     using System.Xml.Linq;
@@ -11,11 +10,7 @@
     {
         public static void RemoveSelfAndWhiteSpace([NotNull] this XElement element)
         {
-            Contract.Requires(element != null);
-
-            var previous = element.PreviousNode as XText;
-
-            if ((previous != null) && string.IsNullOrWhiteSpace(previous.Value))
+            if ((element.PreviousNode is XText previous) && string.IsNullOrWhiteSpace(previous.Value))
             {
                 previous.Remove();
             }
@@ -25,9 +20,6 @@
 
         public static void AddWithFormatting([NotNull] this XElement parent, [NotNull] XElement item)
         {
-            Contract.Requires(parent != null);
-            Contract.Requires(item != null);
-
             var firstNode = parent.FirstNode;
             var lastNode = parent.LastNode;
 
@@ -49,8 +41,6 @@
 
         private static int GetDefaultIndent([NotNull] this XObject item)
         {
-            Contract.Requires(item != null);
-
             return item.Parent?.GetDefaultIndent() ?? 0 + 2;
         }
     }

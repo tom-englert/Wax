@@ -1,6 +1,5 @@
 ﻿namespace tomenglertde.Wax.Model.Wix
 {
-    using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
     using JetBrains.Annotations;
@@ -12,8 +11,6 @@
 
         public WixNames([NotNull] string @namespace)
         {
-            Contract.Requires(@namespace != null);
-
             _namespace = @namespace;
         }
 

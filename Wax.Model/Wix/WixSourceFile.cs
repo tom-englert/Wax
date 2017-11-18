@@ -4,7 +4,6 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -20,8 +19,6 @@ namespace tomenglertde.Wax.Model.Wix
     public class WixSourceFile
     {
         [NotNull]
-        private readonly WixProject _project;
-        [NotNull]
         private readonly EnvDTE.ProjectItem _projectItem;
         [NotNull]
         private readonly XDocument _xmlFile;
@@ -29,26 +26,20 @@ namespace tomenglertde.Wax.Model.Wix
         private XDocument _rawXmlFile;
         [NotNull]
         private readonly XElement _root;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly List<WixFileNode> _fileNodes;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly List<WixDirectoryNode> _directoryNodes;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly List<WixComponentGroupNode> _componentGroups;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly List<WixFeatureNode> _featureNodes;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly List<WixDefine> _defines;
-
-        [NotNull]
-        public WixNames WixNames { get; private set; }
 
         public WixSourceFile([NotNull] WixProject project, [NotNull] EnvDTE.ProjectItem projectItem)
         {
-            Contract.Requires(project != null);
-            Contract.Requires(projectItem != null);
-
-            _project = project;
+            Project = project;
             _projectItem = projectItem;
 
             _xmlFile = _projectItem.GetXmlContent(LoadOptions.PreserveWhitespace);
@@ -66,6 +57,7 @@ namespace tomenglertde.Wax.Model.Wix
                 .ToList();
 
             _componentGroups = root.Descendants(WixNames.ComponentGroupNode)
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixComponentGroupNode(this, node))
                 .ToList();
 
@@ -73,74 +65,40 @@ namespace tomenglertde.Wax.Model.Wix
 
             _fileNodes.AddRange(root
                 .Descendants(WixNames.FileNode)
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixFileNode(this, node, _fileNodes)));
 
             _directoryNodes = root
                 .Descendants(WixNames.DirectoryNode)
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixDirectoryNode(this, node))
                 .Where(node => node.Id != "TARGETDIR")
                 .ToList();
 
             _featureNodes = root
                 .Descendants(WixNames.FeatureNode)
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixFeatureNode(this, node))
                 .ToList();
         }
 
         [NotNull]
-        public IEnumerable<WixFileNode> FileNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixFileNode>>() != null);
-
-                return new ReadOnlyCollection<WixFileNode>(_fileNodes);
-            }
-        }
+        public WixNames WixNames { get; }
 
         [NotNull]
-        public IEnumerable<WixDirectoryNode> DirectoryNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixDirectoryNode>>() != null);
-
-                return new ReadOnlyCollection<WixDirectoryNode>(_directoryNodes);
-            }
-        }
+        public IEnumerable<WixFileNode> FileNodes => new ReadOnlyCollection<WixFileNode>(_fileNodes);
 
         [NotNull]
-        public IEnumerable<WixComponentGroupNode> ComponentGroups
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixComponentGroupNode>>() != null);
-
-                return new ReadOnlyCollection<WixComponentGroupNode>(_componentGroups);
-            }
-        }
+        public IEnumerable<WixDirectoryNode> DirectoryNodes => new ReadOnlyCollection<WixDirectoryNode>(_directoryNodes);
 
         [NotNull]
-        public IEnumerable<WixFeatureNode> FeatureNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixFeatureNode>>() != null);
-
-                return new ReadOnlyCollection<WixFeatureNode>(_featureNodes);
-            }
-        }
+        public IEnumerable<WixComponentGroupNode> ComponentGroups => new ReadOnlyCollection<WixComponentGroupNode>(_componentGroups);
 
         [NotNull]
-        public WixProject Project
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<WixProject>() != null);
+        public IEnumerable<WixFeatureNode> FeatureNodes => new ReadOnlyCollection<WixFeatureNode>(_featureNodes);
 
-                return _project;
-            }
-        }
+        [NotNull]
+        public WixProject Project { get; }
 
         public bool HasChanges
         {
@@ -162,11 +120,6 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         internal WixDirectoryNode AddDirectory([NotNull] string id, [NotNull] string name, [NotNull] string parentId)
         {
-            Contract.Requires(id != null);
-            Contract.Requires(name != null);
-            Contract.Requires(parentId != null);
-            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
-
             var root = _root;
 
             var fragmentElement = new XElement(WixNames.FragmentNode);
@@ -186,9 +139,6 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public WixDirectoryNode AddDirectoryNode([NotNull] XElement directoryElement)
         {
-            Contract.Requires(directoryElement != null);
-            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
-
             var directoryNode = new WixDirectoryNode(this, directoryElement);
             _directoryNodes.Add(directoryNode);
             return directoryNode;
@@ -197,9 +147,6 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         internal WixComponentGroupNode AddComponentGroup([NotNull] string directoryId)
         {
-            Contract.Requires(directoryId != null);
-            Contract.Ensures(Contract.Result<WixComponentGroupNode>() != null);
-
             var root = _root;
 
             var fragmentElement = new XElement(WixNames.FragmentNode);
@@ -218,13 +165,7 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         internal WixFileNode AddFileComponent([NotNull] WixComponentGroupNode componentGroup, [NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)
         {
-            Contract.Requires(componentGroup != null);
-            Contract.Requires(id != null);
-            Contract.Requires(name != null);
-            Contract.Requires(fileMapping != null);
-            Contract.Ensures(Contract.Result<WixFileNode>() != null);
-
-            Contract.Assume(componentGroup.SourceFile.Equals(this));
+            Debug.Assert(componentGroup.SourceFile.Equals(this));
 
             var project = fileMapping.Project;
 
@@ -257,9 +198,6 @@ namespace tomenglertde.Wax.Model.Wix
 
         private void ForceDirectoryVariable([NotNull] string variableName, [NotNull] Project project)
         {
-            Contract.Requires(variableName != null);
-            Contract.Requires(project != null);
-
             if (_defines.Any(d => d.Name.Equals(variableName, StringComparison.Ordinal)))
                 return;
 
@@ -286,24 +224,6 @@ namespace tomenglertde.Wax.Model.Wix
             }
 
             _defines.Add(new WixDefine(this, processingInstruction));
-        }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_directoryNodes != null);
-            Contract.Invariant(_fileNodes != null);
-            Contract.Invariant(_projectItem != null);
-            Contract.Invariant(_project != null);
-            Contract.Invariant(_componentGroups != null);
-            Contract.Invariant(_root != null);
-            Contract.Invariant(_xmlFile != null);
-            Contract.Invariant(_rawXmlFile != null);
-            Contract.Invariant(_featureNodes != null);
-            Contract.Invariant(_defines != null);
-            Contract.Invariant(WixNames != null);
         }
     }
 }

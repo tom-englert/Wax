@@ -3,7 +3,6 @@ namespace tomenglertde.Wax.Model.Wix
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -32,9 +31,6 @@ namespace tomenglertde.Wax.Model.Wix
         public WixProject([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
             : base(solution, project)
         {
-            Contract.Requires(solution != null);
-            Contract.Requires(project != null);
-
             _configurationFileProjectItem = GetConfigurationFileProjectItem();
 
             var configurationText = _configurationFileProjectItem.GetContent();
@@ -49,49 +45,18 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<WixSourceFile> SourceFiles
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixSourceFile>>() != null);
-
-                return _sourceFiles;
-            }
-        }
+        public IEnumerable<WixSourceFile> SourceFiles => _sourceFiles;
 
         [NotNull, ItemNotNull]
-        public IEnumerable<WixFileNode> FileNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixFileNode>>() != null);
-
-                return _sourceFiles.SelectMany(sourceFile => sourceFile.FileNodes);
-            }
-        }
+        public IEnumerable<WixFileNode> FileNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.FileNodes);
 
         [NotNull, ItemNotNull]
-        public IEnumerable<WixDirectoryNode> DirectoryNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixDirectoryNode>>() != null);
-
-                return _sourceFiles.SelectMany(sourceFile => sourceFile.DirectoryNodes);
-            }
-        }
+        public IEnumerable<WixDirectoryNode> DirectoryNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.DirectoryNodes);
 
         [NotNull, ItemNotNull]
-        public IEnumerable<WixFeatureNode> FeatureNodes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixFeatureNode>>() != null);
+        public IEnumerable<WixFeatureNode> FeatureNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.FeatureNodes);
 
-                return _sourceFiles.SelectMany(sourceFile => sourceFile.FeatureNodes);
-            }
-        }
-
+        [CanBeNull]
         public WixProductNode ProductNode
         {
             get
@@ -102,39 +67,28 @@ namespace tomenglertde.Wax.Model.Wix
                     return null;
 
                 var parent = firstFeature.Node.Parent;
-                Contract.Assume(parent != null);
+                Debug.Assert(parent != null);
 
                 return new WixProductNode(firstFeature.SourceFile, parent);
             }
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<WixComponentGroupNode> ComponentGroups
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<WixComponentGroupNode>>() != null);
-
-                return _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroups);
-            }
-        }
+        public IEnumerable<WixComponentGroupNode> ComponentGroups => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroups);
 
         [NotNull, ItemNotNull]
         public IEnumerable<Project> DeployedProjects
         {
             get
             {
-                Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
-
                 return Solution.Projects.Where(project => _configuration.DeployedProjectNames.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase));
             }
             set
             {
-                Contract.Requires(value != null);
-
                 var projects = value.ToArray();
                 var removedProjects = DeployedProjects.Except(projects).ToArray();
 
+                // ReSharper disable once PossibleNullReferenceException
                 _configuration.DeployedProjectNames = projects.Select(project => project.UniqueName).ToArray();
 
                 RemoveProjectReferences(removedProjects);
@@ -146,46 +100,26 @@ namespace tomenglertde.Wax.Model.Wix
 
         public bool DeploySymbols
         {
-            get
-            {
-                return _configuration.DeploySymbols;
-            }
-            set
-            {
-                _configuration.DeploySymbols = value;
-            }
+            get => _configuration.DeploySymbols;
+            set => _configuration.DeploySymbols = value;
         }
 
         public bool DeployExternalLocalizations
         {
-            get
-            {
-                return _configuration.DeployExternalLocalizations;
-            }
-            set
-            {
-                _configuration.DeployExternalLocalizations = value;
-            }
+            get => _configuration.DeployExternalLocalizations;
+            set => _configuration.DeployExternalLocalizations = value;
         }
-
 
         public bool HasChanges => HasConfigurationChanges | HasSourceFileChanges;
 
         [NotNull]
         public string GetDirectoryId([NotNull] string directory)
         {
-            Contract.Requires(directory != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
-            string value;
-
-            return (_configuration.DirectoryMappings.TryGetValue(directory, out value) && (value != null)) ? value : GetDefaultId(directory);
+            return (_configuration.DirectoryMappings.TryGetValue(directory, out var value) && (value != null)) ? value : GetDefaultId(directory);
         }
 
         public void UnmapDirectory([NotNull] string directory)
         {
-            Contract.Requires(directory != null);
-
             _configuration.DirectoryMappings.Remove(directory);
 
             SaveProjectConfiguration();
@@ -193,21 +127,16 @@ namespace tomenglertde.Wax.Model.Wix
 
         public void MapDirectory([NotNull] string directory, [NotNull] WixDirectoryNode node)
         {
-            Contract.Requires(directory != null);
-            Contract.Requires(node != null);
-
             MapElement(directory, node, _configuration.DirectoryMappings);
         }
 
         [NotNull]
         public WixDirectoryNode AddDirectoryNode([NotNull] string directory)
         {
-            Contract.Requires(directory != null);
-            Contract.Ensures(Contract.Result<WixDirectoryNode>() != null);
-
             var name = Path.GetFileName(directory);
             var id = GetDirectoryId(directory);
             var parentDirectoryName = Path.GetDirectoryName(directory);
+            Debug.Assert(parentDirectoryName != null);
             var parentId = string.IsNullOrEmpty(directory) ? string.Empty : GetDirectoryId(parentDirectoryName);
 
             var parent = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(parentId));
@@ -222,7 +151,7 @@ namespace tomenglertde.Wax.Model.Wix
                 {
                     parentId = "TODO:" + Guid.NewGuid();
                     var sourceFile = _sourceFiles.FirstOrDefault();
-                    Contract.Assume(sourceFile != null);
+                    Debug.Assert(sourceFile != null);
                     return sourceFile.AddDirectory(id, name, parentId);
                 }
             }
@@ -232,7 +161,6 @@ namespace tomenglertde.Wax.Model.Wix
 
         public bool HasDefaultDirectoryId([NotNull] DirectoryMapping directoryMapping)
         {
-            Contract.Requires(directoryMapping != null);
             var directory = directoryMapping.Directory;
 
             var id = GetDirectoryId(directory);
@@ -244,18 +172,11 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public string GetFileId([NotNull] string filePath)
         {
-            Contract.Requires(filePath != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
-            string value;
-
-            return (_configuration.FileMappings.TryGetValue(filePath, out value) && value != null) ? value : GetDefaultId(filePath);
+            return (_configuration.FileMappings.TryGetValue(filePath, out var value) && value != null) ? value : GetDefaultId(filePath);
         }
 
         public void UnmapFile([NotNull] string filePath)
         {
-            Contract.Requires(filePath != null);
-
             _configuration.FileMappings.Remove(filePath);
 
             SaveProjectConfiguration();
@@ -263,25 +184,21 @@ namespace tomenglertde.Wax.Model.Wix
 
         public void MapFile([NotNull] string filePath, [NotNull] WixFileNode node)
         {
-            Contract.Requires(filePath != null);
-            Contract.Requires(node != null);
-
             MapElement(filePath, node, _configuration.FileMappings);
         }
 
         [CanBeNull]
         public WixFileNode AddFileNode([NotNull] FileMapping fileMapping)
         {
-            Contract.Requires(fileMapping != null);
-
             var targetName = fileMapping.TargetName;
 
             var name = Path.GetFileName(targetName);
             var id = GetFileId(targetName);
             var directoryName = Path.GetDirectoryName(targetName);
+            Debug.Assert(directoryName != null, nameof(directoryName) + " != null");
             var directoryId = GetDirectoryId(directoryName);
             var directory = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(directoryId, StringComparison.OrdinalIgnoreCase));
-            directoryId = directory != null ? directory.Id : "TODO: unknown directory " + directoryName;
+            directoryId = directory?.Id ?? "TODO: unknown directory " + directoryName;
 
             var componentGroup = ForceComponentGroup(directoryId);
 
@@ -294,11 +211,8 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull]
-        public static string GetDefaultId([NotNull] string path)
+        private static string GetDefaultId([NotNull] string path)
         {
-            Contract.Requires(path != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
             if (path.Length == 0)
                 return "_";
 
@@ -328,15 +242,11 @@ namespace tomenglertde.Wax.Model.Wix
         [CanBeNull]
         private WixComponentGroupNode ForceComponentGroup([NotNull] string directoryId)
         {
-            Contract.Requires(directoryId != null);
-
             return ComponentGroups.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.FirstOrDefault()?.AddComponentGroup(directoryId);
         }
 
-        public void ForceFeatureRef([NotNull] string componentGroupId)
+        private void ForceFeatureRef([NotNull] string componentGroupId)
         {
-            Contract.Requires(componentGroupId != null);
-
             if (FeatureNodes.Any(feature => feature.ComponentGroupRefs.Contains(componentGroupId)))
                 return;
 
@@ -350,8 +260,6 @@ namespace tomenglertde.Wax.Model.Wix
 
         public bool HasDefaultFileId([NotNull] FileMapping fileMapping)
         {
-            Contract.Requires(fileMapping != null);
-
             var filePath = fileMapping.TargetName;
             var id = GetFileId(filePath);
             var defaultId = GetDefaultId(filePath);
@@ -361,10 +269,6 @@ namespace tomenglertde.Wax.Model.Wix
 
         private void MapElement([NotNull] string path, [NotNull] WixNode node, [NotNull] IDictionary<string, string> mappings)
         {
-            Contract.Requires(path != null);
-            Contract.Requires(node != null);
-            Contract.Requires(mappings != null);
-
             if (node.Id.Equals(GetDefaultId(path)))
                 mappings.Remove(path);
             else
@@ -380,13 +284,7 @@ namespace tomenglertde.Wax.Model.Wix
 
         private bool HasConfigurationChanges => (_configuration.Serialize() != _configurationFileProjectItem.GetContent());
 
-        private bool HasSourceFileChanges
-        {
-            get
-            {
-                return _sourceFiles.Any(sourceFile => sourceFile.HasChanges);
-            }
-        }
+        private bool HasSourceFileChanges => _sourceFiles.Any(sourceFile => sourceFile.HasChanges);
 
         private void SaveProjectConfiguration()
         {
@@ -399,8 +297,6 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         private EnvDTE.ProjectItem GetConfigurationFileProjectItem()
         {
-            Contract.Ensures(Contract.Result<EnvDTE.ProjectItem>() != null);
-
             var configurationFileProjectItem = GetAllProjectItems().FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
 
             if (configurationFileProjectItem != null)
@@ -412,16 +308,6 @@ namespace tomenglertde.Wax.Model.Wix
                 File.WriteAllText(configurationFileName, new ProjectConfiguration().Serialize());
 
             return AddItemFromFile(configurationFileName);
-        }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_sourceFiles != null);
-            Contract.Invariant(_configuration != null);
-            Contract.Invariant(_configurationFileProjectItem != null);
         }
     }
 }

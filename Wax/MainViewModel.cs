@@ -6,11 +6,8 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Windows;
     using System.Windows.Input;
 
     using JetBrains.Annotations;
@@ -20,175 +17,32 @@
     using tomenglertde.Wax.Model.Wix;
 
     using TomsToolbox.Core;
-    using TomsToolbox.Desktop;
 
-    public class MainViewModel : DependencyObject, INotifyPropertyChanged
+    public sealed class MainViewModel : INotifyPropertyChanged
     {
         private bool _wixProjectChanging;
+
         [NotNull]
-        private readonly Solution _solution;
         private readonly ObservableCollection<Project> _selectedVSProjects = new ObservableCollection<Project>();
 
         public MainViewModel([NotNull] EnvDTE.Solution solution)
         {
-            Contract.Requires(solution != null);
-
             _selectedVSProjects.CollectionChanged += SelectedVSProjects_CollectionChanged;
-            _solution = new Solution(solution);
+            Solution = new Solution(solution);
 
             CommandManager.RequerySuggested += CommandManager_RequerySuggested;
         }
 
         [NotNull]
-        public Solution Solution
+        public Solution Solution { get; }
+
+        [CanBeNull]
+        public WixProject SelectedWixProject { get; set; }
+
+        [UsedImplicitly]
+        private void OnSelectedWixProjectChanged()
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<Solution>() != null);
-
-                return _solution;
-            }
-        }
-
-        public WixProject SelectedWixProject
-        {
-            get { return (WixProject)GetValue(SelectedWixProjectProperty); }
-            set { SetValue(SelectedWixProjectProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the SelectedWixProject dependency property
-        /// </summary>
-        public static readonly DependencyProperty SelectedWixProjectProperty =
-            DependencyProperty.Register("SelectedWixProject", typeof(WixProject), typeof(MainViewModel), new FrameworkPropertyMetadata(null, (sender, e) => ((MainViewModel)sender).SelectedWixProject_Changed((WixProject)e.NewValue)));
-
-
-        [NotNull]
-        public IList SelectedVSProjects
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IList>() != null);
-
-                return _selectedVSProjects;
-            }
-        }
-
-
-        public DirectoryMapping InstallDirectoryMapping
-        {
-            get { return (DirectoryMapping)GetValue(InstallDirectoryMappingProperty); }
-            set { SetValue(InstallDirectoryMappingProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the InstallDirectoryMapping dependency property
-        /// </summary>
-        public static readonly DependencyProperty InstallDirectoryMappingProperty =
-            DependencyProperty.Register("InstallDirectoryMapping", typeof(DirectoryMapping), typeof(MainViewModel));
-
-
-        public IList<DirectoryMapping> DirectoryMappings
-        {
-            get { return (IList<DirectoryMapping>)GetValue(DirectoryMappingsProperty); }
-            set { SetValue(DirectoryMappingsProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the DirectoryMappings dependency property
-        /// </summary>
-        public static readonly DependencyProperty DirectoryMappingsProperty =
-            DependencyProperty.Register("DirectoryMappings", typeof(IList<DirectoryMapping>), typeof(MainViewModel));
-
-
-        public IList<FileMapping> FileMappings
-        {
-            get { return (IList<FileMapping>)GetValue(FileMappingsProperty); }
-            set { SetValue(FileMappingsProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the FileMappings dependency property
-        /// </summary>
-        public static readonly DependencyProperty FileMappingsProperty =
-            DependencyProperty.Register("FileMappings", typeof(IList<FileMapping>), typeof(MainViewModel));
-
-
-        public bool CanHideReferencedProjects
-        {
-            get { return this.GetValue<bool>(CanHideReferencedProjectsProperty); }
-            set { SetValue(CanHideReferencedProjectsProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the CanHideReferencedProjects dependency property
-        /// </summary>
-        public static readonly DependencyProperty CanHideReferencedProjectsProperty =
-            DependencyProperty.Register("CanHideReferencedProjects", typeof(bool), typeof(MainViewModel));
-
-
-        public bool DeploySymbols
-        {
-            get { return this.GetValue<bool>(DeploySymbolsProperty); }
-            set { SetValue(DeploySymbolsProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the DeploySymbols dependency property
-        /// </summary>
-        public static readonly DependencyProperty DeploySymbolsProperty =
-            DependencyProperty.Register("DeploySymbols", typeof(bool), typeof(MainViewModel), new FrameworkPropertyMetadata(false, (sender, e) => ((MainViewModel)sender).DeploySymbols_Changed((bool)e.NewValue)));
-
-
-        public bool DeployExternalLocalizations
-        {
-            get { return this.GetValue<bool>(DeployExternalLocalizationsProperty); }
-            set { SetValue(DeployExternalLocalizationsProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the <see cref="DeployExternalLocalizations"/> dependency property
-        /// </summary>
-        public static readonly DependencyProperty DeployExternalLocalizationsProperty =
-            DependencyProperty.Register("DeployExternalLocalizations", typeof(bool), typeof(MainViewModel), new FrameworkPropertyMetadata(false, (sender, e) => ((MainViewModel)sender).DeployExternalLocalizations_Changed((bool)e.NewValue)));
-
-
-        public IList<UnmappedFile> UnmappedFileNodes
-        {
-            get { return (IList<UnmappedFile>)GetValue(UnmappedFileNodesProperty); }
-            set { SetValue(UnmappedFileNodesProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the UnmappedFileNodes dependency property
-        /// </summary>
-        public static readonly DependencyProperty UnmappedFileNodesProperty =
-            DependencyProperty.Register("UnmappedFileNodes", typeof(IList<UnmappedFile>), typeof(MainViewModel));
-
-        public bool HasExternalChanges => ((SelectedWixProject != null) && (SelectedWixProject.HasChanges));
-
-        public bool AreAllDirectoriesMapped
-        {
-            get
-            {
-                return InstallDirectoryMapping != null && InstallDirectoryMapping.MappedNode != null && DirectoryMappings != null && DirectoryMappings.All(item => item.MappedNode != null);
-            }
-        }
-
-        public bool AreAllFilesMapped
-        {
-            get
-            {
-                return FileMappings != null && FileMappings.All(item => item.MappedNode != null);
-            }
-        }
-
-        [NotNull]
-        public static IEnumerable<BuildFileGroups> ProjectOutputs
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<BuildFileGroups>>() != null);
-
-                return Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
-            }
-        }
-
-        private void SelectedWixProject_Changed(WixProject newValue)
-        {
+            var newValue = SelectedWixProject;
             if (newValue == null)
                 return;
 
@@ -209,7 +63,68 @@
             _wixProjectChanging = false;
         }
 
-        private void SelectedVSProjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        [NotNull]
+        public IList SelectedVSProjects => _selectedVSProjects;
+
+        [CanBeNull]
+        public DirectoryMapping InstallDirectoryMapping { get; set; }
+
+        [CanBeNull, ItemNotNull]
+        public IList<DirectoryMapping> DirectoryMappings { get; set; }
+
+        [CanBeNull, ItemNotNull]
+        public IList<FileMapping> FileMappings { get; set; }
+
+        public bool CanHideReferencedProjects { get; set; }
+
+        public bool DeploySymbols { get; set; }
+
+        [UsedImplicitly]
+        private void OnDeploySymbolsChanged()
+        {
+            if (_wixProjectChanging)
+                return;
+
+            var wixProject = SelectedWixProject;
+
+            if (wixProject == null)
+                return;
+
+            wixProject.DeploySymbols = DeploySymbols;
+
+            GenerateMappings(SelectedVSProjects, wixProject);
+        }
+
+        public bool DeployExternalLocalizations { get; set; }
+
+        [UsedImplicitly]
+        private void OnDeployExternalLocalizationsChanged()
+        {
+            if (_wixProjectChanging)
+                return;
+
+            var wixProject = SelectedWixProject;
+
+            if (wixProject == null)
+                return;
+
+            wixProject.DeployExternalLocalizations = DeployExternalLocalizations;
+
+            GenerateMappings(SelectedVSProjects, wixProject);
+        }
+
+        public IList<UnmappedFile> UnmappedFileNodes { get; set; }
+
+        public bool HasExternalChanges => ((SelectedWixProject != null) && (SelectedWixProject.HasChanges));
+
+        public bool AreAllDirectoriesMapped => InstallDirectoryMapping?.MappedNode != null && DirectoryMappings != null && DirectoryMappings.All(item => item?.MappedNode != null);
+
+        public bool AreAllFilesMapped => FileMappings != null && FileMappings.All(item => item?.MappedNode != null);
+
+        [NotNull]
+        public static IEnumerable<BuildFileGroups> ProjectOutputs => Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
+
+        private void SelectedVSProjects_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
         {
             CanHideReferencedProjects = _selectedVSProjects.All(p => Solution.TopLevelProjects.Contains(p));
 
@@ -226,7 +141,7 @@
             GenerateMappings(_selectedVSProjects, wixProject);
         }
 
-        private void GenerateMappings(IEnumerable vsProjects, WixProject wixProject)
+        private void GenerateMappings([CanBeNull, ItemNotNull] IEnumerable vsProjects, [CanBeNull] WixProject wixProject)
         {
             if (vsProjects == null)
                 return;
@@ -234,7 +149,7 @@
             GenerateMappings(vsProjects.Cast<Project>().ToArray(), wixProject);
         }
 
-        private void GenerateMappings([ItemNotNull] IList<Project> vsProjects, WixProject wixProject)
+        private void GenerateMappings([CanBeNull, ItemNotNull] IList<Project> vsProjects, [CanBeNull] WixProject wixProject)
         {
             if ((vsProjects == null) || (wixProject == null))
                 return;
@@ -256,9 +171,6 @@
 
         private void GenerateFileMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
         {
-            Contract.Requires(projectOutputs != null);
-            Contract.Requires(wixProject != null);
-
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
             unmappedFileNodes.AddRange(wixProject.FileNodes.Select(node => new UnmappedFile(node, unmappedFileNodes)));
 
@@ -269,6 +181,7 @@
 
             var unmappedProjectOutputs = new ObservableCollection<ProjectOutput>(projectOutputs);
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             FileMappings = projectOutputs.Select(projectOutput => new FileMapping(projectOutput, unmappedProjectOutputs, wixProject, unmappedFileNodes))
                 .ToArray();
 
@@ -277,9 +190,6 @@
 
         private void GenerateDirectoryMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
         {
-            Contract.Requires(projectOutputs != null);
-            Contract.Requires(wixProject != null);
-
             var directories = projectOutputs
                 .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -289,11 +199,15 @@
 
             var unmappedDirectoryNodes = new ObservableCollection<WixDirectoryNode>();
 
-            var directoryMappings = directories.Select(dir => new DirectoryMapping(dir, wixProject, unmappedDirectoryNodes)).ToArray();
+            // ReSharper disable once AssignNullToNotNullAttribute
+            var directoryMappings = directories
+                .Select(dir => new DirectoryMapping(dir, wixProject, unmappedDirectoryNodes))
+                .ToArray();
 
             InstallDirectoryMapping = directoryMappings.FirstOrDefault();
             DirectoryMappings = directoryMappings.Skip(1).ToArray();
 
+            // ReSharper disable once PossibleNullReferenceException
             var unmappedNodes = wixProject.DirectoryNodes.Where(node => directoryMappings.All(mapping => mapping.Id != node.Id));
 
             foreach (var node in unmappedNodes)
@@ -302,60 +216,17 @@
             }
         }
 
-        private void DeploySymbols_Changed(bool newValue)
+        private void CommandManager_RequerySuggested([NotNull] object sender, [NotNull] EventArgs e)
         {
-            if (_wixProjectChanging)
-                return;
-
-            var wixProject = SelectedWixProject;
-
-            if (wixProject == null)
-                return;
-
-            wixProject.DeploySymbols = newValue;
-
-            GenerateMappings(SelectedVSProjects, wixProject);
-        }
-
-        private void DeployExternalLocalizations_Changed(bool newValue)
-        {
-            if (_wixProjectChanging)
-                return;
-
-            var wixProject = SelectedWixProject;
-
-            if (wixProject == null)
-                return;
-
-            wixProject.DeployExternalLocalizations = newValue;
-
-            GenerateMappings(SelectedVSProjects, wixProject);
-        }
-
-
-        private void CommandManager_RequerySuggested(object sender, EventArgs e)
-        {
-            OnPropertyChanged("AreAllDirectoriesMapped");
-            OnPropertyChanged("AreAllFilesMapped");
+            OnPropertyChanged(nameof(AreAllDirectoriesMapped));
+            OnPropertyChanged(nameof(AreAllFilesMapped));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([NotNull] string propertyName)
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
-            Contract.Requires(!string.IsNullOrEmpty(propertyName));
-
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_solution != null);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
