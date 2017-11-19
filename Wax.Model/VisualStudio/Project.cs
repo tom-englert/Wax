@@ -75,7 +75,7 @@
 
         [NotNull]
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        protected string FullName => _project.FullName;
+        public string FullName => _project.FullName;
 
         [Equals(StringComparison.OrdinalIgnoreCase)]
         [NotNull]

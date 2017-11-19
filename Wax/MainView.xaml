@@ -8,6 +8,7 @@
              xmlns:toms="urn:TomsToolbox"
              xmlns:local="clr-namespace:tomenglertde.Wax"
              xmlns:properties="clr-namespace:tomenglertde.Wax"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              d:DataContext="{d:DesignInstance local:MainViewModel}">
   <!-- TODO:
     xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
@@ -86,9 +87,9 @@
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/refresh.png" />
         </Button>
         <Separator />
-        <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" ToolTip="{x:Static properties:Resources.DeploySymbolsToolTip}"/>
-        <CheckBox Content="{x:Static properties:Resources.Localizations}" IsChecked="{Binding DeployLocalizations}" ToolTip="{x:Static properties:Resources.LocalizationsToolTip}"/>
-        <CheckBox Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}"/>
+        <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" ToolTip="{x:Static properties:Resources.DeploySymbolsToolTip}" />
+        <CheckBox Content="{x:Static properties:Resources.Localizations}" IsChecked="{Binding DeployLocalizations}" ToolTip="{x:Static properties:Resources.LocalizationsToolTip}" />
+        <CheckBox Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}" />
         <Separator />
         <Button x:Name="LikeButton" ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"
                 Tag="https://marketplace.visualstudio.com/vsgallery/ab48d869-8f75-4e02-8e7d-577346065aa6#review-details">
@@ -413,26 +414,112 @@
           </DataGrid>
         </local:GroupBox>
         <GridSplitter Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="5" />
-        <GroupBox Grid.Row="4" Header="{x:Static properties:Resources.UnmappedFiles}">
-          <DataGrid ItemsSource="{Binding UnmappedFileNodes}" Style="{StaticResource DefaultDataGridStyle}">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="{x:Static properties:Resources.Id}" Binding="{Binding Node.Id}" IsReadOnly="True" />
-              <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-              <DataGridTextColumn Header="{x:Static properties:Resources.Name}" Binding="{Binding Name}" IsReadOnly="True" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Source}" Binding="{Binding Node.Source, Mode=OneWay}" Width="*" IsReadOnly="True" />
-              <DataGridTemplateColumn Width="25">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Grid d:DataContext="{d:DesignInstance wax:UnmappedFile}">
-                      <Button Content="-" Command="{Binding DeleteCommand}" Style="{StaticResource SquareControlStyle}"
-                              ToolTip="{x:Static properties:Resources.RemoveUnmappedFile}" />
-                    </Grid>
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-            </DataGrid.Columns>
-          </DataGrid>
-        </GroupBox>
+        <Grid Grid.Row="4">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="2*" />
+          </Grid.ColumnDefinitions>
+          <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.UnmappedFiles}">
+            <DataGrid ItemsSource="{Binding UnmappedFileNodes}" Style="{StaticResource DefaultDataGridStyle}">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="{x:Static properties:Resources.Id}" Binding="{Binding Node.Id}" IsReadOnly="True" />
+                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                <DataGridTextColumn Header="{x:Static properties:Resources.Name}" Binding="{Binding Name}" IsReadOnly="True" />
+                <DataGridTextColumn Header="{x:Static properties:Resources.Source}" Binding="{Binding Node.Source, Mode=OneWay}" Width="*" IsReadOnly="True" />
+                <DataGridTemplateColumn Width="25">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <Grid d:DataContext="{d:DesignInstance wax:UnmappedFile}">
+                        <Button Content="-" Command="{Binding DeleteCommand}" Style="{StaticResource SquareControlStyle}"
+                                ToolTip="{x:Static properties:Resources.RemoveUnmappedFile}" />
+                      </Grid>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+          </GroupBox>
+          <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5" />
+          <GroupBox Grid.Column="2" Header="Features">
+            <GroupBox.Resources>
+              <Style TargetType="Span">
+                <Style.Triggers>
+                  <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="TextDecorations" Value="Underline" />
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+              <DataTemplate DataType="{x:Type wax:FeatureMapping}">
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Top" Margin="2,2,0,0" Background="Transparent">
+                    <Run Text="{Binding FeatureNode.Id, Mode=OneWay}" FontWeight="Bold" />
+                    <Run Text="  " />
+                    <Span>
+                      <Span.ToolTip>
+                        <DockPanel>
+                          <DockPanel.Resources>
+                            <CollectionViewSource x:Key="FilesSource" Source="{Binding InstalledFiles}">
+                              <CollectionViewSource.SortDescriptions>
+                                <componentModel:SortDescription PropertyName="DisplayName" />
+                              </CollectionViewSource.SortDescriptions>
+                            </CollectionViewSource>
+                          </DockPanel.Resources>
+                          <TextBlock DockPanel.Dock="Top" Text="Files installed by this feature:" FontWeight="Bold" TextDecorations="Underline" />
+                          <Decorator Height="3" DockPanel.Dock="Top"/>
+                          <ItemsControl ItemsSource="{Binding Source={StaticResource FilesSource}}" DisplayMemberPath="DisplayName">
+                            <ItemsControl.ItemsPanel>
+                              <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" MaxHeight="800" />
+                              </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                          </ItemsControl>
+                        </DockPanel>
+                      </Span.ToolTip>
+                      <Run Text="Files:" />
+                      <Run Text="{Binding InstalledFiles.Count, Mode=OneWay}" />
+                    </Span>
+                    <Run Text="  " />
+                    <Span>
+                      <Span.ToolTip>
+                        <DockPanel>
+                          <TextBlock DockPanel.Dock="Top" Text="Projects installed by this feature:" FontWeight="Bold" TextDecorations="Underline" />
+                          <Decorator Height="3" DockPanel.Dock="Top"/>
+                          <ItemsControl ItemsSource="{Binding Projects}">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate DataType="wax:Project">
+                                <TextBlock>
+                                  <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" Foreground="#202020" />
+                                  (<Run Text="{Binding RelativeFolder, Mode=OneWay}" />)
+                                </TextBlock>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </DockPanel>
+                      </Span.ToolTip>
+                      <Run Text="Projects:" />
+                      <Run Text="{Binding Projects.Count, Mode=OneWay}" />
+                    </Span>
+                    <Run Text="  " />
+                    <Span>
+                      <Span.ToolTip>
+                        <DockPanel>
+                          <TextBlock DockPanel.Dock="Top" Text="Project output not installed by this feature:" FontWeight="Bold" TextDecorations="Underline" />
+                          <Decorator Height="3" DockPanel.Dock="Top"/>
+                          <ItemsControl ItemsSource="{Binding MissingProjectOutputs}" DisplayMemberPath="TargetName" />
+                        </DockPanel>
+                      </Span.ToolTip>
+                      <Run Text="Missing:" />
+                      <Run Text="{Binding MissingProjectOutputs.Count, Mode=OneWay}" />
+                    </Span>
+                  </TextBlock>
+                  <ItemsControl ItemsSource="{Binding Children}" Margin="15,0,0,0" />
+                </DockPanel>
+              </DataTemplate>
+            </GroupBox.Resources>
+            <ItemsControl ItemsSource="{Binding FeatureMappings}" />
+          </GroupBox>
+        </Grid>
       </Grid>
     </Grid>
   </DockPanel>
