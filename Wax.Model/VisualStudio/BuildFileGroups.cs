@@ -12,6 +12,6 @@
         Built = 8,
         SourceFiles = 16,
         Symbols = 32,
-        Documentation = 64,
+        Documentation = 64
     }
 }

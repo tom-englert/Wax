@@ -291,5 +291,17 @@
                 return null;
             }
         }
+
+        public static bool GetCopyLocal([CanBeNull] this VSLangProj.Reference reference)
+        {
+            try
+            {
+                return reference?.CopyLocal ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

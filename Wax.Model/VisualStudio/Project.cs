@@ -14,17 +14,30 @@
 
     using Mono.Cecil;
 
+    using TomsToolbox.Core;
+
+    using VSLangProj;
+
     [ImplementsEquatable]
     public class Project
     {
+        private const BuildFileGroups AllDeployGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls | BuildFileGroups.Symbols;
+
         [NotNull]
         private readonly EnvDTE.Project _project;
         private readonly VSLangProj.VSProject _vsProject;
         [NotNull, ItemNotNull]
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
-
         [NotNull]
         private readonly string _projectTypeGuids;
+        [NotNull, ItemNotNull]
+        private readonly Lazy<IReadOnlyCollection<ProjectOutput>> _buildFiles;
+        [NotNull, ItemNotNull]
+        private readonly Lazy<IReadOnlyCollection<Reference>> _references;
+        [NotNull, ItemNotNull]
+        private readonly Lazy<IReadOnlyCollection<ProjectReference>> _projectReferences;
+        [NotNull]
+        private readonly Lazy<string> _primaryOutputFileName;
 
         public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
         {
@@ -37,13 +50,16 @@
 
             _projectTypeGuids = _project.GetProjectTypeGuids();
 
-            PrimaryOutputFileName = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
+            _primaryOutputFileName = new Lazy<string>(() => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault());
+            _buildFiles = new Lazy<IReadOnlyCollection<ProjectOutput>>(() => GetBuildFiles(this, AllDeployGroups, Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty));
+            _references = new Lazy<IReadOnlyCollection<Reference>>(GetReferences);
+            _projectReferences = new Lazy<IReadOnlyCollection<ProjectReference>>(GetProjectReferences);
         }
 
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectReference> GetProjectReferences()
         {
-            return GetProjectReferences(GetReferences());
+            return GetProjectReferences(_references.Value);
         }
 
         [NotNull, ItemNotNull]
@@ -51,7 +67,7 @@
         {
             var projectReferences = references
                 .Where(reference => reference.GetSourceProject() != null)
-                .Where(reference => reference.CopyLocal)
+                .Where(reference => reference.GetCopyLocal())
                 .Select(reference => new ProjectReference(Solution, reference));
 
             return projectReferences.ToArray();
@@ -62,7 +78,7 @@
         {
             var localFileReferences = references
                 .Where(reference => reference.GetSourceProject() == null)
-                .Where(reference => reference.CopyLocal)
+                .Where(reference => reference.GetCopyLocal())
                 .Where(reference => !string.IsNullOrEmpty(reference.Path))
                 .Select(reference => new ProjectOutput(rootProject, reference, targetDirectory))
                 .Concat(GetSecondTierReferences(references, rootProject, deployExternalLocalizations, targetDirectory));
@@ -90,7 +106,7 @@
         public bool IsVsProject => _vsProject != null;
 
         [CanBeNull]
-        public string PrimaryOutputFileName { get; } 
+        public string PrimaryOutputFileName => _primaryOutputFileName.Value;
 
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations)
@@ -105,13 +121,27 @@
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, [NotNull] string binaryTargetDirectory)
         {
-            var references = GetReferences();
+            var references = _references;
 
-            var projectOutput = GetBuildFiles(rootProject, deploySymbols, deployLocalizations, binaryTargetDirectory)
-                .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
-                .Concat(GetProjectReferences(references).SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
+            var buildFileGroups = GetBuildFileGroups(deploySymbols, deployLocalizations);
+
+            var projectOutput = _buildFiles.Value.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
+                .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references.Value, binaryTargetDirectory)) // references must go to the same folder as the referencing component.
+                .Concat(_projectReferences.Value.SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
             return projectOutput.ToArray();
+        }
+
+        private static BuildFileGroups GetBuildFileGroups(bool deploySymbols, bool deployLocalizations)
+        {
+            var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles;
+
+            if (deployLocalizations)
+                buildFileGroups |= BuildFileGroups.LocalizedResourceDlls;
+
+            if (deploySymbols)
+                buildFileGroups |= BuildFileGroups.Symbols;
+            return buildFileGroups;
         }
 
         [NotNull, ItemNotNull]
@@ -186,20 +216,6 @@
         protected Solution Solution { get; }
 
         [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, [NotNull] string binaryTargetDirectory)
-        {
-            var buildFileGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles;
-
-            if (deployLocalizations)
-                buildFileGroups |= BuildFileGroups.LocalizedResourceDlls;
-
-            if (deploySymbols)
-                buildFileGroups |= BuildFileGroups.Symbols;
-
-            return GetBuildFiles(rootProject, buildFileGroups, binaryTargetDirectory);
-        }
-
-        [NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, [NotNull] string binaryTargetDirectory)
         {
             var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
@@ -234,14 +250,14 @@
             if (referencesCollection == null)
                 return;
 
-            var projectReferences = GetReferences()
-                .Where(r => r.GetSourceProject() != null)
-                .ToArray();
+            var existingValues = _references.Value
+                .Select(r => r.GetSourceProject()?.UniqueName)
+                .Where(r => r != null);
+
+            var exisitingReferences = new HashSet<string>(existingValues, StringComparer.OrdinalIgnoreCase);
 
             var newProjects = projects
-                // ReSharper disable once AssignNullToNotNullAttribute
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                .Where(project => projectReferences.All(reference => !Equals(reference.GetSourceProject(), project)))
+                .Where(p => !exisitingReferences.Contains(p.UniqueName))
                 .ToArray();
 
             foreach (var project in newProjects)
@@ -255,12 +271,12 @@
 
         protected void RemoveProjectReferences([NotNull] params Project[] projects)
         {
-            var references = GetReferences();
+            var references = _references.Value.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
 
             var projectReferences = projects
                 // ReSharper disable once AssignNullToNotNullAttribute
                 // ReSharper disable once SuspiciousTypeConversion.Global
-                .Select(project => references.FirstOrDefault(reference => Equals(reference.GetSourceProject(), project)))
+                .Select(project => references.GetValueOrDefault(project.UniqueName))
                 .ToArray();
 
             foreach (var reference in projectReferences)
