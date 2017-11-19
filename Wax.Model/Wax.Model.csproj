@@ -193,6 +193,7 @@
       <Link>Version.cs</Link>
     </Compile>
     <Compile Include="Mapping\DirectoryMapping.cs" />
+    <Compile Include="Mapping\FeatureMapping.cs" />
     <Compile Include="Mapping\FileMapping.cs" />
     <Compile Include="Mapping\MappingState.cs" />
     <Compile Include="Mapping\UnmappedFile.cs" />

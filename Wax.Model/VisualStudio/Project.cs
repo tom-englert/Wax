@@ -97,7 +97,9 @@
         {
             var binaryTargetDirectory = Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty;
 
-            return GetProjectOutput(this, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory);
+            var projectOutput = GetProjectOutput(this, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory);
+
+            return projectOutput;
         }
 
         [NotNull, ItemNotNull]

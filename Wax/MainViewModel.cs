@@ -6,6 +6,7 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Windows.Input;
@@ -69,15 +70,18 @@
         public IList SelectedVSProjects => _selectedVSProjects;
 
         [CanBeNull]
-        public DirectoryMapping InstallDirectoryMapping { get; set; }
+        public DirectoryMapping InstallDirectoryMapping { get; private set; }
 
         [CanBeNull, ItemNotNull]
-        public IList<DirectoryMapping> DirectoryMappings { get; set; }
+        public IList<DirectoryMapping> DirectoryMappings { get; private set; }
 
         [CanBeNull, ItemNotNull]
-        public IList<FileMapping> FileMappings { get; set; }
+        public IList<FileMapping> FileMappings { get; private set; }
 
-        public bool CanHideReferencedProjects { get; set; }
+        [CanBeNull, ItemNotNull]
+        public ICollection<FeatureMapping> FeatureMappings { get; private set; }
+
+        public bool CanHideReferencedProjects { get; private set; }
 
         public bool DeploySymbols { get; set; }
 
@@ -199,37 +203,66 @@
 
         private void GenerateFeatureMappings([NotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] IList<Project> vsProjects, [NotNull] WixProject wixProject)
         {
+            Debug.Assert(FileMappings != null);
+
             var componentNodes = wixProject.ComponentNodes.ToDictionary(node => node.Id);
             var componentGroupNodes = wixProject.ComponentGroupNodes.ToDictionary(node => node.Id);
             var fileNodes = wixProject.FileNodes.ToDictionary(node => node.Id);
+            var fileMappingsLookup = FileMappings.ToDictionary(fm => fm.Id);
+            var featureMappings = new List<FeatureMapping>();
 
             foreach (var featureNode in wixProject.FeatureNodes)
             {
-                var installedFiles = featureNode.EnumerateInstalledFiles(componentGroupNodes, componentNodes, fileNodes)
+                var installedFileNodes = featureNode.EnumerateInstalledFiles(componentGroupNodes, componentNodes, fileNodes)
                     .ToArray();
 
-                var fileMappingsLookup = FileMappings.ToDictionary(fm => fm.Id);
-
-                var fileMappings = installedFiles
+                var fileMappings = installedFileNodes
                     .Select(file => fileMappingsLookup.GetValueOrDefault(file.Id))
                     .Where(item => item != null)
                     .ToArray();
 
-                var installedFileNames = new HashSet<string>(fileMappings.Select(fm => fm.TargetName));
+                var installedTargetNames = new HashSet<string>(fileMappings.Select(fm => fm.TargetName));
 
-                var projects = vsProjects.Where(p => installedFileNames.Contains(p.PrimaryOutputFileName)).ToArray();
+                var projects = vsProjects
+                    .Where(p => installedTargetNames.Contains(p.PrimaryOutputFileName))
+                    .ToArray();
 
-                var requiredOutputs = projectOutputGroups.Where(group => projects.Any(proj => group.Projects.Contains(proj)));
+                var requiredOutputs = projectOutputGroups
+                    .Where(group => projects.Any(proj => group.Projects.Contains(proj)))
+                    .ToArray();
 
-                var missingOutputs = requiredOutputs.Where(o => !installedFileNames.Contains(o.TargetName));
+                var missingOutputs = requiredOutputs
+                    .Where(o => !installedTargetNames.Contains(o.TargetName))
+                    .ToArray();
+
+                featureMappings.Add(new FeatureMapping(featureNode, fileMappings, projects, requiredOutputs, missingOutputs));
             }
+
+            var featureMappingsLookup = featureMappings.ToDictionary(item => item.FeatureNode);
+
+            foreach (var featureMapping in featureMappings)
+            {
+                var parentNode = featureMapping.FeatureNode.Parent;
+                if (parentNode == null)
+                    continue;
+
+                featureMapping.Parent = featureMappingsLookup.GetValueOrDefault(parentNode);
+            }
+
+            foreach (var featureMapping in featureMappings)
+            {
+                featureMapping.Parent?.Children.Add(featureMapping);
+            }
+
+            FeatureMappings = featureMappings
+                .Where(feature => feature?.Parent == null)
+                .ToArray();
         }
 
         private void GenerateFileMappings([NotNull, ItemNotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] WixProject wixProject)
         {
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
             unmappedFileNodes.AddRange(wixProject.FileNodes.Select(node => new UnmappedFile(node, unmappedFileNodes)));
-
 
             var unmappedProjectOutputs = new ObservableCollection<ProjectOutputGroup>(projectOutputGroups);
 
