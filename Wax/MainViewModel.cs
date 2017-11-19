@@ -49,11 +49,13 @@
             _wixProjectChanging = true;
 
             DeploySymbols = newValue.DeploySymbols;
+            DeployLocalizations = newValue.DeployLocalizations;
             DeployExternalLocalizations = newValue.DeployExternalLocalizations;
 
             var deployedProjects = newValue.DeployedProjects.ToArray();
 
-            CanHideReferencedProjects = deployedProjects.All(p => Solution.TopLevelProjects.Contains(p));
+            var topLevelProjects = new HashSet<Project>(Solution.EnumerateTopLevelProjects);
+            CanHideReferencedProjects = deployedProjects.All(p => topLevelProjects.Contains(p));
 
             _selectedVSProjects.Clear();
             _selectedVSProjects.AddRange(deployedProjects);
@@ -144,7 +146,9 @@
 
         private void SelectedVSProjects_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
         {
-            CanHideReferencedProjects = _selectedVSProjects.All(p => Solution.TopLevelProjects.Contains(p));
+            var topLevelProjects = new HashSet<Project>(Solution.EnumerateTopLevelProjects);
+
+            CanHideReferencedProjects = _selectedVSProjects.All(p => topLevelProjects.Contains(p));
 
             if (_wixProjectChanging)
                 return;
@@ -178,8 +182,14 @@
                     .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployLocalizations, DeployExternalLocalizations))
                     .ToArray();
 
+                var projectOutputGroups = projectOutputs
+                    .GroupBy(item => item.TargetName)
+                    .Select(group => new ProjectOutputGroup(group.Key, group.OrderBy(item => item.IsReference ? 1 : 0).ToArray()))
+                    .ToArray();
+
                 GenerateDirectoryMappings(projectOutputs, wixProject);
-                GenerateFileMappings(projectOutputs, wixProject);
+                GenerateFileMappings(projectOutputGroups, wixProject);
+                GenerateFeatureMappings(projectOutputGroups, vsProjects, wixProject);
             }
             catch
             {
@@ -187,20 +197,44 @@
             }
         }
 
-        private void GenerateFileMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
+        private void GenerateFeatureMappings([NotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] IList<Project> vsProjects, [NotNull] WixProject wixProject)
+        {
+            var componentNodes = wixProject.ComponentNodes.ToDictionary(node => node.Id);
+            var componentGroupNodes = wixProject.ComponentGroupNodes.ToDictionary(node => node.Id);
+            var fileNodes = wixProject.FileNodes.ToDictionary(node => node.Id);
+
+            foreach (var featureNode in wixProject.FeatureNodes)
+            {
+                var installedFiles = featureNode.EnumerateInstalledFiles(componentGroupNodes, componentNodes, fileNodes)
+                    .ToArray();
+
+                var fileMappingsLookup = FileMappings.ToDictionary(fm => fm.Id);
+
+                var fileMappings = installedFiles
+                    .Select(file => fileMappingsLookup.GetValueOrDefault(file.Id))
+                    .Where(item => item != null)
+                    .ToArray();
+
+                var installedFileNames = new HashSet<string>(fileMappings.Select(fm => fm.TargetName));
+
+                var projects = vsProjects.Where(p => installedFileNames.Contains(p.PrimaryOutputFileName)).ToArray();
+
+                var requiredOutputs = projectOutputGroups.Where(group => projects.Any(proj => group.Projects.Contains(proj)));
+
+                var missingOutputs = requiredOutputs.Where(o => !installedFileNames.Contains(o.TargetName));
+            }
+        }
+
+        private void GenerateFileMappings([NotNull, ItemNotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] WixProject wixProject)
         {
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
             unmappedFileNodes.AddRange(wixProject.FileNodes.Select(node => new UnmappedFile(node, unmappedFileNodes)));
 
-            projectOutputs = projectOutputs
-                .OrderBy(item => item.IsReference ? 1 : 0)
-                .Distinct()
-                .ToArray();
 
-            var unmappedProjectOutputs = new ObservableCollection<ProjectOutput>(projectOutputs);
+            var unmappedProjectOutputs = new ObservableCollection<ProjectOutputGroup>(projectOutputGroups);
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            FileMappings = projectOutputs.Select(projectOutput => new FileMapping(projectOutput, unmappedProjectOutputs, wixProject, unmappedFileNodes))
+            FileMappings = projectOutputGroups.Select(projectOutput => new FileMapping(projectOutput, unmappedProjectOutputs, wixProject, unmappedFileNodes))
                 .ToArray();
 
             UnmappedFileNodes = unmappedFileNodes;

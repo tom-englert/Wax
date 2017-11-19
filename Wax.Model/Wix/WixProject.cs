@@ -41,7 +41,7 @@ namespace tomenglertde.Wax.Model.Wix
                 .Where(item => _wixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
-                .ToList();
+                .ToArray();
         }
 
         [NotNull, ItemNotNull]
@@ -59,6 +59,9 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull, ItemNotNull]
         public IEnumerable<WixComponentNode> ComponentNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentNodes);
 
+        [NotNull, ItemNotNull]
+        public IEnumerable<WixComponentGroupNode> ComponentGroupNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroupNodes);
+
         [CanBeNull]
         public WixProductNode ProductNode
         {
@@ -75,9 +78,6 @@ namespace tomenglertde.Wax.Model.Wix
                 return new WixProductNode(firstFeature.SourceFile, parent);
             }
         }
-
-        [NotNull, ItemNotNull]
-        public IEnumerable<WixComponentGroupNode> ComponentGroups => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroupNodes);
 
         [NotNull, ItemNotNull]
         public IEnumerable<Project> DeployedProjects
@@ -251,7 +251,7 @@ namespace tomenglertde.Wax.Model.Wix
         [CanBeNull]
         private WixComponentGroupNode ForceComponentGroup([NotNull] string directoryId)
         {
-            return ComponentGroups.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.FirstOrDefault()?.AddComponentGroup(directoryId);
+            return ComponentGroupNodes.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.FirstOrDefault()?.AddComponentGroup(directoryId);
         }
 
         private void ForceFeatureRef([NotNull] string componentGroupId)

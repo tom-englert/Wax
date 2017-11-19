@@ -24,11 +24,11 @@
     public class FileMapping
     {
         [NotNull]
-        private readonly ProjectOutput _projectOutput;
+        private readonly ProjectOutputGroup _projectOutputGroup;
         [NotNull, ItemNotNull]
-        private readonly ObservableCollection<ProjectOutput> _allUnmappedProjectOutputs;
+        private readonly ObservableCollection<ProjectOutputGroup> _allUnmappedProjectOutputs;
         [NotNull, ItemNotNull]
-        private readonly ObservableFilteredCollection<ProjectOutput> _unmappedProjectOutputs;
+        private readonly ObservableFilteredCollection<ProjectOutputGroup> _unmappedProjectOutputs;
         [NotNull]
         private readonly WixProject _wixProject;
         [NotNull, ItemNotNull]
@@ -36,9 +36,9 @@
         [NotNull, ItemNotNull]
         private readonly ObservableFilteredCollection<UnmappedFile> _unmappedFiles;
 
-        public FileMapping([NotNull] ProjectOutput projectOutput, [NotNull] ObservableCollection<ProjectOutput> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
+        public FileMapping([NotNull] ProjectOutputGroup projectOutputGroup, [NotNull] ObservableCollection<ProjectOutputGroup> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
         {
-            _projectOutput = projectOutput;
+            _projectOutputGroup = projectOutputGroup;
             _allUnmappedProjectOutputs = allUnmappedProjectOutputs;
             _wixProject = wixProject;
             _allUnmappedFiles = allUnmappedFiles;
@@ -47,7 +47,7 @@
 
             MappedNode = wixProject.FileNodes.FirstOrDefault(node => node.Id == Id);
 
-            _unmappedProjectOutputs = new ObservableFilteredCollection<ProjectOutput>(_allUnmappedProjectOutputs, item => string.Equals(item?.FileName, DisplayName, StringComparison.OrdinalIgnoreCase));
+            _unmappedProjectOutputs = new ObservableFilteredCollection<ProjectOutputGroup>(_allUnmappedProjectOutputs, item => string.Equals(item?.FileName, DisplayName, StringComparison.OrdinalIgnoreCase));
             _unmappedProjectOutputs.CollectionChanged += UnmappedProjectOutputs_CollectionChanged;
 
             _unmappedFiles = new ObservableFilteredCollection<UnmappedFile>(allUnmappedFiles, item => string.Equals(item?.Node.Name, DisplayName, StringComparison.OrdinalIgnoreCase));
@@ -57,22 +57,22 @@
         }
 
         [NotNull]
-        public string DisplayName => _projectOutput.FileName;
+        public string DisplayName => _projectOutputGroup.FileName;
 
         [NotNull]
         public string Id { get; }
 
         [NotNull]
-        public string UniqueName => _projectOutput.TargetName;
+        public string UniqueName => _projectOutputGroup.TargetName;
 
         [NotNull]
-        public string Extension => Path.GetExtension(_projectOutput.TargetName);
+        public string Extension => Path.GetExtension(_projectOutputGroup.TargetName);
 
         [NotNull]
-        public string TargetName => _projectOutput.TargetName;
+        public string TargetName => _projectOutputGroup.TargetName;
 
         [NotNull]
-        public string SourceName => _projectOutput.SourceName;
+        public string SourceName => _projectOutputGroup.SourceName;
 
         [NotNull]
         public IList<UnmappedFile> UnmappedNodes => _unmappedFiles;
@@ -102,7 +102,7 @@
             selectedItems => selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.ResolveFile()));
 
         [NotNull]
-        public Project Project => _projectOutput.Project;
+        public Project Project => _projectOutputGroup.ProjectOutputs.First().Project;
 
         [CanBeNull]
         public WixFileNode MappedNodeSetter
@@ -132,7 +132,7 @@
             {
                 _allUnmappedFiles.Add(new UnmappedFile(oldValue, _allUnmappedFiles));
                 _wixProject.UnmapFile(TargetName);
-                _allUnmappedProjectOutputs.Add(_projectOutput);
+                _allUnmappedProjectOutputs.Add(_projectOutputGroup);
             }
 
             if (newValue != null)
@@ -140,7 +140,7 @@
                 var unmappedFile = _allUnmappedFiles.FirstOrDefault(file => Equals(file.Node, newValue));
                 _allUnmappedFiles.Remove(unmappedFile);
                 _wixProject.MapFile(TargetName, newValue);
-                _allUnmappedProjectOutputs.Remove(_projectOutput);
+                _allUnmappedProjectOutputs.Remove(_projectOutputGroup);
             }
 
             UpdateMappingState();

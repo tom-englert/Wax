@@ -234,7 +234,7 @@
                 </ListBox.ItemTemplate>
                 <ListBox.Style>
                   <Style TargetType="ListBox">
-                    <Setter Property="ItemsSource" Value="{Binding Solution.TopLevelProjects}" />
+                    <Setter Property="ItemsSource" Value="{Binding Solution.EnumerateTopLevelProjects}" />
                     <Style.Triggers>
                       <DataTrigger Binding="{Binding IsChecked, ElementName=ShowAllProjects}" Value="True">
                         <Setter Property="ItemsSource" Value="{Binding Solution.Projects}" />

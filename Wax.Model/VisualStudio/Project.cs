@@ -36,6 +36,8 @@
             UniqueName = _project.UniqueName;
 
             _projectTypeGuids = _project.GetProjectTypeGuids();
+
+            PrimaryOutputFileName = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
         }
 
         [NotNull, ItemNotNull]
@@ -87,12 +89,13 @@
 
         public bool IsVsProject => _vsProject != null;
 
+        [CanBeNull]
+        public string PrimaryOutputFileName { get; } 
+
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations)
         {
-            var primaryOutput = _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
-
-            var binaryTargetDirectory = Path.GetDirectoryName(primaryOutput) ?? string.Empty;
+            var binaryTargetDirectory = Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty;
 
             return GetProjectOutput(this, deploySymbols, deployLocalizations, deployExternalLocalizations, binaryTargetDirectory);
         }

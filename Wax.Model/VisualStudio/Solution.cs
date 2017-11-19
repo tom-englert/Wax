@@ -53,7 +53,7 @@
         public IEnumerable<WixProject> WixProjects { get; }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<Project> TopLevelProjects => Projects
+        public IEnumerable<Project> EnumerateTopLevelProjects => Projects
             .Where(project => !project.IsTestProject)
             .Where(project => project.ReferencedBy.All(reference => reference.IsTestProject))
             .OrderBy(project => project.Name);

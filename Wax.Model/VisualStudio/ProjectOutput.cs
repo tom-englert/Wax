@@ -3,19 +3,10 @@
     using System;
     using System.IO;
 
-    using Equatable;
-
     using JetBrains.Annotations;
 
-    [ImplementsEquatable]
     public class ProjectOutput
     {
-        [NotNull]
-        private readonly string _relativeFileName;
-        [Equals(StringComparison.OrdinalIgnoreCase)]
-        [NotNull]
-        private readonly string _targetName;
-
         public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, BuildFileGroups buildFileGroup, [NotNull] string binaryTargetDirectory)
         {
             Project = project;
@@ -24,23 +15,23 @@
 
             if ((buildFileGroup != BuildFileGroups.ContentFiles) && relativeFileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                _relativeFileName = relativeFileName.Substring(prefix.Length);
+                SourceName = relativeFileName.Substring(prefix.Length);
             }
             else
             {
-                _relativeFileName = relativeFileName;
+                SourceName = relativeFileName;
             }
 
             BuildFileGroup = buildFileGroup;
 
-            _targetName = (BuildFileGroup == BuildFileGroups.ContentFiles) ? _relativeFileName : Path.Combine(binaryTargetDirectory, _relativeFileName);
+            TargetName = (BuildFileGroup == BuildFileGroups.ContentFiles) ? SourceName : Path.Combine(binaryTargetDirectory, SourceName);
         }
 
         public ProjectOutput([NotNull] Project project, [NotNull] string relativeFileName, [NotNull] string binaryTargetDirectory)
         {
             Project = project;
-            _relativeFileName = relativeFileName;
-            _targetName = Path.Combine(binaryTargetDirectory, relativeFileName);
+            SourceName = relativeFileName;
+            TargetName = Path.Combine(binaryTargetDirectory, relativeFileName);
         }
 
         public ProjectOutput([NotNull] Project project, [NotNull] VSLangProj.Reference reference, [NotNull] string binaryTargetDirectory)
@@ -50,13 +41,10 @@
         }
 
         [NotNull]
-        public string SourceName => _relativeFileName;
+        public string SourceName { get; }
 
         [NotNull]
-        public string TargetName => _targetName;
-
-        [NotNull]
-        public string FileName => Path.GetFileName(_relativeFileName);
+        public string TargetName { get; }
 
         [NotNull]
         public Project Project { get; }
@@ -67,7 +55,7 @@
 
         public override string ToString()
         {
-            return _targetName;
+            return TargetName;
         }
     }
 }

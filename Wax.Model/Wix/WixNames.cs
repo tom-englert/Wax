@@ -33,10 +33,16 @@
         public XName ComponentGroupNode => XName.Get("ComponentGroup", _namespace);
 
         [NotNull]
+        public XName ComponentRefNode => XName.Get("ComponentRef", _namespace);
+
+        [NotNull]
         public XName ComponentGroupRefNode => XName.Get("ComponentGroupRef", _namespace);
 
         [NotNull]
         public XName FeatureNode => XName.Get("Feature", _namespace);
+
+        [NotNull]
+        public XName FeatureRefNode => XName.Get("FeatureRef", _namespace);
 
         [NotNull]
         public XName PropertyNode => XName.Get("Property", _namespace);

@@ -87,6 +87,13 @@ namespace tomenglertde.Wax.Model.Wix
                 // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixFeatureNode(this, node))
                 .ToList();
+
+            var featureNodesLookup = _featureNodes.ToDictionary(item => item.Id);
+
+            foreach (var featureNode in _featureNodes)
+            {
+                featureNode.BuildTree(featureNodesLookup);
+            }
         }
 
         [NotNull]

@@ -60,7 +60,7 @@ namespace tomenglertde.Wax.Model.Wix
             if (componentGroupNode == null)
                 return null;
 
-            var componentGroups = SourceFile.Project.ComponentGroups;
+            var componentGroups = SourceFile.Project.ComponentGroupNodes;
 
             if (componentGroupNode.Name == WixNames.ComponentGroupNode)
             {
