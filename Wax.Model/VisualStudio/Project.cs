@@ -8,6 +8,8 @@
     using System.Linq;
     using System.Runtime.InteropServices;
 
+    using AutoLazy;
+
     using Equatable;
 
     using JetBrains.Annotations;
@@ -28,14 +30,6 @@
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
         [NotNull]
         private readonly string _projectTypeGuids;
-        [NotNull, ItemNotNull]
-        private readonly Lazy<IReadOnlyCollection<ProjectOutput>> _buildFiles;
-        [NotNull, ItemNotNull]
-        private readonly Lazy<IReadOnlyCollection<VSLangProj.Reference>> _references;
-        [NotNull, ItemNotNull]
-        private readonly Lazy<IReadOnlyCollection<ProjectReference>> _projectReferences;
-        [NotNull, ItemNotNull]
-        private readonly Lazy<string> _primaryOutputFileName;
 
         public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
         {
@@ -47,17 +41,12 @@
             UniqueName = _project.UniqueName;
 
             _projectTypeGuids = _project.GetProjectTypeGuids();
-
-            _primaryOutputFileName = new Lazy<string>(() => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault());
-            _buildFiles = new Lazy<IReadOnlyCollection<ProjectOutput>>(() => GetBuildFiles(this, AllDeployGroups, Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty));
-            _references = new Lazy<IReadOnlyCollection<VSLangProj.Reference>>(GetReferences);
-            _projectReferences = new Lazy<IReadOnlyCollection<ProjectReference>>(GetProjectReferences);
         }
 
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectReference> GetProjectReferences()
         {
-            return GetProjectReferences(_references.Value);
+            return GetProjectReferences(References);
         }
 
         [NotNull, ItemNotNull]
@@ -103,8 +92,17 @@
 
         public bool IsVsProject => _vsProject != null;
 
-        [CanBeNull]
-        public string PrimaryOutputFileName => _primaryOutputFileName.Value;
+        [Lazy, CanBeNull]
+        public string PrimaryOutputFileName => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
+
+        [Lazy, NotNull, ItemNotNull]
+        private IReadOnlyCollection<ProjectOutput> BuildFiles => GetBuildFiles(this, AllDeployGroups, Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty);
+
+        [Lazy, NotNull, ItemNotNull]
+        private IReadOnlyCollection<VSLangProj.Reference> References => GetReferences();
+
+        [Lazy, NotNull, ItemNotNull]
+        private IReadOnlyCollection<ProjectReference> _projectReferences => GetProjectReferences();
 
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations)
@@ -122,15 +120,15 @@
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
         {
-            var references = _references;
+            var references = References;
 
             var buildFileGroups = GetBuildFileGroups(deploySymbols, deployLocalizations);
 
             // ReSharper disable once PossibleNullReferenceException
-            var projectOutput = _buildFiles.Value.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
-                .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references.Value, outputDirectory, relativeTargetDirectory))
+            var projectOutput = BuildFiles.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
+                .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, outputDirectory, relativeTargetDirectory))
                 // ReSharper disable once PossibleNullReferenceException
-                .Concat(_projectReferences.Value.SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
+                .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
             return projectOutput.ToArray();
         }
@@ -251,7 +249,7 @@
             if (referencesCollection == null)
                 return;
 
-            var existingValues = _references.Value
+            var existingValues = References
                 .Select(r => r.GetSourceProject()?.UniqueName)
                 .Where(r => r != null);
 
@@ -272,7 +270,7 @@
 
         protected void RemoveProjectReferences([NotNull] params Project[] projects)
         {
-            var references = _references.Value.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
+            var references = References.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
 
             var projectReferences = projects
                 // ReSharper disable once AssignNullToNotNullAttribute
