@@ -112,14 +112,19 @@
             var outputDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(_project.FullName), properties?.Item(@"OutputPath")?.Value as string ?? string.Empty));
             var relativeTargetDirectory = Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty;
 
-            var projectOutput = GetProjectOutput(this, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory);
+            var cache = new Dictionary<Project, IReadOnlyCollection<ProjectOutput>>();
+
+            var projectOutput = GetProjectOutput(cache, this, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory);
 
             return projectOutput;
         }
 
         [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
+        private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] IDictionary<Project, IReadOnlyCollection<ProjectOutput>> cache, [NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
         {
+            if (cache.TryGetValue(this, out var result))
+                return result;
+
             var references = References;
 
             var buildFileGroups = GetBuildFileGroups(deploySymbols, deployLocalizations);
@@ -128,9 +133,13 @@
             var projectOutput = BuildFiles.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
                 .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, outputDirectory, relativeTargetDirectory))
                 // ReSharper disable once PossibleNullReferenceException
-                .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
+                .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
-            return projectOutput.ToArray();
+            result = projectOutput.ToArray();
+
+            cache[this] = result;
+
+            return result;
         }
 
         private static BuildFileGroups GetBuildFileGroups(bool deploySymbols, bool deployLocalizations)
