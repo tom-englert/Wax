@@ -1,3 +1,6 @@
+1.1:
+- use new version numbering scheme compliant with build agent auto-numbering
+
 1.0.27.0:
 - Fix second tier reference lookup.
 - Show feature mappings.
