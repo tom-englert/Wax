@@ -148,7 +148,7 @@
     <value>Wix定义</value>
   </data>
   <data name="RemoveTheCustomMapping" xml:space="preserve">
-    <value>移除自动以映射。</value>
+    <value>移除自定义映射。</value>
   </data>
   <data name="CreateANewDirectoryNode" xml:space="preserve">
     <value>创建新目录节点。</value>
@@ -209,5 +209,11 @@
   </data>
   <data name="ExternalLocalizationsToolTip" xml:space="preserve">
     <value>在安装项目中包含外部或第三方的本地化。</value>
+  </data>
+  <data name="Localizations" xml:space="preserve">
+    <value>本地化</value>
+  </data>
+  <data name="LocalizationsToolTip" xml:space="preserve">
+    <value>在安装项目中包含本地化内容</value>
   </data>
 </root>
