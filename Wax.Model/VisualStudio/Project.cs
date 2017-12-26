@@ -54,7 +54,7 @@
         {
             var projectReferences = references
                 .Where(reference => reference.GetSourceProject() != null)
-                .Where(reference => reference.GetCopyLocal())
+                .Where(reference => reference.GetCopyLocal(null))
                 .Select(reference => new ProjectReference(Solution, reference));
 
             return projectReferences.ToArray();
@@ -63,9 +63,11 @@
         [NotNull, ItemNotNull]
         private static IReadOnlyCollection<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull, ItemNotNull] IReadOnlyCollection<VSLangProj.Reference> references, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
         {
+            Debug.WriteLine(string.Join("\r\n", references.Select(r => $"{r.Name}, {r.CopyLocal}, {r.Path}")));
+
             var localFileReferences = references
                 .Where(reference => reference.GetSourceProject() == null)
-                .Where(reference => reference.GetCopyLocal())
+                .Where(reference => reference.GetCopyLocal(outputDirectory))
                 .Where(reference => !string.IsNullOrEmpty(reference.Path))
                 .Select(reference => new ProjectOutput(rootProject, reference, relativeTargetDirectory))
                 .Concat(GetSecondTierReferences(references, rootProject, deployExternalLocalizations, outputDirectory, relativeTargetDirectory));
@@ -159,7 +161,7 @@
         {
             // Try to resolve second-tier references for CopyLocal references
             return references
-                .Where(reference => reference.CopyLocal)
+                .Where(reference => reference.GetCopyLocal(outputDirectory))
                 .Select(reference => reference.Path)
                 .Where(File.Exists) // Reference can be a project reference, but project has not been built yet.
                                     // ReSharper disable once AssignNullToNotNullAttribute

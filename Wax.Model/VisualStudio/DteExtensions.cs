@@ -292,16 +292,41 @@
             }
         }
 
-        public static bool GetCopyLocal([CanBeNull] this VSLangProj.Reference reference)
+        public static bool GetCopyLocal([CanBeNull] this VSLangProj.Reference reference, [CanBeNull] string outputDirectory)
         {
+            if (reference == null)
+                return false;
+
             try
             {
-                return reference?.CopyLocal ?? false;
+                return reference.CopyLocal || GetImplicitCopyLocal(reference, outputDirectory);
+            }
+            catch
+            {
+                return GetImplicitCopyLocal(reference, outputDirectory); ;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="VSLangProj.Reference.CopyLocal"/> is always FALSE for NuGet packages installed via "PackageRefrence" instead of "Packages.config"
+        /// => check if file exists in output directory
+        /// </summary>
+        private static bool GetImplicitCopyLocal([NotNull] VSLangProj.Reference reference, [CanBeNull] string outputDirectory)
+        {
+            if (string.IsNullOrEmpty(outputDirectory))
+                return false;
+
+            try
+            {
+                var fileName = Path.GetFileName(reference.Path);
+
+                return !string.IsNullOrEmpty(fileName) && File.Exists(Path.Combine(outputDirectory, fileName));
             }
             catch
             {
                 return false;
             }
         }
+
     }
 }
