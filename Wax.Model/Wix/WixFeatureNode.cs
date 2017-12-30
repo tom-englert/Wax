@@ -96,7 +96,7 @@
             var children = Components.Select(componentNodes.GetValueOrDefault)
                 .Where(item => item != null);
 
-            var files = byComponentGroupRef.Concat(byComponentRef).Concat(children).SelectMany(c => c.EnumerateFiles(fileNodes));
+            var files = byComponentGroupRef.Concat(byComponentRef).Concat(children).SelectMany(c => c?.EnumerateFiles(fileNodes));
 
             if (Parent != null)
             {

@@ -3,7 +3,6 @@
     using System;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Runtime.InteropServices;
     using System.Windows;
     using System.Windows.Controls.Primitives;
@@ -86,8 +85,6 @@
         [Localizable(false)]
         private void CreateWebBrowser([NotNull] string url)
         {
-            Contract.Requires(url != null);
-
             var webBrowsingService = (IVsWebBrowsingService)GetService(typeof(SVsWebBrowsingService));
             if (webBrowsingService != null)
             {

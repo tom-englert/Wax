@@ -253,7 +253,7 @@
             return GetVsProjectReferences() ?? GetMpfProjectReferences() ?? new VSLangProj.Reference[0];
         }
 
-        protected void AddProjectReferences([NotNull] params Project[] projects)
+        protected void AddProjectReferences([NotNull, ItemNotNull] params Project[] projects)
         {
             var referencesCollection = ReferencesCollection;
 
@@ -279,8 +279,9 @@
             }
         }
 
-        protected void RemoveProjectReferences([NotNull] params Project[] projects)
+        protected void RemoveProjectReferences([NotNull, ItemNotNull] params Project[] projects)
         {
+            // ReSharper disable once PossibleNullReferenceException
             var references = References.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
 
             var projectReferences = projects

@@ -186,10 +186,14 @@
                     .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployLocalizations, DeployExternalLocalizations))
                     .ToArray();
 
+                // ReSharper disable PossibleNullReferenceException
+                // ReSharper disable AssignNullToNotNullAttribute
                 var projectOutputGroups = projectOutputs
                     .GroupBy(item => item.TargetName)
                     .Select(group => new ProjectOutputGroup(group.Key, group.OrderBy(item => item.IsReference ? 1 : 0).ToArray()))
                     .ToArray();
+                // ReSharper restore AssignNullToNotNullAttribute
+                // ReSharper restore PossibleNullReferenceException
 
                 GenerateDirectoryMappings(projectOutputs, wixProject);
                 GenerateFileMappings(projectOutputGroups, wixProject);
@@ -201,13 +205,14 @@
             }
         }
 
-        private void GenerateFeatureMappings([NotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] IList<Project> vsProjects, [NotNull] WixProject wixProject)
+        private void GenerateFeatureMappings([NotNull, ItemNotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull, ItemNotNull] IList<Project> vsProjects, [NotNull] WixProject wixProject)
         {
             Debug.Assert(FileMappings != null);
 
             var componentNodes = wixProject.ComponentNodes.ToDictionary(node => node.Id);
             var componentGroupNodes = wixProject.ComponentGroupNodes.ToDictionary(node => node.Id);
             var fileNodes = wixProject.FileNodes.ToDictionary(node => node.Id);
+            // ReSharper disable once PossibleNullReferenceException
             var fileMappingsLookup = FileMappings.ToDictionary(fm => fm.Id);
             var featureMappings = new List<FeatureMapping>();
 
@@ -217,10 +222,12 @@
                     .ToArray();
 
                 var fileMappings = installedFileNodes
+                    // ReSharper disable once PossibleNullReferenceException
                     .Select(file => fileMappingsLookup.GetValueOrDefault(file.Id))
                     .Where(item => item != null)
                     .ToArray();
 
+                // ReSharper disable once PossibleNullReferenceException
                 var installedTargetNames = new HashSet<string>(fileMappings.Select(fm => fm.TargetName));
 
                 var projects = vsProjects
@@ -232,12 +239,14 @@
                     .ToArray();
 
                 var missingOutputs = requiredOutputs
+                    // ReSharper disable once PossibleNullReferenceException
                     .Where(o => !installedTargetNames.Contains(o.TargetName))
                     .ToArray();
 
                 featureMappings.Add(new FeatureMapping(featureNode, fileMappings, projects, requiredOutputs, missingOutputs));
             }
 
+            // ReSharper disable once PossibleNullReferenceException
             var featureMappingsLookup = featureMappings.ToDictionary(item => item.FeatureNode);
 
             foreach (var featureMapping in featureMappings)

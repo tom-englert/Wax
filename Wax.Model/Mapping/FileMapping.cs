@@ -102,6 +102,7 @@
             selectedItems => selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.ResolveFile()));
 
         [NotNull]
+        // ReSharper disable once PossibleNullReferenceException
         public Project Project => _projectOutputGroup.ProjectOutputs.First().Project;
 
         [CanBeNull]
@@ -221,40 +222,6 @@
             }
 
             MappingState = MappingState.Ambiguous;
-        }
-
-        [NotNull]
-        public static IEqualityComparer<FileMapping> Comparer { get; } = new EqualityComparer();
-
-        private class EqualityComparer : IEqualityComparer<FileMapping>
-        {
-            /// <summary>Determines whether the specified objects are equal.</summary>
-            /// <returns>true if the specified objects are equal; otherwise, false.</returns>
-            /// <param name="x">The first object to compare.</param>
-            /// <param name="y">The second object to compare.</param>
-            public bool Equals(FileMapping x, FileMapping y)
-            {
-                if (ReferenceEquals(x, y))
-                    return true;
-                if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
-                    return false;
-
-                return x.UniqueName.Equals(y.UniqueName, StringComparison.OrdinalIgnoreCase);
-            }
-
-            /// <summary>
-            /// Returns a hash code for the specified object.
-            /// </summary>
-            /// <returns>A hash code for the specified object.</returns>
-            /// <param name="obj">The <see cref="T:System.Object"/> for which a hash code is to be returned.</param>
-            /// <exception cref="T:System.ArgumentNullException">The type of <paramref name="obj"/> is a reference type and <paramref name="obj"/> is null.</exception>
-            public int GetHashCode(FileMapping obj)
-            {
-                if (obj == null)
-                    throw new ArgumentNullException("obj");
-
-                return obj.UniqueName.GetHashCode();
-            }
         }
     }
 }

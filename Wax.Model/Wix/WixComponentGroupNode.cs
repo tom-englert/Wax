@@ -24,27 +24,21 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public IEnumerable<string> Components => Node
             .Descendants(WixNames.ComponentNode)
-            // ReSharper disable once PossibleNullReferenceException
-            .Where(node => node.Parent == Node)
-            // ReSharper disable once AssignNullToNotNullAttribute
+            .Where(node => node?.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 
         [NotNull]
         public IEnumerable<string> ComponentRefs => Node
             .Descendants(WixNames.ComponentRefNode)
-            // ReSharper disable once PossibleNullReferenceException
-            .Where(node => node.Parent == Node)
-            // ReSharper disable once AssignNullToNotNullAttribute
+            .Where(node => node?.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 
         [NotNull]
         public IEnumerable<string> ComponentGroupRefs => Node
             .Descendants(WixNames.ComponentGroupRefNode)
-            // ReSharper disable once PossibleNullReferenceException
-            .Where(node => node.Parent == Node)
-            // ReSharper disable once AssignNullToNotNullAttribute
+            .Where(node => node?.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 
@@ -55,7 +49,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull]
-        public IEnumerable<WixComponentNode> EnumerateComponents(IDictionary<string, WixComponentGroupNode> componentGroupNodes, [NotNull] IDictionary<string, WixComponentNode> componentNodes)
+        public IEnumerable<WixComponentNode> EnumerateComponents([NotNull] IDictionary<string, WixComponentGroupNode> componentGroupNodes, [NotNull] IDictionary<string, WixComponentNode> componentNodes)
         {
             var byComponentGroupRef = ComponentGroupRefs.Select(componentGroupNodes.GetValueOrDefault)
                 .Where(item => item != null)

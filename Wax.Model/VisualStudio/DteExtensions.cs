@@ -303,7 +303,7 @@
             }
             catch
             {
-                return GetImplicitCopyLocal(reference, outputDirectory); ;
+                return GetImplicitCopyLocal(reference, outputDirectory);
             }
         }
 

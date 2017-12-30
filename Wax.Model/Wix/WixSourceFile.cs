@@ -88,6 +88,7 @@ namespace tomenglertde.Wax.Model.Wix
                 .Select(node => new WixFeatureNode(this, node))
                 .ToList();
 
+            // ReSharper disable once PossibleNullReferenceException
             var featureNodesLookup = _featureNodes.ToDictionary(item => item.Id);
 
             foreach (var featureNode in _featureNodes)
