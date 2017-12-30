@@ -44,6 +44,7 @@
                 .ToArray();
         }
 
+        [CanBeNull]
         public string FullName => _solution.FullName;
 
         [NotNull, ItemNotNull]
@@ -54,8 +55,7 @@
 
         [NotNull, ItemNotNull]
         public IEnumerable<Project> EnumerateTopLevelProjects => Projects
-            .Where(project => !project.IsTestProject)
-            .Where(project => project.ReferencedBy.All(reference => reference.IsTestProject))
+            .Where(project => project.IsTopLevelProject)
             .OrderBy(project => project.Name);
     }
 }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
@@ -19,7 +20,7 @@
     using TomsToolbox.Core;
 
     [ImplementsEquatable]
-    public class Project
+    public class Project : INotifyPropertyChanged
     {
         private const BuildFileGroups AllDeployGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls | BuildFileGroups.Symbols;
 
@@ -94,8 +95,31 @@
 
         public bool IsVsProject => _vsProject != null;
 
+        public bool IsTopLevelProject => !IsTestProject && ReferencedBy.All(reference => reference.IsTestProject);
+
         [Lazy, CanBeNull]
         public string PrimaryOutputFileName => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
+
+        [NotNull]
+        public string Name
+        {
+            get
+            {
+                var name = _project.Name;
+                Debug.Assert(name != null);
+                return name;
+            }
+        }
+
+        public bool IsImplicitSelected { get; private set; }
+
+        public bool UpdateIsImplicitSelected([NotNull, ItemNotNull] ICollection<Project> selectedVSProjects)
+        {
+            if (!IsVsProject)
+                return false;
+
+            return IsImplicitSelected = ReferencedBy.Any(project => selectedVSProjects.Contains(project) || project.UpdateIsImplicitSelected(selectedVSProjects));
+        }
 
         [Lazy, NotNull, ItemNotNull]
         private IReadOnlyCollection<ProjectOutput> BuildFiles => GetBuildFiles(this, AllDeployGroups, Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty);
@@ -212,17 +236,6 @@
         }
 
         [NotNull]
-        public string Name
-        {
-            get
-            {
-                var name = _project.Name;
-                Debug.Assert(name != null);
-                return name;
-            }
-        }
-
-        [NotNull]
         protected Solution Solution { get; }
 
         [NotNull, ItemNotNull]
@@ -260,7 +273,8 @@
             if (referencesCollection == null)
                 return;
 
-            var existingValues = References
+            var existingValues = referencesCollection
+                .OfType<VSLangProj.Reference>()
                 .Select(r => r.GetSourceProject()?.UniqueName)
                 .Where(r => r != null);
 
@@ -381,6 +395,14 @@
             var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup, binaryTargetDirectory));
 
             return projectOutputForGroup.ToArray();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator, UsedImplicitly]
+        protected virtual void OnPropertyChanged([NotNull] string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public override string ToString()

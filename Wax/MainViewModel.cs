@@ -154,6 +154,13 @@
 
             CanHideReferencedProjects = _selectedVSProjects.All(p => topLevelProjects.Contains(p));
 
+            var vsProjects = Solution.Projects.Where(p => p.IsVsProject);
+
+            foreach (var project in vsProjects)
+            {
+                project.UpdateIsImplicitSelected(new HashSet<Project>(_selectedVSProjects));
+            }
+
             if (_wixProjectChanging)
                 return;
 

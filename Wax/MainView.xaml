@@ -226,11 +226,16 @@
                 <ListBox.ItemTemplate>
                   <DataTemplate DataType="wax:Project">
                     <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}">
-                      <TextBlock>
-                        <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" Foreground="#202020" />
+                      <TextBlock x:Name="TextBlock">
+                        <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
                         (<Run Text="{Binding RelativeFolder, Mode=OneWay}" />)
                       </TextBlock>
                     </CheckBox>
+                    <DataTemplate.Triggers>
+                      <DataTrigger Binding="{Binding IsImplicitSelected}" Value="True">
+                        <Setter TargetName="TextBlock" Property="TextElement.Foreground" Value="Gray"/>
+                      </DataTrigger>
+                    </DataTemplate.Triggers>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.Style>
