@@ -55,25 +55,49 @@
         {
             var projectReferences = references
                 .Where(reference => reference.GetSourceProject() != null)
-                .Where(reference => reference.GetCopyLocal(null))
+                .Where(reference => reference.GetCopyLocal())
                 .Select(reference => new ProjectReference(Solution, reference));
 
             return projectReferences.ToArray();
         }
 
         [NotNull, ItemNotNull]
-        private static IReadOnlyCollection<ProjectOutput> GetLocalFileReferences([NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull, ItemNotNull] IReadOnlyCollection<VSLangProj.Reference> references, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
+        private static IReadOnlyCollection<ProjectOutput> GetLocalFileReferences([NotNull] Project project, [NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
         {
-            Debug.WriteLine(string.Join("\r\n", references.Select(r => $"{r.Name}, {r.CopyLocal}, {r.Path}")));
+            var targetDirectory = Path.Combine(outputDirectory, relativeTargetDirectory);
 
-            var localFileReferences = references
-                .Where(reference => reference.GetSourceProject() == null)
-                .Where(reference => reference.GetCopyLocal(outputDirectory))
-                .Where(reference => !string.IsNullOrEmpty(reference.Path))
-                .Select(reference => new ProjectOutput(rootProject, reference, relativeTargetDirectory))
-                .Concat(GetSecondTierReferences(references, rootProject, deployExternalLocalizations, outputDirectory, relativeTargetDirectory));
+            var outputs = project
+                .GetBuildFiles(rootProject, BuildFileGroups.Built, outputDirectory)
+                .Select(item => item.TargetName)
+                .Where(File.Exists)
+                .SelectMany(output => GetReferencedAssemblyNames(output, deployExternalLocalizations, targetDirectory))
+                .Distinct()
+                .ToArray();
 
-            return localFileReferences.ToArray();
+            var resolvedOutputs = new HashSet<string>(outputs, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var output in outputs)
+            {
+                ResolveReferences(Path.Combine(targetDirectory, output), deployExternalLocalizations, targetDirectory, resolvedOutputs);
+            }
+
+            var references = resolvedOutputs
+                // ReSharper disable once AssignNullToNotNullAttribute
+                .Select(file => new ProjectOutput(rootProject, file, relativeTargetDirectory))
+                .ToArray();
+
+            return references;
+        }
+
+        private static void ResolveReferences([NotNull] string filePath, bool deployExternalLocalizations, [NotNull] string targetDirectory, [NotNull] HashSet<string> resolvedOutputs)
+        {
+            foreach (var reference in GetReferencedAssemblyNames(filePath, deployExternalLocalizations, targetDirectory))
+            {
+                if (resolvedOutputs.Add(reference))
+                {
+                    ResolveReferences(Path.Combine(targetDirectory, reference), deployExternalLocalizations, targetDirectory, resolvedOutputs);
+                }
+            }
         }
 
         [NotNull, ItemNotNull]
@@ -151,13 +175,11 @@
             if (cache.TryGetValue(this, out var result))
                 return result;
 
-            var references = References;
-
             var buildFileGroups = GetBuildFileGroups(deploySymbols, deployLocalizations);
 
             // ReSharper disable once PossibleNullReferenceException
             var projectOutput = BuildFiles.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
-                .Concat(GetLocalFileReferences(rootProject, deployExternalLocalizations, references, outputDirectory, relativeTargetDirectory))
+                .Concat(GetLocalFileReferences(this, rootProject, deployExternalLocalizations, outputDirectory, relativeTargetDirectory))
                 // ReSharper disable once PossibleNullReferenceException
                 .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
@@ -178,22 +200,6 @@
             if (deploySymbols)
                 buildFileGroups |= BuildFileGroups.Symbols;
             return buildFileGroups;
-        }
-
-        [NotNull, ItemNotNull]
-        private static IReadOnlyCollection<ProjectOutput> GetSecondTierReferences([NotNull, ItemNotNull] IEnumerable<VSLangProj.Reference> references, [NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
-        {
-            // Try to resolve second-tier references for CopyLocal references
-            return references
-                .Where(reference => reference.GetCopyLocal(outputDirectory))
-                .Select(reference => reference.Path)
-                .Where(File.Exists) // Reference can be a project reference, but project has not been built yet.
-                                    // ReSharper disable once AssignNullToNotNullAttribute
-                .SelectMany(file => GetReferencedAssemblyNames(file, deployExternalLocalizations, Path.Combine(outputDirectory, relativeTargetDirectory)))
-                .Distinct()
-                // ReSharper disable once AssignNullToNotNullAttribute
-                .Select(file => new ProjectOutput(rootProject, file, relativeTargetDirectory))
-                .ToArray();
         }
 
         [NotNull, ItemNotNull]
