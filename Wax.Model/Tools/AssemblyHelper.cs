@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -100,7 +101,7 @@
                     true,
                     BindingFlags.NonPublic | BindingFlags.Instance,
                     null,
-                    new object[] {target, existingAssemblies},
+                    new object[] { target, existingAssemblies },
                     CultureInfo.InvariantCulture,
                     new object[0]);
 
@@ -123,6 +124,7 @@
                 _assemblyNames = FindReferences(target, existingAssemblies);
             }
 
+            [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
             [NotNull]
             private static AssemblyName[] FindReferences([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
             {
@@ -151,7 +153,7 @@
             [NotNull]
             private static HashSet<AssemblyName> FindXamlRefrences([NotNull] IDictionary<string, AssemblyName> existingAssemblies, [NotNull] Assembly assembly)
             {
-                var assembyResources = assembly.GetManifestResourceNames().FirstOrDefault(res => res.EndsWith("g.resources"));
+                var assembyResources = assembly.GetManifestResourceNames().FirstOrDefault(res => res.EndsWith("g.resources", StringComparison.Ordinal));
 
                 var usedAssemblies = new HashSet<AssemblyName>();
 
@@ -174,50 +176,52 @@
 
                 AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
 
-                using (var resourceStream = assembly.GetManifestResourceStream(assembyResources))
+                var resourceStream = assembly.GetManifestResourceStream(assembyResources);
+
+                if (resourceStream == null)
+                    return usedAssemblies;
+                
+                using (var resourceReader = new ResourceReader(resourceStream))
                 {
-                    using (var resourceReader = new ResourceReader(resourceStream))
+                    foreach (DictionaryEntry entry in resourceReader)
                     {
-                        foreach (DictionaryEntry entry in resourceReader)
+                        if ((entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) != true)
+                            continue;
+
+                        var bamlStream = (Stream) entry.Value;
+                        if (bamlStream == null)
+                            continue;
+
+                        using (var bamlReader = new Baml2006Reader(bamlStream, new XamlReaderSettings {ProvideLineInfo = true}))
                         {
-                            if ((entry.Key as string)?.EndsWith(".baml") == true)
+                            try
                             {
-                                using (var bamlStream = (Stream) entry.Value)
+                                while (bamlReader.Read())
                                 {
-                                    using (var bamlReader = new Baml2006Reader(bamlStream, new XamlReaderSettings {ProvideLineInfo = true}))
+                                    if (bamlReader.NodeType == XamlNodeType.StartMember)
                                     {
                                         try
                                         {
-                                            while (bamlReader.Read())
+                                            var type = bamlReader.Member.DeclaringType?.UnderlyingType;
+                                            if (type != null)
                                             {
-                                                if (bamlReader.NodeType == XamlNodeType.StartMember)
+                                                var requestedAssemblyName = type.Assembly.GetName();
+
+                                                if (existingAssemblies.TryGetValue(requestedAssemblyName.Name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
                                                 {
-                                                    try
-                                                    {
-                                                        var type = bamlReader.Member.DeclaringType?.UnderlyingType;
-                                                        if (type != null)
-                                                        {
-                                                            var requestedAssemblyName = type.Assembly.GetName();
-
-                                                            if (existingAssemblies.TryGetValue(requestedAssemblyName.Name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
-                                                            {
-                                                                usedAssemblies.Add(assemblyName);
-                                                            }
-                                                        }
-                                                    }
-                                                    catch
-                                                    {
-
-                                                    }
+                                                    usedAssemblies.Add(assemblyName);
                                                 }
                                             }
                                         }
                                         catch
                                         {
-                                            // nothing left to do...
                                         }
                                     }
                                 }
+                            }
+                            catch
+                            {
+                                // nothing left to do...
                             }
                         }
                     }
