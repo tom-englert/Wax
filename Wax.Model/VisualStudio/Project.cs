@@ -15,7 +15,7 @@
 
     using JetBrains.Annotations;
 
-    using Mono.Cecil;
+    using tomenglertde.Wax.Model.Tools;
 
     using TomsToolbox.Core;
 
@@ -209,15 +209,10 @@
         {
             try
             {
-                var referencedAssemblyNames = AssemblyDefinition.ReadAssembly(assemblyFileName)
-                    .MainModule
-                    .AssemblyReferences
-                    .Select(reference => reference.Name)
-                    .Where(assemblyName => File.Exists(Path.Combine(outputDirectory, assemblyName + ".dll")))
-                    .ToArray();
+                var referencedAssemblyNames = AssemblyHelper.FindReferences(assemblyFileName, outputDirectory);
 
                 var referencedAssemblyFileNames = referencedAssemblyNames
-                    .Select(assemblyName => assemblyName + ".dll")
+                    .Select(assemblyName => Path.GetFileName(new Uri(assemblyName.CodeBase).LocalPath))
                     .ToArray();
 
                 if (!deployExternalLocalizations)
@@ -226,8 +221,9 @@
                 }
 
                 var satteliteDlls = referencedAssemblyNames
-                    .SelectMany(assemblyName => Directory.GetFiles(outputDirectory, assemblyName + ".resources.dll", SearchOption.AllDirectories))
-                    .Select(file => file.Substring(outputDirectory.Length + 1));
+                    .SelectMany(assemblyName => Directory.GetFiles(outputDirectory, assemblyName.Name + ".resources.dll", SearchOption.AllDirectories))
+                    .Select(file => file.Substring(outputDirectory.Length))
+                    .Select(file => file.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 
                 return referencedAssemblyFileNames
                     .Concat(satteliteDlls)

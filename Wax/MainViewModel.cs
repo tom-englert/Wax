@@ -145,6 +145,8 @@
 
         public bool AreAllFilesMapped => FileMappings != null && FileMappings.All(item => item?.MappedNode != null);
 
+        public bool IsUpdating { get; set; }
+
         [NotNull]
         public static IEnumerable<BuildFileGroups> ProjectOutputs => Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
 
@@ -189,6 +191,8 @@
 
             try
             {
+                IsUpdating = true;
+
                 var projectOutputs = vsProjects
                     .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployLocalizations, DeployExternalLocalizations))
                     .ToArray();
@@ -209,6 +213,10 @@
             catch
             {
                 // solution is still loading....
+            }
+            finally
+            {
+                IsUpdating = false;
             }
         }
 

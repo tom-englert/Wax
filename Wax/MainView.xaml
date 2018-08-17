@@ -528,4 +528,13 @@
       </Grid>
     </Grid>
   </DockPanel>
+  <UserControl.Style>
+    <Style TargetType="UserControl">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsUpdating}" Value="True">
+          <Setter Property="Cursor" Value="{x:Static Cursors.Wait}"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Style>
 </UserControl>
