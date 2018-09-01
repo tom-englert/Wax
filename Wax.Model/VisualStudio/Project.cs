@@ -70,6 +70,7 @@
                 .GetBuildFiles(rootProject, BuildFileGroups.Built, outputDirectory)
                 .Select(item => item.TargetName)
                 .Where(File.Exists)
+                // ReSharper disable once AssignNullToNotNullAttribute
                 .SelectMany(output => GetReferencedAssemblyNames(output, deployExternalLocalizations, targetDirectory))
                 .Distinct()
                 .ToArray();

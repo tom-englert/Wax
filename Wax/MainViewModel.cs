@@ -141,9 +141,9 @@
 
         public bool HasExternalChanges => ((SelectedWixProject != null) && (SelectedWixProject.HasChanges));
 
-        public bool AreAllDirectoriesMapped => InstallDirectoryMapping?.MappedNode != null && DirectoryMappings != null && DirectoryMappings.All(item => item?.MappedNode != null);
+        public bool AreAllDirectoriesMapped => InstallDirectoryMapping?.MappedNode != null && DirectoryMappings != null && DirectoryMappings.All(item => item.MappedNode != null);
 
-        public bool AreAllFilesMapped => FileMappings != null && FileMappings.All(item => item?.MappedNode != null);
+        public bool AreAllFilesMapped => FileMappings != null && FileMappings.All(item => item.MappedNode != null);
 
         public bool IsUpdating { get; set; }
 

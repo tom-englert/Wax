@@ -28,6 +28,7 @@
 
             if (_referenceCache.TryGetValue(target, out var cacheEntry) && (cacheEntry.TimeStamp == timeStamp))
             {
+                // ReSharper disable once AssignNullToNotNullAttribute
                 return cacheEntry.References;
             }
 
@@ -37,6 +38,7 @@
 
             _referenceCache[target] = new ReferenceCacheEntry(references, timeStamp);
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             return references;
         }
 
@@ -45,6 +47,7 @@
         {
             var folder = new DirectoryInfo(outputDirectory);
             var files = folder.GetFiles("*.dll");
+            // ReSharper disable once PossibleNullReferenceException
             var hash = files.Select(file => file.LastWriteTime.GetHashCode()).Aggregate(0, HashCode.Aggregate);
 
             Dictionary<string, AssemblyName> existingAssemblies;
@@ -56,6 +59,7 @@
             else
             {
                 existingAssemblies = files
+                    // ReSharper disable once PossibleNullReferenceException
                     .Select(file => file.FullName)
                     .Select(TryGetAssemblyName)
                     .Where(assemblyName => assemblyName != null)
@@ -97,6 +101,7 @@
             {
                 var assemblyNameList = appDomain.CreateInstanceAndUnwrap(
                     implementingType.Assembly.FullName,
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     implementingType.FullName,
                     true,
                     BindingFlags.NonPublic | BindingFlags.Instance,
@@ -105,6 +110,7 @@
                     CultureInfo.InvariantCulture,
                     new object[0]);
 
+                // ReSharper disable once AssignNullToNotNullAttribute
                 var result = ((IEnumerable<AssemblyName>)assemblyNameList).ToArray();
 
                 return result;
@@ -153,6 +159,7 @@
             [NotNull]
             private static HashSet<AssemblyName> FindXamlRefrences([NotNull] IDictionary<string, AssemblyName> existingAssemblies, [NotNull] Assembly assembly)
             {
+                // ReSharper disable once PossibleNullReferenceException
                 var assembyResources = assembly.GetManifestResourceNames().FirstOrDefault(res => res.EndsWith("g.resources", StringComparison.Ordinal));
 
                 var usedAssemblies = new HashSet<AssemblyName>();
@@ -162,8 +169,11 @@
 
                 Assembly AssemblyResolve(object sender, ResolveEventArgs args)
                 {
+                    // ReSharper disable once PossibleNullReferenceException
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     var requestedAssemblyName = new AssemblyName(args.Name);
 
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     if (existingAssemblies.TryGetValue(requestedAssemblyName.Name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
                     {
                         usedAssemblies.Add(assemblyName);
@@ -198,24 +208,28 @@
                             {
                                 while (bamlReader.Read())
                                 {
-                                    if (bamlReader.NodeType == XamlNodeType.StartMember)
-                                    {
-                                        try
-                                        {
-                                            var type = bamlReader.Member.DeclaringType?.UnderlyingType;
-                                            if (type != null)
-                                            {
-                                                var requestedAssemblyName = type.Assembly.GetName();
+                                    if (bamlReader.NodeType != XamlNodeType.StartMember)
+                                        continue;
 
-                                                if (existingAssemblies.TryGetValue(requestedAssemblyName.Name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
-                                                {
-                                                    usedAssemblies.Add(assemblyName);
-                                                }
-                                            }
-                                        }
-                                        catch
+                                    try
+                                    {
+                                        var type = bamlReader.Member?.DeclaringType?.UnderlyingType;
+                                        if (type == null)
+                                            continue;
+
+                                        var requestedAssemblyName = type.Assembly.GetName();
+                                        var name = requestedAssemblyName.Name;
+                                        if (name == null)
+                                            continue;
+
+                                        if (existingAssemblies.TryGetValue(name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
                                         {
+                                            usedAssemblies.Add(assemblyName);
                                         }
+                                    }
+                                    catch
+                                    {
+                                        // if bamlReader crashes here, we can't do anything...
                                     }
                                 }
                             }
