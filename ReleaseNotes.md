@@ -1,3 +1,7 @@
+1.2:
+- Ignore VS references for assemblies, only rely on the real references of the target assemblies.
+- Detect late bound XAML references
+
 1.1:
 - use new version numbering scheme compliant with build agent auto-numbering
 
