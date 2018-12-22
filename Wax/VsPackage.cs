@@ -5,6 +5,9 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
+    using System.Threading;
+
+    using JetBrains.Annotations;
 
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
@@ -22,7 +25,7 @@
     /// </summary>
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", Product.Version, IconResourceID = 400)]
@@ -31,7 +34,7 @@
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(ToolWindow))]
     [Guid(GuidList.guidWaxPkgString)]
-    public sealed class VsPackage : Package
+    public sealed class VsPackage : AsyncPackage
     {
         /// <summary>
         /// Default constructor of the package.
@@ -66,21 +69,25 @@
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initilaization code that rely on services provided by VisualStudio.
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, [NotNull] IProgress<ServiceProgressData> progress)
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
-            base.Initialize();
+            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
+
+            await base.InitializeAsync(cancellationToken, progress).ConfigureAwait(false);
+
+            var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(false);
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
+            if (menuCommandService is OleMenuCommandService mcs)
             {
                 // Create the command for the tool window
                 var toolwndCommandID = new CommandID(GuidList.guidWaxCmdSet, (int)PkgCmdIDList.cmdidWaxToolWindow);
                 var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand( menuToolWin );
+                mcs.AddCommand(menuToolWin);
             }
         }
     }

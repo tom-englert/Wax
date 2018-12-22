@@ -9,7 +9,7 @@
     using System.Linq;
     using System.Runtime.InteropServices;
 
-    using AutoLazy;
+    using Lazy;
 
     using Equatable;
 
