@@ -1,3 +1,6 @@
+1.3:
+- Support VS2019
+
 1.2:
 - Ignore VS references for assemblies, only rely on the real references of the target assemblies.
 - Detect late bound XAML references
