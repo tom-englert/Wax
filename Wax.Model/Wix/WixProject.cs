@@ -41,7 +41,7 @@ namespace tomenglertde.Wax.Model.Wix
                 .Where(item => _wixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
-                .ToArray();
+                .ToList().AsReadOnly();
         }
 
         [NotNull, ItemNotNull]
@@ -88,8 +88,8 @@ namespace tomenglertde.Wax.Model.Wix
             }
             set
             {
-                var projects = value.ToArray();
-                var removedProjects = DeployedProjects.Except(projects).ToArray();
+                var projects = value.ToList().AsReadOnly();
+                var removedProjects = DeployedProjects.Except(projects).ToList().AsReadOnly();
 
                 // ReSharper disable once PossibleNullReferenceException
                 _configuration.DeployedProjectNames = projects.Select(project => project.UniqueName).ToArray();

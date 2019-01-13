@@ -16,7 +16,6 @@
     using tomenglertde.Wax.Model.VisualStudio;
     using tomenglertde.Wax.Model.Wix;
 
-    using TomsToolbox.Core;
     using TomsToolbox.ObservableCollections;
     using TomsToolbox.Wpf;
 
@@ -84,7 +83,7 @@
             // ReSharper disable once PossibleNullReferenceException
             selectedItems =>
             {
-                selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.AddFile());
+                selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.AddFile());
             });
 
         [NotNull, DoNotNotify]
@@ -92,14 +91,14 @@
             _ => CanClearMapping(),
             // ReSharper disable once AssignNullToNotNullAttribute
             // ReSharper disable once PossibleNullReferenceException
-            selectedItems => selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.ClearMapping()));
+            selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ClearMapping()));
 
         [NotNull, DoNotNotify]
         public ICommand ResolveFileCommand => new DelegateCommand<IEnumerable>(
             _ => CanResolveFile(),
             // ReSharper disable once AssignNullToNotNullAttribute
             // ReSharper disable once PossibleNullReferenceException
-            selectedItems => selectedItems.Cast<FileMapping>().ToArray().ForEach(fileMapping => fileMapping.ResolveFile()));
+            selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ResolveFile()));
 
         [NotNull]
         // ReSharper disable once PossibleNullReferenceException

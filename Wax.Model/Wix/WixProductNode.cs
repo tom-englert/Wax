@@ -18,13 +18,12 @@
         }
 
         [NotNull, ItemNotNull]
-        // ReSharper disable once AssignNullToNotNullAttribute
         public IEnumerable<WixPropertyNode> PropertyNodes => Node.Descendants(WixNames.PropertyNode).Select(node => new WixPropertyNode(SourceFile, node));
 
         [NotNull, ItemNotNull]
         public IEnumerable<string> EnumerateCustomActionRefs()
         {
-            return Node.Descendants(WixNames.CustomActionRefNode).Select(node => node?.GetAttribute("Id")).Where(item => item != null);
+            return Node.Descendants(WixNames.CustomActionRefNode).Select(node => node.GetAttribute("Id")).Where(item => item != null);
         }
 
         [NotNull]

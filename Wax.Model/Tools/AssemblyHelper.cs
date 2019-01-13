@@ -3,14 +3,10 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Resources;
-    using System.Windows.Baml2006;
-    using System.Xaml;
 
     using Baml;
 
@@ -26,7 +22,7 @@
         [NotNull] private static readonly Dictionary<string, DirectoryCacheEntry> _directoryCache = new Dictionary<string, DirectoryCacheEntry>(StringComparer.OrdinalIgnoreCase);
 
         [NotNull]
-        public static AssemblyName[] FindReferences([NotNull] string target, [NotNull] string outputDirectory)
+        public static IReadOnlyCollection<AssemblyName> FindReferences([NotNull] string target, [NotNull] string outputDirectory)
         {
             var timeStamp = File.GetLastWriteTime(target);
 
@@ -89,14 +85,16 @@
         }
 
         [NotNull]
-        private static AssemblyName[] FindReferences([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
+        private static IReadOnlyCollection<AssemblyName> FindReferences([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
         {
             try
             {
                 var assembly = ModuleDefinition.ReadModule(target);
 
+                // ReSharper disable once AssignNullToNotNullAttribute
                 var usedAssemblies = FindXamlReferences(existingAssemblies, assembly);
 
+                // ReSharper disable once AssignNullToNotNullAttribute
                 var referencedAssemblyNames = assembly.AssemblyReferences
                     .Select(item => item?.Name)
                     .Where(item => item != null)
@@ -105,7 +103,7 @@
 
                 usedAssemblies.AddRange(referencedAssemblyNames);
 
-                return usedAssemblies.ToArray();
+                return usedAssemblies.ToList().AsReadOnly();
             }
             catch
             {
@@ -142,6 +140,7 @@
 
                     foreach (var name in records.OfType<AssemblyInfoRecord>().Select(ai => new AssemblyName(ai.AssemblyFullName)))
                     {
+                        // ReSharper disable once AssignNullToNotNullAttribute
                         if (existingAssemblies.TryGetValue(name.Name, out var assemblyName) && ((name.Version == null) || (name.Version <= assemblyName.Version)))
                         {
                             usedAssemblies.Add(assemblyName);
@@ -155,13 +154,13 @@
 
         private class ReferenceCacheEntry
         {
-            public ReferenceCacheEntry(AssemblyName[] references, DateTime timeStamp)
+            public ReferenceCacheEntry(IReadOnlyCollection<AssemblyName> references, DateTime timeStamp)
             {
                 References = references;
                 TimeStamp = timeStamp;
             }
 
-            public AssemblyName[] References { get; }
+            public IReadOnlyCollection<AssemblyName> References { get; }
 
             public DateTime TimeStamp { get; }
         }

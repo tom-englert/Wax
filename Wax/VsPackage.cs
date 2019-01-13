@@ -75,6 +75,8 @@
         {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
 
+            // ReSharper disable PossibleNullReferenceException
+            
             await base.InitializeAsync(cancellationToken, progress).ConfigureAwait(false);
 
             var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(false);
@@ -85,10 +87,12 @@
             if (menuCommandService is OleMenuCommandService mcs)
             {
                 // Create the command for the tool window
-                var toolwndCommandID = new CommandID(GuidList.guidWaxCmdSet, (int)PkgCmdIDList.cmdidWaxToolWindow);
-                var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
+                var toolWindowCommandID = new CommandID(GuidList.guidWaxCmdSet, (int)PkgCmdIDList.cmdidWaxToolWindow);
+                var menuToolWin = new MenuCommand(ShowToolWindow, toolWindowCommandID);
                 mcs.AddCommand(menuToolWin);
             }
+
+            // ReSharper restore PossibleNullReferenceException
         }
     }
 }

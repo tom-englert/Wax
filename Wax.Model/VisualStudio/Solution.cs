@@ -22,7 +22,7 @@
                 .Select(project => new Project(this, project))
                 .Where(project => project.IsVsProject)
                 .OrderBy(project => project.Name)
-                .ToArray();
+                .ToList().AsReadOnly();
 
             foreach (var project in Projects)
             {
@@ -41,7 +41,7 @@
                 .Where(project => "{930c7802-8a8c-48f9-8165-68863bccd9dd}".Equals(project.Kind, StringComparison.OrdinalIgnoreCase))
                 .Select(project => new WixProject(this, project))
                 .OrderBy(project => project.Name)
-                .ToArray();
+                .ToList().AsReadOnly();
         }
 
         [CanBeNull]

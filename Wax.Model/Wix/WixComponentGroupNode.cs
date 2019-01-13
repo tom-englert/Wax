@@ -24,21 +24,21 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public IEnumerable<string> Components => Node
             .Descendants(WixNames.ComponentNode)
-            .Where(node => node?.Parent == Node)
+            .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 
         [NotNull]
         public IEnumerable<string> ComponentRefs => Node
             .Descendants(WixNames.ComponentRefNode)
-            .Where(node => node?.Parent == Node)
+            .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 
         [NotNull]
         public IEnumerable<string> ComponentGroupRefs => Node
             .Descendants(WixNames.ComponentGroupRefNode)
-            .Where(node => node?.Parent == Node)
+            .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 

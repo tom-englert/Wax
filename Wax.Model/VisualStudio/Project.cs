@@ -58,7 +58,7 @@
                 .Where(reference => reference.GetCopyLocal())
                 .Select(reference => new ProjectReference(Solution, reference));
 
-            return projectReferences.ToArray();
+            return projectReferences.ToList().AsReadOnly();
         }
 
         [NotNull, ItemNotNull]
@@ -73,7 +73,7 @@
                 // ReSharper disable once AssignNullToNotNullAttribute
                 .SelectMany(output => GetReferencedAssemblyNames(output, deployExternalLocalizations, targetDirectory))
                 .Distinct()
-                .ToArray();
+                .ToList().AsReadOnly();
 
             var resolvedOutputs = new HashSet<string>(outputs, StringComparer.OrdinalIgnoreCase);
 
@@ -85,7 +85,7 @@
             var references = resolvedOutputs
                 // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(file => new ProjectOutput(rootProject, file, relativeTargetDirectory))
-                .ToArray();
+                .ToList().AsReadOnly();
 
             return references;
         }
@@ -184,7 +184,7 @@
                 // ReSharper disable once PossibleNullReferenceException
                 .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
-            result = projectOutput.ToArray();
+            result = projectOutput.ToList().AsReadOnly();
 
             cache[this] = result;
 
@@ -214,7 +214,7 @@
 
                 var referencedAssemblyFileNames = referencedAssemblyNames
                     .Select(assemblyName => Path.GetFileName(new Uri(assemblyName.CodeBase).LocalPath))
-                    .ToArray();
+                    .ToList().AsReadOnly();
 
                 if (!deployExternalLocalizations)
                 {
@@ -228,7 +228,7 @@
 
                 return referencedAssemblyFileNames
                     .Concat(satteliteDlls)
-                    .ToArray();
+                    .ToList().AsReadOnly();
             }
             catch
             {
@@ -254,13 +254,13 @@
 
             var buildFiles = selectedOutputGroups.SelectMany(item => GetProjectOutputForGroup(rootProject, item, binaryTargetDirectory));
 
-            return buildFiles.ToArray();
+            return buildFiles.ToList().AsReadOnly();
         }
 
         [NotNull, ItemNotNull]
         protected IReadOnlyCollection<EnvDTE.ProjectItem> GetAllProjectItems()
         {
-            return _project.EnumerateAllProjectItems().ToArray();
+            return _project.EnumerateAllProjectItems().ToList().AsReadOnly();
         }
 
         [NotNull, ItemNotNull]
@@ -269,7 +269,7 @@
             return GetVsProjectReferences() ?? GetMpfProjectReferences() ?? new VSLangProj.Reference[0];
         }
 
-        protected void AddProjectReferences([NotNull, ItemNotNull] params Project[] projects)
+        protected void AddProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
         {
             var referencesCollection = ReferencesCollection;
 
@@ -285,7 +285,7 @@
 
             var newProjects = projects
                 .Where(p => !exisitingReferences.Contains(p.UniqueName))
-                .ToArray();
+                .ToList();
 
             foreach (var project in newProjects)
             {
@@ -296,7 +296,7 @@
             }
         }
 
-        protected void RemoveProjectReferences([NotNull, ItemNotNull] params Project[] projects)
+        protected void RemoveProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
         {
             // ReSharper disable once PossibleNullReferenceException
             var references = References.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
@@ -305,7 +305,7 @@
                 // ReSharper disable once AssignNullToNotNullAttribute
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 .Select(project => references.GetValueOrDefault(project.UniqueName))
-                .ToArray();
+                .ToList().AsReadOnly();
 
             foreach (var reference in projectReferences)
             {
@@ -361,7 +361,7 @@
                     .Take(1)
                     // ReSharper disable once AssignNullToNotNullAttribute
                     .SelectMany(references => references.OfType<VSLangProj.Reference>())
-                    .ToArray();
+                    .ToList().AsReadOnly();
             }
             catch
             {
@@ -377,7 +377,7 @@
                 return _vsProject?
                     .References?
                     .OfType<VSLangProj.Reference>()
-                    .ToArray();
+                    .ToList().AsReadOnly();
             }
             catch
             {
@@ -397,7 +397,7 @@
 
             var projectOutputForGroup = fileNames.Select(fileName => new ProjectOutput(project, fileName, buildFileGroup, binaryTargetDirectory));
 
-            return projectOutputForGroup.ToArray();
+            return projectOutputForGroup.ToList().AsReadOnly();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -430,17 +430,17 @@
         }
 
         [NotNull, ItemNotNull]
-        public static string[] GetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        public static IEnumerable<string> GetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
         {
-            return InternalGetFileNames(outputGroup) ?? new string[0];
+            return InternalGetFileNames(outputGroup) ?? Array.Empty<string>();
         }
 
         [CanBeNull]
-        private static string[] InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        private static IReadOnlyCollection<string> InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
         {
             try
             {
-                return ((Array)outputGroup.FileNames)?.OfType<string>().ToArray();
+                return ((Array)outputGroup.FileNames)?.OfType<string>().ToList().AsReadOnly();
             }
             catch
             {
