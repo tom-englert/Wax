@@ -1,3 +1,6 @@
+1.4:
+- Performance improvements.
+
 1.3:
 - Support VS2019
 

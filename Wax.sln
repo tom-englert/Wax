@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.25824.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{305BD4E4-C124-4172-9F2C-49CCA08CCFD1}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
 		README.md = README.md
 		ReleaseNotes.md = ReleaseNotes.md
 		Screenshot.png = Screenshot.png
@@ -33,5 +34,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC847233-AC59-4104-B415-47B4C3F9FCB3}
 	EndGlobalSection
 EndGlobal
