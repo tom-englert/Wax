@@ -12,7 +12,11 @@
     using System.Windows.Baml2006;
     using System.Xaml;
 
+    using Baml;
+
     using JetBrains.Annotations;
+
+    using Mono.Cecil;
 
     using TomsToolbox.Core;
 
@@ -34,7 +38,7 @@
 
             var existingAssemblies = FindExistingAssemblies(outputDirectory);
 
-            var references = InvokeInSeparateDomain(target, existingAssemblies);
+            var references = FindReferences(target, existingAssemblies);
 
             _referenceCache[target] = new ReferenceCacheEntry(references, timeStamp);
 
@@ -84,175 +88,69 @@
             }
         }
 
-        [CanBeNull]
-        private static AssemblyName[] InvokeInSeparateDomain([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
+        [NotNull]
+        private static AssemblyName[] FindReferences([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
         {
-            var friendlyName = "Temporary domain";
-            var currentDomain = AppDomain.CurrentDomain;
-            var implementingType = typeof(InternalHelper);
-            var baseDirectory = Path.GetDirectoryName(implementingType.Assembly.Location);
-
-            var appDomain = AppDomain.CreateDomain(friendlyName, currentDomain.Evidence, baseDirectory, string.Empty, false);
-
-            if (appDomain == null)
-                return new AssemblyName[0];
-
             try
             {
-                var assemblyNameList = appDomain.CreateInstanceAndUnwrap(
-                    implementingType.Assembly.FullName,
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    implementingType.FullName,
-                    true,
-                    BindingFlags.NonPublic | BindingFlags.Instance,
-                    null,
-                    new object[] { target, existingAssemblies },
-                    CultureInfo.InvariantCulture,
-                    new object[0]);
+                var assembly = ModuleDefinition.ReadModule(target);
 
-                // ReSharper disable once AssignNullToNotNullAttribute
-                var result = ((IEnumerable<AssemblyName>)assemblyNameList).ToArray();
+                var usedAssemblies = FindXamlReferences(existingAssemblies, assembly);
 
-                return result;
+                var referencedAssemblyNames = assembly.AssemblyReferences
+                    .Select(item => item?.Name)
+                    .Where(item => item != null)
+                    .Select(existingAssemblies.GetValueOrDefault)
+                    .Where(item => item != null);
+
+                usedAssemblies.AddRange(referencedAssemblyNames);
+
+                return usedAssemblies.ToArray();
             }
-            finally
+            catch
             {
-                AppDomain.Unload(appDomain);
+                return Array.Empty<AssemblyName>();
             }
         }
 
-        private class InternalHelper : MarshalByRefObject, IEnumerable<AssemblyName>
+        [NotNull]
+        private static HashSet<AssemblyName> FindXamlReferences([NotNull] IDictionary<string, AssemblyName> existingAssemblies, [NotNull] ModuleDefinition assembly)
         {
-            [NotNull] private readonly IList<AssemblyName> _assemblyNames;
+            var assemblyResources = assembly.Resources?.OfType<EmbeddedResource>().FirstOrDefault(res => res.Name?.EndsWith("g.resources", StringComparison.Ordinal) == true);
 
-            private InternalHelper([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
+            var usedAssemblies = new HashSet<AssemblyName>();
+
+            if (assemblyResources == null)
+                return usedAssemblies;
+
+            var resourceStream = assemblyResources.GetResourceStream();
+
+            if (resourceStream == null)
+                return usedAssemblies;
+
+            using (var resourceReader = new ResourceReader(resourceStream))
             {
-                _assemblyNames = FindReferences(target, existingAssemblies);
-            }
-
-            [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
-            [NotNull]
-            private static AssemblyName[] FindReferences([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
-            {
-                try
+                foreach (DictionaryEntry entry in resourceReader)
                 {
-                    var assembly = Assembly.LoadFrom(target);
+                    if ((entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) != true)
+                        continue;
 
-                    var usedAssemblies = FindXamlRefrences(existingAssemblies, assembly);
+                    if (!(entry.Value is Stream bamlStream))
+                        continue;
 
-                    var referencedAssemblyNames = assembly.GetReferencedAssemblies()
-                        .Select(item => item?.Name)
-                        .Where(item => item != null)
-                        .Select(existingAssemblies.GetValueOrDefault)
-                        .Where(item => item != null);
+                    var records = Baml.ReadDocument(bamlStream);
 
-                    usedAssemblies.AddRange(referencedAssemblyNames);
-
-                    return usedAssemblies.ToArray();
-                }
-                catch (BadImageFormatException)
-                {
-                    return new AssemblyName[0];
-                }
-            }
-
-            [NotNull]
-            private static HashSet<AssemblyName> FindXamlRefrences([NotNull] IDictionary<string, AssemblyName> existingAssemblies, [NotNull] Assembly assembly)
-            {
-                // ReSharper disable once PossibleNullReferenceException
-                var assembyResources = assembly.GetManifestResourceNames().FirstOrDefault(res => res.EndsWith("g.resources", StringComparison.Ordinal));
-
-                var usedAssemblies = new HashSet<AssemblyName>();
-
-                if (assembyResources == null)
-                    return usedAssemblies;
-
-                Assembly AssemblyResolve(object sender, ResolveEventArgs args)
-                {
-                    // ReSharper disable once PossibleNullReferenceException
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    var requestedAssemblyName = new AssemblyName(args.Name);
-
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    if (existingAssemblies.TryGetValue(requestedAssemblyName.Name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
+                    foreach (var name in records.OfType<AssemblyInfoRecord>().Select(ai => new AssemblyName(ai.AssemblyFullName)))
                     {
-                        usedAssemblies.Add(assemblyName);
-
-                        return Assembly.Load(assemblyName);
-                    }
-
-                    return null;
-                }
-
-                AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
-
-                var resourceStream = assembly.GetManifestResourceStream(assembyResources);
-
-                if (resourceStream == null)
-                    return usedAssemblies;
-                
-                using (var resourceReader = new ResourceReader(resourceStream))
-                {
-                    foreach (DictionaryEntry entry in resourceReader)
-                    {
-                        if ((entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) != true)
-                            continue;
-
-                        var bamlStream = (Stream) entry.Value;
-                        if (bamlStream == null)
-                            continue;
-
-                        using (var bamlReader = new Baml2006Reader(bamlStream, new XamlReaderSettings {ProvideLineInfo = true}))
+                        if (existingAssemblies.TryGetValue(name.Name, out var assemblyName) && ((name.Version == null) || (name.Version <= assemblyName.Version)))
                         {
-                            try
-                            {
-                                while (bamlReader.Read())
-                                {
-                                    if (bamlReader.NodeType != XamlNodeType.StartMember)
-                                        continue;
-
-                                    try
-                                    {
-                                        var type = bamlReader.Member?.DeclaringType?.UnderlyingType;
-                                        if (type == null)
-                                            continue;
-
-                                        var requestedAssemblyName = type.Assembly.GetName();
-                                        var name = requestedAssemblyName.Name;
-                                        if (name == null)
-                                            continue;
-
-                                        if (existingAssemblies.TryGetValue(name, out var assemblyName) && (requestedAssemblyName.Version <= assemblyName.Version))
-                                        {
-                                            usedAssemblies.Add(assemblyName);
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        // if bamlReader crashes here, we can't do anything...
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                                // nothing left to do...
-                            }
+                            usedAssemblies.Add(assemblyName);
                         }
                     }
                 }
-
-                return usedAssemblies;
             }
 
-            public IEnumerator<AssemblyName> GetEnumerator()
-            {
-                return _assemblyNames.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            return usedAssemblies;
         }
 
         private class ReferenceCacheEntry
