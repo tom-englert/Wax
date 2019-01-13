@@ -1,0 +1,4 @@
+[submodule "BAML"]
+	path = BAML
+	url = https://github.com/tom-englert/BAML.git
+	branch = master
