@@ -1,4 +1,5 @@
-﻿namespace tomenglertde.Wax.Model.VisualStudio
+﻿// ReSharper disable UnusedMember.Global
+namespace tomenglertde.Wax.Model.VisualStudio
 {
     using System;
 

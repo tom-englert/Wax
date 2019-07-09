@@ -11,15 +11,10 @@ namespace tomenglertde.Wax.Model.Wix
     [ImplementsEquatable]
     public class WixNode
     {
-        [NotNull]
-        private readonly WixSourceFile _sourceFile;
-        [NotNull]
-        private readonly XElement _node;
-
         public WixNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
         {
-            _sourceFile = sourceFile;
-            _node = node;
+            SourceFile = sourceFile;
+            Node = node;
         }
 
         [Equals]
@@ -34,10 +29,10 @@ namespace tomenglertde.Wax.Model.Wix
         public string Name => GetAttribute("Name");
 
         [NotNull]
-        internal XElement Node => _node;
+        internal XElement Node { get; }
 
         [NotNull]
-        public WixSourceFile SourceFile => _sourceFile;
+        public WixSourceFile SourceFile { get; }
 
         [NotNull]
         public WixNames WixNames => SourceFile.WixNames;

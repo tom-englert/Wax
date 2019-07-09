@@ -84,7 +84,6 @@
     <Compile Include="Mapping\UnmappedFile.cs" />
     <Compile Include="Tools\AssemblyHelper.cs" />
     <Compile Include="Tools\SerializerExtensions.cs" />
-    <Compile Include="Mapping\IMapping.cs" />
     <Compile Include="Tools\XmlExtensions.cs" />
     <Compile Include="VisualStudio\BuildFileGroups.cs" />
     <Compile Include="VisualStudio\DteExtensions.cs" />
@@ -95,7 +94,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualStudio\Solution.cs" />
     <Compile Include="Wix\ProjectConfiguration.cs" />
-    <Compile Include="Wix\WixProductNode.cs" />
     <Compile Include="Wix\WixComponentGroupNode.cs" />
     <Compile Include="Wix\WixComponentNode.cs" />
     <Compile Include="Wix\WixDefine.cs" />
@@ -104,8 +102,6 @@
     <Compile Include="Wix\WixFileNode.cs" />
     <Compile Include="Wix\WixNames.cs" />
     <Compile Include="Wix\WixNode.cs" />
-    <Compile Include="Wix\WixPropertyNode.cs" />
-    <Compile Include="Wix\WixRegistrySearch.cs" />
     <Compile Include="Wix\WixSourceFile.cs" />
     <Compile Include="Wix\WixProject.cs" />
   </ItemGroup>

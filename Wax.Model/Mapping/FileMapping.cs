@@ -35,7 +35,7 @@
         [NotNull, ItemNotNull]
         private readonly ObservableFilteredCollection<UnmappedFile> _unmappedFiles;
 
-        public FileMapping([NotNull] ProjectOutputGroup projectOutputGroup, [NotNull] ObservableCollection<ProjectOutputGroup> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] ObservableCollection<UnmappedFile> allUnmappedFiles)
+        public FileMapping([NotNull] ProjectOutputGroup projectOutputGroup, [NotNull] ObservableCollection<ProjectOutputGroup> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] IList<UnmappedFile> allUnmappedFiles)
         {
             _projectOutputGroup = projectOutputGroup;
             _allUnmappedProjectOutputs = allUnmappedProjectOutputs;
@@ -137,7 +137,7 @@
             UpdateMappingState();
         }
 
-        void UnmappedProjectOutputs_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
+        private void UnmappedProjectOutputs_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
         {
             UpdateMappingState();
         }

@@ -89,7 +89,7 @@
             return references;
         }
 
-        private static void ResolveReferences([NotNull] string filePath, bool deployExternalLocalizations, [NotNull] string targetDirectory, [NotNull] HashSet<string> resolvedOutputs)
+        private static void ResolveReferences([NotNull] string filePath, bool deployExternalLocalizations, [NotNull] string targetDirectory, [NotNull] ISet<string> resolvedOutputs)
         {
             foreach (var reference in GetReferencedAssemblyNames(filePath, deployExternalLocalizations, targetDirectory))
             {
@@ -152,7 +152,7 @@
         private IReadOnlyCollection<VSLangProj.Reference> References => GetReferences();
 
         [Lazy, NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectReference> _projectReferences => GetProjectReferences();
+        private IReadOnlyCollection<ProjectReference> ProjectReferences => GetProjectReferences();
 
         [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations)
@@ -179,7 +179,7 @@
 
             var projectOutput = BuildFiles.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
                     .Concat(GetLocalFileReferences(this, rootProject, deployExternalLocalizations, outputDirectory, relativeTargetDirectory))
-                    .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
+                    .Concat(ProjectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
             result = projectOutput.ToList().AsReadOnly();
 

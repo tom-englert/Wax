@@ -62,23 +62,6 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull, ItemNotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroupNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroupNodes);
 
-        [CanBeNull]
-        public WixProductNode ProductNode
-        {
-            get
-            {
-                var firstFeature = FeatureNodes.FirstOrDefault();
-
-                if (firstFeature == null)
-                    return null;
-
-                var parent = firstFeature.Node.Parent;
-                Debug.Assert(parent != null);
-
-                return new WixProductNode(firstFeature.SourceFile, parent);
-            }
-        }
-
         [NotNull, ItemNotNull]
         public IEnumerable<Project> DeployedProjects
         {

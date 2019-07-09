@@ -277,6 +277,7 @@
         private void GenerateFileMappings([NotNull, ItemNotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] WixProject wixProject)
         {
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
+            // ReSharper disable once ImplicitlyCapturedClosure
             unmappedFileNodes.AddRange(wixProject.FileNodes.Select(node => new UnmappedFile(node, unmappedFileNodes)));
 
             var unmappedProjectOutputs = new ObservableCollection<ProjectOutputGroup>(projectOutputGroups);
