@@ -59,12 +59,10 @@ namespace tomenglertde.Wax.Model.Wix
                 .ToList();
 
             _componentGroupNodes = root.Descendants(WixNames.ComponentGroupNode)
-                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixComponentGroupNode(this, node))
                 .ToList();
 
             _componentNodes = root.Descendants(WixNames.ComponentNode)
-                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixComponentNode(this, node))
                 .ToList();
 
@@ -72,23 +70,19 @@ namespace tomenglertde.Wax.Model.Wix
 
             _fileNodes.AddRange(root
                 .Descendants(WixNames.FileNode)
-                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixFileNode(this, node, _fileNodes)));
 
             _directoryNodes = root
                 .Descendants(WixNames.DirectoryNode)
-                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixDirectoryNode(this, node))
                 .Where(node => node.Id != "TARGETDIR")
                 .ToList();
 
             _featureNodes = root
                 .Descendants(WixNames.FeatureNode)
-                // ReSharper disable once AssignNullToNotNullAttribute
                 .Select(node => new WixFeatureNode(this, node))
                 .ToList();
 
-            // ReSharper disable once PossibleNullReferenceException
             var featureNodesLookup = _featureNodes.ToDictionary(item => item.Id);
 
             foreach (var featureNode in _featureNodes)

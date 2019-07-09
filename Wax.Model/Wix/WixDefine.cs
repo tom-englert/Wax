@@ -17,7 +17,6 @@
         }
 
         [NotNull]
-        // ReSharper disable once PossibleNullReferenceException
         public string Name => Node.Data.Split('=').Select(item => item.Trim()).FirstOrDefault() ?? "<invalid>";
 
         [Equals]

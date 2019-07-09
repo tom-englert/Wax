@@ -197,14 +197,10 @@
                     .SelectMany(project => project.GetProjectOutput(DeploySymbols, DeployLocalizations, DeployExternalLocalizations))
                     .ToList().AsReadOnly();
 
-                // ReSharper disable PossibleNullReferenceException
-                // ReSharper disable AssignNullToNotNullAttribute
                 var projectOutputGroups = projectOutputs
                     .GroupBy(item => item.TargetName)
                     .Select(group => new ProjectOutputGroup(group.Key, group.OrderBy(item => item.IsReference ? 1 : 0).ToList().AsReadOnly()))
                     .ToList().AsReadOnly();
-                // ReSharper restore AssignNullToNotNullAttribute
-                // ReSharper restore PossibleNullReferenceException
 
                 GenerateDirectoryMappings(projectOutputs, wixProject);
                 GenerateFileMappings(projectOutputGroups, wixProject);
@@ -236,12 +232,10 @@
                     .ToList().AsReadOnly();
 
                 var fileMappings = installedFileNodes
-                    // ReSharper disable once PossibleNullReferenceException
                     .Select(file => fileMappingsLookup.GetValueOrDefault(file.Id))
                     .Where(item => item != null)
                     .ToList().AsReadOnly();
 
-                // ReSharper disable once PossibleNullReferenceException
                 var installedTargetNames = new HashSet<string>(fileMappings.Select(fm => fm.TargetName));
 
                 var projects = vsProjects
@@ -253,14 +247,12 @@
                     .ToList().AsReadOnly();
 
                 var missingOutputs = requiredOutputs
-                    // ReSharper disable once PossibleNullReferenceException
                     .Where(o => !installedTargetNames.Contains(o.TargetName))
                     .ToList().AsReadOnly();
 
                 featureMappings.Add(new FeatureMapping(featureNode, fileMappings, projects, requiredOutputs, missingOutputs));
             }
 
-            // ReSharper disable once PossibleNullReferenceException
             var featureMappingsLookup = featureMappings.ToDictionary(item => item.FeatureNode);
 
             foreach (var featureMapping in featureMappings)
@@ -289,7 +281,6 @@
 
             var unmappedProjectOutputs = new ObservableCollection<ProjectOutputGroup>(projectOutputGroups);
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             FileMappings = projectOutputGroups.Select(projectOutput => new FileMapping(projectOutput, unmappedProjectOutputs, wixProject, unmappedFileNodes))
                 .ToList().AsReadOnly();
 
@@ -307,7 +298,6 @@
 
             var unmappedDirectoryNodes = new ObservableCollection<WixDirectoryNode>();
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             var directoryMappings = directories
                 .Select(dir => new DirectoryMapping(dir, wixProject, unmappedDirectoryNodes))
                 .ToList().AsReadOnly();
@@ -315,7 +305,6 @@
             InstallDirectoryMapping = directoryMappings.FirstOrDefault();
             DirectoryMappings = directoryMappings.Skip(1).ToList().AsReadOnly();
 
-            // ReSharper disable once PossibleNullReferenceException
             var unmappedNodes = wixProject.DirectoryNodes.Where(node => directoryMappings.All(mapping => mapping.Id != node.Id));
 
             foreach (var node in unmappedNodes)

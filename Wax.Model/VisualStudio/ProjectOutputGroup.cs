@@ -28,7 +28,6 @@
         public string FileName => Path.GetFileName(TargetName);
 
         [NotNull]
-        // ReSharper disable once PossibleNullReferenceException
         public string SourceName => ProjectOutputs.First().SourceName;
 
         public override string ToString()

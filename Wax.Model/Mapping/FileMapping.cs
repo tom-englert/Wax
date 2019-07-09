@@ -77,31 +77,15 @@
         public IList<UnmappedFile> UnmappedNodes => _unmappedFiles;
 
         [NotNull, DoNotNotify]
-        public ICommand AddFileCommand => new DelegateCommand<IEnumerable>(
-            _ => CanAddFile(),
-            // ReSharper disable once AssignNullToNotNullAttribute
-            // ReSharper disable once PossibleNullReferenceException
-            selectedItems =>
-            {
-                selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.AddFile());
-            });
+        public ICommand AddFileCommand => new DelegateCommand<IEnumerable>(_ => CanAddFile(), AddFile);
 
         [NotNull, DoNotNotify]
-        public ICommand ClearMappingCommand => new DelegateCommand<IEnumerable>(
-            _ => CanClearMapping(),
-            // ReSharper disable once AssignNullToNotNullAttribute
-            // ReSharper disable once PossibleNullReferenceException
-            selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ClearMapping()));
+        public ICommand ClearMappingCommand => new DelegateCommand<IEnumerable>(_ => CanClearMapping(), ClearMapping);
 
         [NotNull, DoNotNotify]
-        public ICommand ResolveFileCommand => new DelegateCommand<IEnumerable>(
-            _ => CanResolveFile(),
-            // ReSharper disable once AssignNullToNotNullAttribute
-            // ReSharper disable once PossibleNullReferenceException
-            selectedItems => selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ResolveFile()));
+        public ICommand ResolveFileCommand => new DelegateCommand<IEnumerable>(_ => CanResolveFile(), ResolveFile);
 
         [NotNull]
-        // ReSharper disable once PossibleNullReferenceException
         public Project Project => _projectOutputGroup.ProjectOutputs.First().Project;
 
         [CanBeNull]
@@ -163,6 +147,11 @@
             return (MappedNode == null) && !_unmappedFiles.Any();
         }
 
+        private static void AddFile(IEnumerable selectedItems)
+        {
+            selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.AddFile());
+        }
+
         private void AddFile()
         {
             if (CanAddFile())
@@ -176,6 +165,11 @@
             return (MappedNode != null) && (!_wixProject.HasDefaultFileId(this));
         }
 
+        private static void ClearMapping(IEnumerable selectedItems)
+        {
+            selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ClearMapping());
+        }
+
         private void ClearMapping()
         {
             if (CanClearMapping())
@@ -187,6 +181,11 @@
         private bool CanResolveFile()
         {
             return (MappedNode == null) && (_unmappedFiles.Count == 1);
+        }
+
+        private static void ResolveFile(IEnumerable selectedItems)
+        {
+            selectedItems.Cast<FileMapping>().ToList().ForEach(fileMapping => fileMapping.ResolveFile());
         }
 
         private void ResolveFile()

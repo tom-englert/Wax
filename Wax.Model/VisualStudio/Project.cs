@@ -26,6 +26,7 @@
 
         [NotNull]
         private readonly EnvDTE.Project _project;
+        [CanBeNull]
         private readonly VSLangProj.VSProject _vsProject;
         [NotNull, ItemNotNull]
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
@@ -70,7 +71,6 @@
                 .GetBuildFiles(rootProject, BuildFileGroups.Built, outputDirectory)
                 .Select(item => item.TargetName)
                 .Where(File.Exists)
-                // ReSharper disable once AssignNullToNotNullAttribute
                 .SelectMany(output => GetReferencedAssemblyNames(output, deployExternalLocalizations, targetDirectory))
                 .Distinct()
                 .ToList().AsReadOnly();
@@ -83,8 +83,7 @@
             }
 
             var references = resolvedOutputs
-                // ReSharper disable once AssignNullToNotNullAttribute
-                .Select(file => new ProjectOutput(rootProject, file, relativeTargetDirectory))
+                                .Select(file => new ProjectOutput(rootProject, file, relativeTargetDirectory))
                 .ToList().AsReadOnly();
 
             return references;
@@ -178,11 +177,9 @@
 
             var buildFileGroups = GetBuildFileGroups(deploySymbols, deployLocalizations);
 
-            // ReSharper disable once PossibleNullReferenceException
             var projectOutput = BuildFiles.Where(output => (output.BuildFileGroup & buildFileGroups) != 0)
-                .Concat(GetLocalFileReferences(this, rootProject, deployExternalLocalizations, outputDirectory, relativeTargetDirectory))
-                // ReSharper disable once PossibleNullReferenceException
-                .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
+                    .Concat(GetLocalFileReferences(this, rootProject, deployExternalLocalizations, outputDirectory, relativeTargetDirectory))
+                    .Concat(_projectReferences.SelectMany(reference => reference.SourceProject?.GetProjectOutput(cache, rootProject, deploySymbols, deployLocalizations, deployExternalLocalizations, outputDirectory, relativeTargetDirectory) ?? Enumerable.Empty<ProjectOutput>()));
 
             result = projectOutput.ToList().AsReadOnly();
 
@@ -281,10 +278,10 @@
                 .Select(r => r.GetSourceProject()?.UniqueName)
                 .Where(r => r != null);
 
-            var exisitingReferences = new HashSet<string>(existingValues, StringComparer.OrdinalIgnoreCase);
+            var existingReferences = new HashSet<string>(existingValues, StringComparer.OrdinalIgnoreCase);
 
             var newProjects = projects
-                .Where(p => !exisitingReferences.Contains(p.UniqueName))
+                .Where(p => !existingReferences.Contains(p.UniqueName))
                 .ToList();
 
             foreach (var project in newProjects)
@@ -298,11 +295,9 @@
 
         protected void RemoveProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
         {
-            // ReSharper disable once PossibleNullReferenceException
             var references = References.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
 
             var projectReferences = projects
-                // ReSharper disable once AssignNullToNotNullAttribute
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 .Select(project => references.GetValueOrDefault(project.UniqueName))
                 .ToList().AsReadOnly();
@@ -316,8 +311,6 @@
         [NotNull]
         protected EnvDTE.ProjectItem AddItemFromFile([NotNull] string fileName)
         {
-            // ReSharper disable once AssignNullToNotNullAttribute
-            // ReSharper disable once PossibleNullReferenceException
             return _project.ProjectItems.AddFromFile(fileName);
         }
 
@@ -359,8 +352,7 @@
                     .Select(p => p.Object)
                     .OfType<VSLangProj.References>()
                     .Take(1)
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    .SelectMany(references => references.OfType<VSLangProj.Reference>())
+                                        .SelectMany(references => references.OfType<VSLangProj.Reference>())
                     .ToList().AsReadOnly();
             }
             catch

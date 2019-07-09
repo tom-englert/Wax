@@ -91,7 +91,6 @@ namespace tomenglertde.Wax.Model.Wix
                 var projects = value.ToList().AsReadOnly();
                 var removedProjects = DeployedProjects.Except(projects).ToList().AsReadOnly();
 
-                // ReSharper disable once PossibleNullReferenceException
                 _configuration.DeployedProjectNames = projects.Select(project => project.UniqueName).ToArray();
 
                 RemoveProjectReferences(removedProjects);

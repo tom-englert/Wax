@@ -22,9 +22,7 @@
         [NotNull]
         public IEnumerable<string> Files => Node
             .Descendants(WixNames.FileNode)
-            // ReSharper disable once PossibleNullReferenceException
             .Where(node => node.Parent == Node)
-            // ReSharper disable once AssignNullToNotNullAttribute
             .Select(node => node.GetAttribute("Id"))
             .Where(id => !string.IsNullOrEmpty(id));
 

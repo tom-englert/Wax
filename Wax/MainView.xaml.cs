@@ -1,13 +1,9 @@
 ﻿namespace tomenglertde.Wax
 {
     using System;
-    using System.Diagnostics;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Interactivity;
-
-    using DataGridExtensions;
 
     using JetBrains.Annotations;
 
@@ -21,8 +17,6 @@
 
         public MainView([NotNull] EnvDTE.DTE dte)
         {
-            References.Resolve(this);
-
             _dte = dte;
 
             InitializeComponent();
@@ -97,25 +91,6 @@
             if ((listBox.Items.Count == 1) && (listBox.SelectedIndex == -1))
             {
                 listBox.SelectedIndex = 0;
-            }
-        }
-
-        /// <summary>
-        /// Assemblies only referenced via reflection (XAML) can cause problems at runtime, sometimes they are not correctly installed
-        /// by the VSIX installer. Add some code references to avoid this problem by forcing the assemblies to be loaded before the XAML is loaded.
-        /// </summary>
-        static class References
-        {
-            private static readonly DependencyProperty HardReferenceToDgx = DataGridFilterColumn.FilterProperty;
-
-            public static void Resolve([NotNull] DependencyObject view)
-            {
-                if (HardReferenceToDgx == null) // just use this to avoid warnings...
-                {
-                    Trace.WriteLine("HardReferenceToDgx failed");
-                }
-
-                Interaction.GetBehaviors(view);
             }
         }
     }

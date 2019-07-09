@@ -28,7 +28,6 @@
 
             if (_referenceCache.TryGetValue(target, out var cacheEntry) && (cacheEntry.TimeStamp == timeStamp))
             {
-                // ReSharper disable once AssignNullToNotNullAttribute
                 return cacheEntry.References;
             }
 
@@ -38,7 +37,6 @@
 
             _referenceCache[target] = new ReferenceCacheEntry(references, timeStamp);
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             return references;
         }
 
@@ -47,7 +45,6 @@
         {
             var folder = new DirectoryInfo(outputDirectory);
             var files = folder.GetFiles("*.dll");
-            // ReSharper disable once PossibleNullReferenceException
             var hash = files.Select(file => file.LastWriteTime.GetHashCode()).Aggregate(0, HashCode.Aggregate);
 
             Dictionary<string, AssemblyName> existingAssemblies;
@@ -59,8 +56,7 @@
             else
             {
                 existingAssemblies = files
-                    // ReSharper disable once PossibleNullReferenceException
-                    .Select(file => file.FullName)
+                                        .Select(file => file.FullName)
                     .Select(TryGetAssemblyName)
                     .Where(assemblyName => assemblyName != null)
                     .ToDictionary(assemblyName => assemblyName.Name);
@@ -91,15 +87,13 @@
             {
                 var assembly = ModuleDefinition.ReadModule(target);
 
-                // ReSharper disable once AssignNullToNotNullAttribute
                 var usedAssemblies = FindXamlReferences(existingAssemblies, assembly);
 
-                // ReSharper disable once AssignNullToNotNullAttribute
                 var referencedAssemblyNames = assembly.AssemblyReferences
-                    .Select(item => item?.Name)
-                    .Where(item => item != null)
-                    .Select(existingAssemblies.GetValueOrDefault)
-                    .Where(item => item != null);
+    .Select(item => item?.Name)
+    .Where(item => item != null)
+    .Select(existingAssemblies.GetValueOrDefault)
+    .Where(item => item != null);
 
                 usedAssemblies.AddRange(referencedAssemblyNames);
 
@@ -140,7 +134,6 @@
 
                     foreach (var name in records.OfType<AssemblyInfoRecord>().Select(ai => new AssemblyName(ai.AssemblyFullName)))
                     {
-                        // ReSharper disable once AssignNullToNotNullAttribute
                         if (existingAssemblies.TryGetValue(name.Name, out var assemblyName) && ((name.Version == null) || (name.Version <= assemblyName.Version)))
                         {
                             usedAssemblies.Add(assemblyName);
@@ -154,7 +147,7 @@
 
         private class ReferenceCacheEntry
         {
-            public ReferenceCacheEntry(IReadOnlyCollection<AssemblyName> references, DateTime timeStamp)
+            public ReferenceCacheEntry([NotNull] IReadOnlyCollection<AssemblyName> references, DateTime timeStamp)
             {
                 References = references;
                 TimeStamp = timeStamp;

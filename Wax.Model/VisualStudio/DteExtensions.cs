@@ -181,7 +181,6 @@
                 // some items report a file count > 0 but don't return a file name!
                 if (projectItem.FileCount > 0)
                 {
-                    // ReSharper disable once PossibleNullReferenceException
                     return projectItem.FileNames[0];
                 }
             }
@@ -211,7 +210,6 @@
 
                 if (document != null)
                 {
-                    // ReSharper disable once AssignNullToNotNullAttribute
                     return GetContent((EnvDTE.TextDocument)document.Object("TextDocument"));
                 }
 

@@ -50,7 +50,6 @@
         {
             base.OnCreate();
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             EventManager.RegisterClassHandler(typeof(MainView), ButtonBase.ClickEvent, new RoutedEventHandler(Navigate_Click));
 
             var t = typeof(Solution);
