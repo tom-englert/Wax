@@ -9,20 +9,20 @@
              xmlns:local="clr-namespace:tomenglertde.Wax"
              xmlns:properties="clr-namespace:tomenglertde.Wax"
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:styles="urn:TomsToolbox.Wpf.Styles"
+             Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
+             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
              d:DataContext="{d:DesignInstance local:MainViewModel}">
-  <!-- TODO:
-    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
-    TextElement.Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
-    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"-->
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    <Style TargetType="Control" x:Key="SquareControlStyle">
-      <Setter Property="Width" Value="{Binding Path=ActualHeight ,RelativeSource={RelativeSource Self}}" />
+    <Style TargetType="Button" x:Key="SquareButtonStyle" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ButtonStyle}}">
+      <Setter Property="Width" Value="{Binding Path=ActualHeight, RelativeSource={RelativeSource Self}}" />
       <Setter Property="TextElement.FontWeight" Value="Bold" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
-    <Style TargetType="DataGrid" x:Key="DefaultDataGridStyle">
-      <Setter Property="HorizontalGridLinesBrush" Value="LightGray" />
-      <Setter Property="VerticalGridLinesBrush" Value="LightGray" />
+    <Style TargetType="DataGrid" x:Key="DefaultDataGridStyle" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridStyle}}">
       <Setter Property="RowHeight" Value="22" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="CanUserAddRows" Value="False" />
@@ -35,7 +35,7 @@
       <Setter Property="SelectionMode" Value="Single" />
       <Setter Property="RowStyle">
         <Setter.Value>
-          <Style TargetType="DataGridRow">
+          <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
             <Style.Triggers>
               <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
               <DataTrigger Binding="{Binding MappedNode}" Value="{x:Null}">
@@ -52,10 +52,10 @@
       </Style.Triggers>
     </Style>
     <Style TargetType="ToolBarTray">
-      <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBarBrushKey}}" />
+      <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" />
     </Style>
     <Style TargetType="ToolBar">
-      <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBarBrushKey}}" />
+      <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" />
       <Setter Property="KeyboardNavigation.TabNavigation" Value="Once" />
       <Setter Property="Template">
         <!-- A simplified tool bar without overflow and thumb -->
@@ -79,23 +79,32 @@
         </Setter.Value>
       </Setter>
     </Style>
+    <styles:InvertGrayEffect x:Key="InvertGrayEffect" />
+    <Style TargetType="Image">
+      <Setter Property="Stretch" Value="None" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsDarkTheme, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" Value="True">
+          <Setter Property="Effect" Value="{StaticResource InvertGrayEffect}" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
   </UserControl.Resources>
-  <DockPanel Background="{x:Static SystemColors.ControlBrush}">
-    <ToolBarTray DockPanel.Dock="Top" Margin="0">
-      <ToolBar>
+  <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <ToolBarTray DockPanel.Dock="Top" Margin="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+      <ToolBar Background="Transparent">
         <Button ToolTip="{x:Static properties:Resources.Refresh}" Click="Refresh_Click">
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/refresh.png" />
         </Button>
         <Separator />
-        <CheckBox Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" ToolTip="{x:Static properties:Resources.DeploySymbolsToolTip}" />
-        <CheckBox Content="{x:Static properties:Resources.Localizations}" IsChecked="{Binding DeployLocalizations}" ToolTip="{x:Static properties:Resources.LocalizationsToolTip}" />
-        <CheckBox Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}" />
+        <ToggleButton Content="{x:Static properties:Resources.DeploySymbols}" IsChecked="{Binding DeploySymbols}" ToolTip="{x:Static properties:Resources.DeploySymbolsToolTip}" />
+        <ToggleButton Content="{x:Static properties:Resources.Localizations}" IsChecked="{Binding DeployLocalizations}" ToolTip="{x:Static properties:Resources.LocalizationsToolTip}" />
+        <ToggleButton Content="{x:Static properties:Resources.ExternalLocalizations}" IsChecked="{Binding DeployExternalLocalizations}" ToolTip="{x:Static properties:Resources.ExternalLocalizationsToolTip}" />
         <Separator />
-        <Button x:Name="LikeButton" ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"
+        <Button ToolTip="{x:Static properties:Resources.SupportTheProjectByWritingAShortReview}"
                 Tag="https://marketplace.visualstudio.com/vsgallery/ab48d869-8f75-4e02-8e7d-577346065aa6#review-details">
           <Image SnapsToDevicePixels="True" Source="/Wax;component/Resources/like.png" />
         </Button>
-        <Button x:Name="HelpButton" ToolTip="{x:Static properties:Resources.Documentation}"
+        <Button ToolTip="{x:Static properties:Resources.Documentation}"
                 Tag="https://github.com/tom-englert/Wax">
           <Grid Width="16" Height="16">
             <TextBlock Text="?" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
@@ -113,6 +122,7 @@
         <Grid DockPanel.Dock="Top">
           <local:GroupBox Ordinal="1" Header="{x:Static properties:Resources.SetupProjectToEdit}">
             <ListBox x:Name="SetupProjectListBox"
+                     Style="{StaticResource {x:Static styles:ResourceKeys.ListBoxStyle}}"
                      ItemsSource="{Binding Solution.WixProjects}"
                      SelectedItem="{Binding SelectedWixProject}"
                      MinHeight="30" MaxHeight="100"
@@ -121,7 +131,7 @@
               <ListBox.ItemTemplate>
                 <DataTemplate DataType="wax:WixProject">
                   <TextBlock>
-                    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" Foreground="#202020" />
+                    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
                     (<Run Text="{Binding RelativeFolder, Mode=OneWay}" />)
                   </TextBlock>
                 </DataTemplate>
@@ -146,13 +156,13 @@
                           VerticalAlignment="Top">
             <Grid Margin="1">
               <TextBlock VerticalAlignment="Center" Margin="3">
-                <Run Text="{Binding MappedNode.Id, Mode=OneWay}" Foreground="#202020" FontWeight="Bold" />
+                <Run Text="{Binding MappedNode.Id, Mode=OneWay}" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" FontWeight="Bold" />
                 (<Run Text="{Binding MappedNode.Path, Mode=OneWay}" />)
               </TextBlock>
               <ComboBox ItemsSource="{Binding UnmappedNodes}"
                         SelectedItem="{Binding MappedNodeSetter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ComboBox.Style>
-                  <Style TargetType="ComboBox">
+                  <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ComboBoxStyle}}">
                     <Setter Property="Visibility" Value="Hidden" />
                     <Style.Triggers>
                       <DataTrigger Binding="{Binding MappedNode}" Value="{x:Null}">
@@ -176,7 +186,7 @@
           </local:GroupBox>
         </Grid>
         <Decorator Height="10" DockPanel.Dock="Top" />
-        <Grid DockPanel.Dock="Bottom" Background="{x:Static SystemColors.ControlBrush}">
+        <Grid DockPanel.Dock="Bottom" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
           <Button Margin="3" HorizontalAlignment="Left"
                   Background="Transparent" BorderBrush="Transparent"
                   BorderThickness="0" ToolTip="{x:Static properties:Resources.SupportTheProject}"
@@ -208,10 +218,12 @@
         <Grid>
           <local:GroupBox Ordinal="3" Header="{x:Static properties:Resources.ProjectsToInstall}">
             <DockPanel>
-              <CheckBox x:Name="ShowAllProjects" DockPanel.Dock="Top" Content="{x:Static properties:Resources.ShowAllProjects}" Margin="0,5"
+              <CheckBox x:Name="ShowAllProjects" DockPanel.Dock="Top" 
+                        Content="{x:Static properties:Resources.ShowAllProjects}" 
+                        Margin="0,5"
                         IsEnabled="{Binding CanHideReferencedProjects}">
                 <CheckBox.Style>
-                  <Style TargetType="CheckBox">
+                  <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}">
                     <Style.Triggers>
                       <Trigger Property="IsEnabled" Value="false">
                         <Setter Property="IsChecked" Value="true" />
@@ -225,7 +237,8 @@
                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                   <DataTemplate DataType="wax:Project">
-                    <CheckBox IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}">
+                    <CheckBox Style="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}"
+                              IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}">
                       <TextBlock x:Name="TextBlock">
                         <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
                         (<Run Text="{Binding RelativeFolder, Mode=OneWay}" />)
@@ -233,13 +246,13 @@
                     </CheckBox>
                     <DataTemplate.Triggers>
                       <DataTrigger Binding="{Binding IsImplicitSelected}" Value="True">
-                        <Setter TargetName="TextBlock" Property="TextElement.Foreground" Value="Gray"/>
+                        <Setter TargetName="TextBlock" Property="TextElement.Foreground" Value="{DynamicResource {x:Static styles:ResourceKeys.DisabledBrush}}" />
                       </DataTrigger>
                     </DataTemplate.Triggers>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.Style>
-                  <Style TargetType="ListBox">
+                  <Style TargetType="ListBox" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ListBoxStyle}}">
                     <Setter Property="ItemsSource" Value="{Binding Solution.EnumerateTopLevelProjects}" />
                     <Style.Triggers>
                       <DataTrigger Binding="{Binding IsChecked, ElementName=ShowAllProjects}" Value="True">
@@ -290,6 +303,7 @@
                           <Span Foreground="Gray">(<Run Text="{Binding Path=Path, Mode=OneWay}" />)</Span>
                         </TextBlock>
                         <ComboBox x:Name="unmappedDirectory" ItemsSource="{Binding UnmappedNodes}"
+                                  Style="{StaticResource {x:Static styles:ResourceKeys.ComboBoxStyle}}"
                                   SelectedItem="{Binding MappedNodeSetter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Visibility="Collapsed" />
                       </Grid>
@@ -306,16 +320,16 @@
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
-              <DataGridTemplateColumn IsReadOnly="True" Width="25">
+              <DataGridTemplateColumn IsReadOnly="True" Width="22">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Grid d:DataContext="{d:DesignInstance wax:DirectoryMapping}">
                       <Button Content="-" Command="{Binding ClearMappingCommand}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.RemoveTheCustomMapping}" />
+                              Style="{StaticResource SquareButtonStyle}" ToolTip="{x:Static properties:Resources.RemoveTheCustomMapping}" />
                       <Button Content="+" Command="{Binding AddDirectoryCommand}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.CreateANewDirectoryNode}" />
+                              Style="{StaticResource SquareButtonStyle}" ToolTip="{x:Static properties:Resources.CreateANewDirectoryNode}" />
                     </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
@@ -348,6 +362,7 @@
                           </Span>
                         </TextBlock>
                         <ComboBox x:Name="ambiguousFile" ItemsSource="{Binding UnmappedNodes}"
+                                  Style="{StaticResource {x:Static styles:ResourceKeys.ComboBoxStyle}}"
                                   DisplayMemberPath="Node"
                                   SelectedValuePath="Node"
                                   SelectedValue="{Binding MappedNodeSetter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -376,22 +391,22 @@
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
-              <DataGridTemplateColumn Width="25">
+              <DataGridTemplateColumn Width="22">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Grid d:DataContext="{d:DesignInstance wax:FileMapping}">
                       <Button Content="-" Command="{Binding ClearMappingCommand}"
                               CommandParameter="{Binding Path=SelectedItems, ElementName=FileMappingsGrid}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.RemoveCustomFileMapping}" />
+                              Style="{StaticResource SquareButtonStyle}" ToolTip="{x:Static properties:Resources.RemoveCustomFileMapping}" />
                       <Button Content="+" Command="{Binding AddFileCommand}"
                               CommandParameter="{Binding Path=SelectedItems, ElementName=FileMappingsGrid}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.CreateANewFileNode}" />
+                              Style="{StaticResource SquareButtonStyle}" ToolTip="{x:Static properties:Resources.CreateANewFileNode}" />
                       <Button Content="?" Command="{Binding ResolveFileCommand}"
                               CommandParameter="{Binding Path=SelectedItems, ElementName=FileMappingsGrid}"
                               Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Style="{StaticResource SquareControlStyle}" ToolTip="{x:Static properties:Resources.ConfirmUniqueFileMapping}" />
+                              Style="{StaticResource SquareButtonStyle}" ToolTip="{x:Static properties:Resources.ConfirmUniqueFileMapping}" />
                     </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
@@ -425,18 +440,19 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="2*" />
           </Grid.ColumnDefinitions>
-          <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.UnmappedFiles}">
+          <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.UnmappedFiles}"
+                    Style="{StaticResource {x:Static styles:ResourceKeys.GroupBoxStyle}}">
             <DataGrid ItemsSource="{Binding UnmappedFileNodes}" Style="{StaticResource DefaultDataGridStyle}">
               <DataGrid.Columns>
                 <DataGridTextColumn Header="{x:Static properties:Resources.Id}" Binding="{Binding Node.Id}" IsReadOnly="True" />
                 <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
                 <DataGridTextColumn Header="{x:Static properties:Resources.Name}" Binding="{Binding Name}" IsReadOnly="True" />
                 <DataGridTextColumn Header="{x:Static properties:Resources.Source}" Binding="{Binding Node.Source, Mode=OneWay}" Width="*" IsReadOnly="True" />
-                <DataGridTemplateColumn Width="25">
+                <DataGridTemplateColumn Width="22">
                   <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                       <Grid d:DataContext="{d:DesignInstance wax:UnmappedFile}">
-                        <Button Content="-" Command="{Binding DeleteCommand}" Style="{StaticResource SquareControlStyle}"
+                        <Button Content="-" Command="{Binding DeleteCommand}" Style="{StaticResource SquareButtonStyle}"
                                 ToolTip="{x:Static properties:Resources.RemoveUnmappedFile}" />
                       </Grid>
                     </DataTemplate>
@@ -446,7 +462,8 @@
             </DataGrid>
           </GroupBox>
           <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5" />
-          <GroupBox Grid.Column="2" Header="Features">
+          <GroupBox Grid.Column="2" Header="Features"
+                    Style="{StaticResource {x:Static styles:ResourceKeys.GroupBoxStyle}}">
             <GroupBox.Resources>
               <Style TargetType="Span">
                 <Style.Triggers>
@@ -471,7 +488,7 @@
                             </CollectionViewSource>
                           </DockPanel.Resources>
                           <TextBlock DockPanel.Dock="Top" Text="Files installed by this feature:" FontWeight="Bold" TextDecorations="Underline" />
-                          <Decorator Height="3" DockPanel.Dock="Top"/>
+                          <Decorator Height="3" DockPanel.Dock="Top" />
                           <ItemsControl ItemsSource="{Binding Source={StaticResource FilesSource}}" DisplayMemberPath="DisplayName">
                             <ItemsControl.ItemsPanel>
                               <ItemsPanelTemplate>
@@ -489,7 +506,7 @@
                       <Span.ToolTip>
                         <DockPanel>
                           <TextBlock DockPanel.Dock="Top" Text="Projects installed by this feature:" FontWeight="Bold" TextDecorations="Underline" />
-                          <Decorator Height="3" DockPanel.Dock="Top"/>
+                          <Decorator Height="3" DockPanel.Dock="Top" />
                           <ItemsControl ItemsSource="{Binding Projects}">
                             <ItemsControl.ItemTemplate>
                               <DataTemplate DataType="wax:Project">
@@ -510,7 +527,7 @@
                       <Span.ToolTip>
                         <DockPanel>
                           <TextBlock DockPanel.Dock="Top" Text="Project output not installed by this feature:" FontWeight="Bold" TextDecorations="Underline" />
-                          <Decorator Height="3" DockPanel.Dock="Top"/>
+                          <Decorator Height="3" DockPanel.Dock="Top" />
                           <ItemsControl ItemsSource="{Binding MissingProjectOutputs}" DisplayMemberPath="TargetName" />
                         </DockPanel>
                       </Span.ToolTip>
@@ -532,7 +549,7 @@
     <Style TargetType="UserControl">
       <Style.Triggers>
         <DataTrigger Binding="{Binding IsUpdating}" Value="True">
-          <Setter Property="Cursor" Value="{x:Static Cursors.Wait}"/>
+          <Setter Property="Cursor" Value="{x:Static Cursors.Wait}" />
         </DataTrigger>
       </Style.Triggers>
     </Style>

@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Media;
 
     using JetBrains.Annotations;
 
@@ -23,6 +24,14 @@
 
             Loaded += Self_Loaded;
         }
+
+        public bool IsDarkTheme
+        {
+            get => (bool)GetValue(IsDarkThemeProperty);
+            set => SetValue(IsDarkThemeProperty, value);
+        }
+        public static readonly DependencyProperty IsDarkThemeProperty = DependencyProperty.Register(
+            "IsDarkTheme", typeof(bool), typeof(MainView), new PropertyMetadata(default(bool)));
 
         [CanBeNull]
         internal MainViewModel ViewModel
@@ -70,18 +79,33 @@
         {
             base.OnPropertyChanged(e);
 
-            if (e.Property != DataContextProperty)
+            if (e.Property == DataContextProperty)
+            {
+
+                if ((!(e.OldValue is MainViewModel oldViewModel)) || (!(e.NewValue is MainViewModel newViewModel)))
+                    return;
+
+                var oldSelectedProject = newViewModel.Solution.WixProjects.FirstOrDefault(p => p.Equals(oldViewModel.SelectedWixProject));
+
+                if (oldSelectedProject == null)
+                    return;
+
+                newViewModel.SelectedWixProject = oldSelectedProject;
+                return
+            }
+
+            if ((e.Property != ForegroundProperty) && (e.Property != BackgroundProperty))
                 return;
 
-            if ((!(e.OldValue is MainViewModel oldViewModel)) || (!(e.NewValue is MainViewModel newViewModel)))
-                return;
+            var foreground = ToGray((Foreground as SolidColorBrush)?.Color);
+            var background = ToGray((Background as SolidColorBrush)?.Color);
 
-            var oldSelectedProject = newViewModel.Solution.WixProjects.FirstOrDefault(p => p.Equals(oldViewModel.SelectedWixProject));
+            IsDarkTheme = background < foreground;
+        }
 
-            if (oldSelectedProject == null)
-                return;
-
-            newViewModel.SelectedWixProject = oldSelectedProject;
+        private static double ToGray(Color? color)
+        {
+            return color?.R * 0.21 + color?.G * 0.72 + color?.B * 0.07 ?? 0.0;
         }
 
         private void SetupProjectListBox_Loaded([NotNull] object sender, [NotNull] RoutedEventArgs e)

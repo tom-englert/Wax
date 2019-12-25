@@ -7,17 +7,17 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:GroupBox}">
-          <DockPanel>
-            <Grid Background="LightGray" DockPanel.Dock="Top">
+          <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Grid Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" DockPanel.Dock="Top">
               <DockPanel Margin="5">
                 <Grid DockPanel.Dock="Left">
-                  <Ellipse Fill="Black" Width="20" Height="20" />
-                  <TextBlock Text="{Binding Ordinal, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  <Ellipse Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" Width="20" Height="20" />
+                  <TextBlock Text="{Binding Ordinal, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
                 <Grid DockPanel.Dock="Right">
                   <Image x:Name="stateImage" Source="/Wax;component/Resources/warning.png" Stretch="None" />
                 </Grid>
-                <ContentPresenter Content="{TemplateBinding Header}" VerticalAlignment="Center" Margin="7,0" TextElement.Foreground="DarkSlateGray" TextElement.FontWeight="DemiBold" />
+                <ContentPresenter Content="{TemplateBinding Header}" VerticalAlignment="Center" Margin="7,0" TextElement.Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrush}}" TextElement.FontWeight="DemiBold" />
               </DockPanel>
             </Grid>
             <ContentPresenter Margin="3" />

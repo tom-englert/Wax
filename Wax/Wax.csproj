@@ -79,6 +79,9 @@
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainViewModel.cs" />
+    <Compile Include="ShellView.xaml.cs">
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolWindow.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -157,6 +160,14 @@
     <Resource Include="Resources\refresh.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Resources\VSColorScheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ShellView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -200,6 +211,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime">
       <Version>14.3.26929</Version>
+    </PackageReference>
+    <PackageReference Include="TomsToolbox.Wpf.Styles">
+      <Version>1.0.75</Version>
     </PackageReference>
     <PackageReference Include="VSLangProj140">
       <Version>14.0.25030</Version>

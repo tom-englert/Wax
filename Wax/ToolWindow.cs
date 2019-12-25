@@ -62,7 +62,7 @@
 
             Debug.Assert(_dte != null);
 
-            Content = new MainView(_dte);
+            Content = new ShellView { Content = new MainView(_dte) };
         }
 
         private void Navigate_Click([NotNull] object sender, [NotNull] RoutedEventArgs e)
