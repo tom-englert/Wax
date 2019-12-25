@@ -6,6 +6,7 @@ namespace tomenglertde.Wax.Model.Wix
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     using JetBrains.Annotations;
 
@@ -37,8 +38,23 @@ namespace tomenglertde.Wax.Model.Wix
 
             _configuration = configurationText.Deserialize<ProjectConfiguration>();
 
+            Regex excludedItemsFilter = null;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_configuration.ExcludedProjectItems))
+                {
+                    excludedItemsFilter = new Regex(_configuration.ExcludedProjectItems);
+                }
+            }
+            catch
+            {
+                // filter is corrupt, go with no filter.
+            }
+
             _sourceFiles = GetAllProjectItems()
                 .Where(item => _wixFileExtensions.Contains(Path.GetExtension(item.Name) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                .Where(item => excludedItemsFilter == null || !excludedItemsFilter.IsMatch(item.Name))
                 .OrderByDescending(item => Path.GetExtension(item.Name), StringComparer.OrdinalIgnoreCase)
                 .Select(item => new WixSourceFile(this, item))
                 .ToList().AsReadOnly();

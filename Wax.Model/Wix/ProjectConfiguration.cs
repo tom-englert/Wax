@@ -56,6 +56,17 @@ namespace tomenglertde.Wax.Model.Wix
 
         [XmlElement("DeployExternalLocalizations")]
         public bool DeployExternalLocalizations { get; set; }
+
+        [XmlElement("ExcludedProjectItems")]
+        [NotNull]
+        public string ExcludedProjectItemsValue
+        {
+            get => string.IsNullOrEmpty(ExcludedProjectItems) ? "-" : ExcludedProjectItems;
+            set => ExcludedProjectItems = value == "-" ? null : value;
+        }
+
+        [XmlIgnore]
+        public string ExcludedProjectItems { get; set; }
     }
 
     [Serializable]
