@@ -44,8 +44,17 @@ namespace tomenglertde.Wax.Model.Wix
             Project = project;
             _projectItem = projectItem;
 
-            _xmlFile = _projectItem.GetXmlContent(LoadOptions.PreserveWhitespace);
-            _rawXmlFile = _projectItem.GetXmlContent(LoadOptions.None);
+            try
+            {
+                _xmlFile = _projectItem.GetXmlContent(LoadOptions.PreserveWhitespace);
+                _rawXmlFile = _projectItem.GetXmlContent(LoadOptions.None);
+            }
+            catch
+            {
+                var placeholder = @"<?xml version=""1.0"" encoding=""utf-8""?><Include />";
+                _xmlFile = XDocument.Parse(placeholder);
+                _rawXmlFile = XDocument.Parse(placeholder);
+            }
 
             var root = _xmlFile.Root;
 
