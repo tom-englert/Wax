@@ -91,7 +91,7 @@
                     return;
 
                 newViewModel.SelectedWixProject = oldSelectedProject;
-                return
+                return;
             }
 
             if ((e.Property != ForegroundProperty) && (e.Property != BackgroundProperty))
