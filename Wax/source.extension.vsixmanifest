@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="6b9b0621-c739-4ee5-9834-a0ba2a8d3596" Version="1.4.0.0" Language="en-US" Publisher="tom-englert.de" />
+        <Identity Id="6b9b0621-c739-4ee5-9834-a0ba2a8d3596" Version="1.4.1.1" Language="en-US" Publisher="tom-englert.de" />
         <DisplayName>Wax</DisplayName>
         <Description xml:space="preserve">An interactive WiX-Setup editor; easily maintain the files to be installed.</Description>
         <MoreInfo>https://github.com/tom-englert/Wax</MoreInfo>
