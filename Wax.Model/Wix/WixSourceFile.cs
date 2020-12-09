@@ -194,13 +194,13 @@ namespace tomenglertde.Wax.Model.Wix
 
             ForceDirectoryVariable(variableName, project);
 
-            var componentElement = new XElement(WixNames.ComponentNode, new XAttribute("Id", id), new XAttribute("Guid", Guid.NewGuid().ToString()));
+            var componentElement = new XElement(WixNames.ComponentNode, new XAttribute("Id", id), new XAttribute("Guid", Guid.NewGuid().ToString().ToUpper()));
 
             componentGroup.Node.AddWithFormatting(componentElement);
 
             var source = string.Format(CultureInfo.InvariantCulture, "$(var.{0}){1}", variableName, fileMapping.SourceName);
 
-            var fileElement = new XElement(WixNames.FileNode, new XAttribute("Id", id), new XAttribute("Name", name), new XAttribute("Source", source));
+            var fileElement = new XElement(WixNames.FileNode, new XAttribute("Id", id), new XAttribute("Name", name), new XAttribute("Source", source), new XAttribute("KeyPath", "yes"));
 
             componentElement.AddWithFormatting(fileElement);
 
