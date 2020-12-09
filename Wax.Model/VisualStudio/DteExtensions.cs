@@ -297,7 +297,7 @@
 
             try
             {
-                return reference.CopyLocal;
+                return reference.CopyLocal || (reference.ContainingProject != null);
             }
             catch
             {

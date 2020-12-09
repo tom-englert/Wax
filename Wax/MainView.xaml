@@ -246,7 +246,7 @@
                     </CheckBox>
                     <DataTemplate.Triggers>
                       <DataTrigger Binding="{Binding IsImplicitSelected}" Value="True">
-                        <Setter TargetName="TextBlock" Property="TextElement.Foreground" Value="{DynamicResource {x:Static styles:ResourceKeys.DisabledBrush}}" />
+                        <Setter TargetName="TextBlock" Property="Opacity" Value=".5" />
                       </DataTrigger>
                     </DataTemplate.Triggers>
                   </DataTemplate>
