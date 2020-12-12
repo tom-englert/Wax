@@ -6,7 +6,7 @@
 
     using JetBrains.Annotations;
 
-    using TomsToolbox.Desktop;
+    using TomsToolbox.Wpf;
 
     public class GroupBox : HeaderedContentControl
     {

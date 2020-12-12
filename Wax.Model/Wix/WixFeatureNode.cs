@@ -8,8 +8,7 @@
 
     using tomenglertde.Wax.Model.Tools;
 
-    using TomsToolbox.Core;
-    using TomsToolbox.Desktop;
+    using TomsToolbox.Essentials;
 
     public class WixFeatureNode : WixNode
     {

@@ -9,7 +9,7 @@ namespace tomenglertde.Wax.Model.Wix
 
     using tomenglertde.Wax.Model.Tools;
 
-    using TomsToolbox.Desktop;
+    using TomsToolbox.Essentials;
 
     public class WixFileNode : WixNode
     {

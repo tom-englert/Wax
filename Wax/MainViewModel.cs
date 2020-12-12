@@ -17,7 +17,7 @@
     using tomenglertde.Wax.Model.VisualStudio;
     using tomenglertde.Wax.Model.Wix;
 
-    using TomsToolbox.Core;
+    using TomsToolbox.Essentials;
 
     public sealed class MainViewModel : INotifyPropertyChanged
     {

@@ -19,7 +19,7 @@
     using TomsToolbox.ObservableCollections;
     using TomsToolbox.Wpf;
 
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class FileMapping
     {
         [NotNull]

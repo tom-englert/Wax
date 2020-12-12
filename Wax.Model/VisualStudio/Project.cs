@@ -17,7 +17,7 @@
 
     using tomenglertde.Wax.Model.Tools;
 
-    using TomsToolbox.Core;
+    using TomsToolbox.Essentials;
 
     [ImplementsEquatable]
     public class Project : INotifyPropertyChanged

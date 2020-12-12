@@ -12,7 +12,7 @@
 
     using TomsToolbox.Wpf;
 
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class DirectoryMapping
     {
         [NotNull]

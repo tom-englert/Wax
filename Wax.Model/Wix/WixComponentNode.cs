@@ -6,8 +6,7 @@
 
     using JetBrains.Annotations;
 
-    using TomsToolbox.Core;
-    using TomsToolbox.Desktop;
+    using TomsToolbox.Essentials;
 
     public class WixComponentNode : WixNode
     {

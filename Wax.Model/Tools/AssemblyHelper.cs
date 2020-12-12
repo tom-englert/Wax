@@ -14,7 +14,7 @@
 
     using Mono.Cecil;
 
-    using TomsToolbox.Core;
+    using TomsToolbox.Essentials;
 
     public static class AssemblyHelper
     {

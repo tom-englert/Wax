@@ -6,7 +6,7 @@ namespace tomenglertde.Wax.Model.Wix
 
     using JetBrains.Annotations;
 
-    using TomsToolbox.Desktop;
+    using TomsToolbox.Essentials;
 
     [ImplementsEquatable]
     public class WixNode

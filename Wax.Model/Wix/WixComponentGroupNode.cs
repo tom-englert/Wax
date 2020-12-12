@@ -8,8 +8,7 @@ namespace tomenglertde.Wax.Model.Wix
 
     using tomenglertde.Wax.Model.Mapping;
 
-    using TomsToolbox.Desktop;
-    using TomsToolbox.Core;
+    using TomsToolbox.Essentials;
 
     public class WixComponentGroupNode : WixNode
     {
