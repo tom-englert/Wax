@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("tom-englert.de")]
 [assembly: AssemblyProduct("Wax - The WiX Setup Editor")]
-[assembly: AssemblyCopyright("Copyright © tom-englert.de 2017-2019")]
+[assembly: AssemblyCopyright("Copyright © tom-englert.de 2017-2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
@@ -16,5 +16,5 @@ using System.Runtime.InteropServices;
 
 internal static class Product
 {
-    public const string Version = "1.4.0.0";
+    public const string Version = "1.5.0.0";
 }

@@ -1,3 +1,8 @@
+1.5:
+- Support dark mode
+- Allow filtering of project items
+- Fix #69: Implicit selected projects are not detected in netstandard format projects
+
 1.4:
 - Performance improvements.
 
