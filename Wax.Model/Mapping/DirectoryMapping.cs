@@ -57,14 +57,15 @@
         }
 
         [CanBeNull]
+        [OnChangedMethod(nameof(OnMappedNodeChanged))]
         public WixDirectoryNode MappedNode { get; set; }
 
-        [UsedImplicitly]
         private void OnMappedNodeChanged([CanBeNull] object oldValue, [CanBeNull] object newValue)
         {
             OnMappedNodeChanged(oldValue as WixDirectoryNode, newValue as WixDirectoryNode);
         }
 
+        [SuppressPropertyChangedWarnings]
         private void OnMappedNodeChanged([CanBeNull] WixDirectoryNode oldValue, [CanBeNull] WixDirectoryNode newValue)
         {
             if (oldValue != null)

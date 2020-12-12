@@ -136,6 +136,7 @@
     </PackageReference>
     <PackageReference Include="Lazy.Fody">
       <Version>1.9.0</Version>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Mono.Cecil">
       <Version>0.11.3</Version>

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CanNotCreateWindow" xml:space="preserve">
-    <value>无法创建工具窗口</value>
+    <value>无法创建工具窗口。</value>
   </data>
   <data name="ToolWindowTitle" xml:space="preserve">
     <value>Wix安装编辑器</value>
@@ -214,6 +214,6 @@
     <value>本地化</value>
   </data>
   <data name="LocalizationsToolTip" xml:space="preserve">
-    <value>在安装项目中包含本地化内容</value>
+    <value>在安装项目中包含本地化内容。</value>
   </data>
 </root>

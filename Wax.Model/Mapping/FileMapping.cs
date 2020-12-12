@@ -102,14 +102,15 @@
         }
 
         [CanBeNull]
+        [OnChangedMethod(nameof(OnMappedNodeChanged))]
         public WixFileNode MappedNode { get; set; }
 
-        [UsedImplicitly]
         private void OnMappedNodeChanged([CanBeNull] object oldValue, [CanBeNull] object newValue)
         {
             OnMappedNodeChanged(oldValue as WixFileNode, newValue as WixFileNode);
         }
 
+        [SuppressPropertyChangedWarnings]
         private void OnMappedNodeChanged([CanBeNull] WixFileNode oldValue, [CanBeNull] WixFileNode newValue)
         {
             if (oldValue != null)

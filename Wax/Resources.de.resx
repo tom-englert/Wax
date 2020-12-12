@@ -139,7 +139,7 @@
     <value>Alle Projekte anzeigen</value>
   </data>
   <data name="DirectoryMappings" xml:space="preserve">
-    <value>Verzeichnis-Zuordnungen:</value>
+    <value>Verzeichnis-Zuordnungen</value>
   </data>
   <data name="Directory" xml:space="preserve">
     <value>Verzeichnis</value>
@@ -148,10 +148,10 @@
     <value>WiX-Definition</value>
   </data>
   <data name="RemoveTheCustomMapping" xml:space="preserve">
-    <value>Eigene Zuordnung entfernen</value>
+    <value>Eigene Zuordnung entfernen.</value>
   </data>
   <data name="CreateANewDirectoryNode" xml:space="preserve">
-    <value>Neuen Verzeichnisknoten erstellen</value>
+    <value>Neuen Verzeichnisknoten erstellen.</value>
   </data>
   <data name="File" xml:space="preserve">
     <value>Datei</value>
@@ -199,21 +199,21 @@
     <value>Dokumentation</value>
   </data>
   <data name="SupportTheProject" xml:space="preserve">
-    <value>Das Projekt unterstützen</value>
+    <value>Das Projekt unterstützen.</value>
   </data>
   <data name="ExternalLocalizations" xml:space="preserve">
     <value>Ext. Lokalisierungen</value>
   </data>
   <data name="DeploySymbolsToolTip" xml:space="preserve">
-    <value>Debug-Symbole mitinstallieren</value>
+    <value>Debug-Symbole mitinstallieren.</value>
   </data>
   <data name="ExternalLocalizationsToolTip" xml:space="preserve">
-    <value>Lokalisierungen externer Komponenten installieren</value>
+    <value>Lokalisierungen externer Komponenten installieren.</value>
   </data>
   <data name="Localizations" xml:space="preserve">
     <value>Lokalisierungen</value>
   </data>
   <data name="LocalizationsToolTip" xml:space="preserve">
-    <value>Lokalisierungen installieren</value>
+    <value>Lokalisierungen installieren.</value>
   </data>
 </root>

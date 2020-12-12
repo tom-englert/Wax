@@ -167,6 +167,7 @@
   </data>
   <data name="Ext" xml:space="preserve">
     <value>Ext.</value>
+    <comment>@MutedRule(PunctuationTail)</comment>
   </data>
   <data name="State" xml:space="preserve">
     <value>State</value>
