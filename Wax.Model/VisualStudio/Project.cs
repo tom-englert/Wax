@@ -295,7 +295,8 @@
 
         protected void RemoveProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
         {
-            var references = References.ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
+            var references = References.Where(item => item.SourceProject != null)
+                .ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
 
             var projectReferences = projects
                 // ReSharper disable once SuspiciousTypeConversion.Global
