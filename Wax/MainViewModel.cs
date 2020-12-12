@@ -10,14 +10,18 @@
     using System.IO;
     using System.Linq;
     using System.Windows.Input;
+    using System.Windows.Threading;
 
     using JetBrains.Annotations;
+
+    using Throttle;
 
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.VisualStudio;
     using tomenglertde.Wax.Model.Wix;
 
     using TomsToolbox.Essentials;
+    using TomsToolbox.Wpf;
 
     public sealed class MainViewModel : INotifyPropertyChanged
     {
@@ -151,6 +155,12 @@
         public static IEnumerable<BuildFileGroups> ProjectOutputs => Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
 
         private void SelectedVSProjects_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
+        {
+            SelectedVSProjects_CollectionChanged();
+        }
+
+        [Throttled(typeof(DispatcherThrottle), (int)DispatcherPriority.Background)]
+        private void SelectedVSProjects_CollectionChanged()
         {
             var topLevelProjects = new HashSet<Project>(Solution.EnumerateTopLevelProjects);
 
