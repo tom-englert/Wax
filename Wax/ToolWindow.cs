@@ -29,7 +29,7 @@
     [Guid("ba4ab97f-d341-4b14-b8c9-3cba5e401a5f")]
     public class ToolWindow : ToolWindowPane
     {
-        private EnvDTE.DTE _dte;
+        private EnvDTE80.DTE2 _dte;
 
         /// <summary>
         /// Standard constructor for the tool window.
@@ -58,7 +58,7 @@
                 // Just to make sure the assembly is loaded, loading it dynamically from XAML may not work!
             }
 
-            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+            _dte = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
 
             Debug.Assert(_dte != null);
 

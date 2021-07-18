@@ -14,9 +14,9 @@
     public partial class MainView
     {
         [NotNull]
-        private readonly EnvDTE.DTE _dte;
+        private readonly EnvDTE80.DTE2 _dte;
 
-        public MainView([NotNull] EnvDTE.DTE dte)
+        public MainView([NotNull] EnvDTE80.DTE2 dte)
         {
             _dte = dte;
 

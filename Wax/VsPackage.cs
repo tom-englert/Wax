@@ -75,7 +75,6 @@
         {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
 
-
             await base.InitializeAsync(cancellationToken, progress).ConfigureAwait(false);
 
             var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(false);

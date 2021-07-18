@@ -265,7 +265,7 @@
         }
 
         [CanBeNull]
-        public static object TryGetObject([CanBeNull] this EnvDTE.Project project)
+        public static object? TryGetObject([CanBeNull] this EnvDTE.Project? project)
         {
             try
             {
@@ -278,11 +278,11 @@
         }
 
         [CanBeNull]
-        public static EnvDTE.DTE TryGetDte([CanBeNull] this EnvDTE.Project project)
+        public static EnvDTE80.DTE2? TryGetDte([CanBeNull] this EnvDTE.Project? project)
         {
             try
             {
-                return project?.DTE;
+                return project?.DTE as EnvDTE80.DTE2;
             }
             catch
             {
