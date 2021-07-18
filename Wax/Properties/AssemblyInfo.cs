@@ -1,10 +1,4 @@
-﻿using System.Reflection;
-
-using Microsoft.VisualStudio.Shell;
-
-[assembly: AssemblyTitle("Wax")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
+﻿using Microsoft.VisualStudio.Shell;
 
 [assembly: System.Windows.ThemeInfo(System.Windows.ResourceDictionaryLocation.None, System.Windows.ResourceDictionaryLocation.SourceAssembly)]
 

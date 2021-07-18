@@ -1,125 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A3F2A655-5194-4A7A-AA66-E9A536F3E352}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <UseWPF>true</UseWPF>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>tomenglertde.Wax.Model</RootNamespace>
-    <AssemblyName>Wax.Model</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\CodeContracts.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\CodeContracts.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\Wax\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UIAutomationTypes" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BAML\Baml.cs">
       <Link>Tools\Baml.cs</Link>
     </Compile>
-    <Compile Include="..\Version.cs">
-      <Link>Version.cs</Link>
-    </Compile>
-    <Compile Include="Mapping\DirectoryMapping.cs" />
-    <Compile Include="Mapping\FeatureMapping.cs" />
-    <Compile Include="Mapping\FileMapping.cs" />
-    <Compile Include="Mapping\MappingState.cs" />
-    <Compile Include="Mapping\UnmappedFile.cs" />
-    <Compile Include="Tools\AssemblyHelper.cs" />
-    <Compile Include="Tools\SerializerExtensions.cs" />
-    <Compile Include="Tools\XmlExtensions.cs" />
-    <Compile Include="VisualStudio\BuildFileGroups.cs" />
-    <Compile Include="VisualStudio\DteExtensions.cs" />
-    <Compile Include="VisualStudio\Project.cs" />
-    <Compile Include="VisualStudio\ProjectOutput.cs" />
-    <Compile Include="VisualStudio\ProjectOutputGroup.cs" />
-    <Compile Include="VisualStudio\ProjectReference.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VisualStudio\Solution.cs" />
-    <Compile Include="Wix\ProjectConfiguration.cs" />
-    <Compile Include="Wix\WixComponentGroupNode.cs" />
-    <Compile Include="Wix\WixComponentNode.cs" />
-    <Compile Include="Wix\WixDefine.cs" />
-    <Compile Include="Wix\WixDirectoryNode.cs" />
-    <Compile Include="Wix\WixFeatureNode.cs" />
-    <Compile Include="Wix\WixFileNode.cs" />
-    <Compile Include="Wix\WixNames.cs" />
-    <Compile Include="Wix\WixNode.cs" />
-    <Compile Include="Wix\WixSourceFile.cs" />
-    <Compile Include="Wix\WixProject.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\CodeContracts.ruleset">
-      <Link>CodeContracts.ruleset</Link>
-    </None>
-    <None Include="..\Wax\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
-      <Link>CustomDictionary.xml</Link>
-    </CodeAnalysisDictionary>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Equatable.Fody">
@@ -138,6 +30,10 @@
       <Version>1.9.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" ExcludeAssets="runtime">
+      <Version>15.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Mono.Cecil">
       <Version>0.11.3</Version>
     </PackageReference>
@@ -145,21 +41,11 @@
       <Version>3.3.1</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="5.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="TomsToolbox.Wpf">
       <Version>2.3.0</Version>
     </PackageReference>
-    <PackageReference Include="EnvDTE100">
-      <Version>16.7.30328.74</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Shell.14.0">
-      <Version>14.3.25407</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime">
-      <Version>16.7.30328.74</Version>
-    </PackageReference>
-    <PackageReference Include="VSLangProj140">
-      <Version>16.7.30328.74</Version>
-    </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
