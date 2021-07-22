@@ -53,7 +53,7 @@
         /// tool window. See the Initialize method to see how the menu item is associated to 
         /// this function using the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
-        private void ShowToolWindow([CanBeNull] object sender, [CanBeNull] EventArgs e)
+        private void ShowToolWindow(object? sender, EventArgs e)
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.

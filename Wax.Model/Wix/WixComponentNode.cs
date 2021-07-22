@@ -15,20 +15,20 @@
         {
         }
 
-        [CanBeNull]
-        public string Directory => GetAttribute("Directory");
+        public string? Directory => GetAttribute("Directory");
 
         [NotNull]
         public IEnumerable<string> Files => Node
             .Descendants(WixNames.FileNode)
             .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
-            .Where(id => !string.IsNullOrEmpty(id));
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ExceptNullItems();
 
         [NotNull]
-        public IEnumerable<WixFileNode> EnumerateFiles([NotNull] IDictionary<string, WixFileNode> fileNodes)
+        public IEnumerable<WixFileNode> EnumerateFiles(IDictionary<string, WixFileNode> fileNodes)
         {
-            return Files.Select(fileNodes.GetValueOrDefault).Where(file => file != null);
+            return Files.Select(fileNodes.GetValueOrDefault!).ExceptNullItems();
         }
     }
 }

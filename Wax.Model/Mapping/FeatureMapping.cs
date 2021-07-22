@@ -34,8 +34,7 @@
         [NotNull]
         public ICollection<ProjectOutputGroup> MissingProjectOutputs { get; }
 
-        [CanBeNull]
-        public FeatureMapping Parent { get; set; }
+        public FeatureMapping? Parent { get; set; }
 
         [NotNull, ItemNotNull]
         public ICollection<FeatureMapping> Children { get; } = new List<FeatureMapping>();

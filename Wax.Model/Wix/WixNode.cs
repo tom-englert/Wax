@@ -25,8 +25,7 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public string Id => GetAttribute("Id") ?? string.Empty;
 
-        [CanBeNull]
-        public string Name => GetAttribute("Name");
+        public string? Name => GetAttribute("Name");
 
         [NotNull]
         internal XElement Node { get; }
@@ -37,8 +36,7 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public WixNames WixNames => SourceFile.WixNames;
 
-        [CanBeNull]
-        protected string GetAttribute([NotNull] string name)
+        protected string? GetAttribute([NotNull] string name)
         {
             return Node.GetAttribute(name);
         }

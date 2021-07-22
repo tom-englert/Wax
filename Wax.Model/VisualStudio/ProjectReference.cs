@@ -21,10 +21,9 @@
             _reference = reference;
         }
 
-        [CanBeNull]
-        public Project SourceProject => _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, _reference.SourceProject?.UniqueName, StringComparison.OrdinalIgnoreCase));
+        public Project? SourceProject => _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, _reference.SourceProject?.UniqueName, StringComparison.OrdinalIgnoreCase));
 
-        [Equals, UsedImplicitly, CanBeNull]
-        private string Identity => _reference.Identity;
+        [Equals]
+        public string? Identity => _reference.Identity;
     }
 }

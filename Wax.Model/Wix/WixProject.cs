@@ -38,7 +38,7 @@ namespace tomenglertde.Wax.Model.Wix
 
             _configuration = configurationText.Deserialize<ProjectConfiguration>();
 
-            Regex excludedItemsFilter = null;
+            Regex? excludedItemsFilter = null;
 
             try
             {
@@ -143,7 +143,6 @@ namespace tomenglertde.Wax.Model.Wix
             var name = Path.GetFileName(directory);
             var id = GetDirectoryId(directory);
             var parentDirectoryName = Path.GetDirectoryName(directory);
-            Debug.Assert(parentDirectoryName != null);
             var parentId = string.IsNullOrEmpty(directory) ? string.Empty : GetDirectoryId(parentDirectoryName);
 
             var parent = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(parentId));
@@ -157,13 +156,12 @@ namespace tomenglertde.Wax.Model.Wix
                 else
                 {
                     parentId = "TODO:" + Guid.NewGuid();
-                    var sourceFile = _sourceFiles.FirstOrDefault();
-                    Debug.Assert(sourceFile != null);
+                    var sourceFile = _sourceFiles.First();
                     return sourceFile.AddDirectory(id, name, parentId);
                 }
             }
 
-            return parent.AddSubdirectory(id, name);
+            return parent.AddSubDirectory(id, name);
         }
 
         public bool HasDefaultDirectoryId([NotNull] DirectoryMapping directoryMapping)
@@ -194,15 +192,13 @@ namespace tomenglertde.Wax.Model.Wix
             MapElement(filePath, node, _configuration.FileMappings);
         }
 
-        [CanBeNull]
-        public WixFileNode AddFileNode([NotNull] FileMapping fileMapping)
+        public WixFileNode? AddFileNode([NotNull] FileMapping fileMapping)
         {
             var targetName = fileMapping.TargetName;
 
             var name = Path.GetFileName(targetName);
             var id = GetFileId(targetName);
             var directoryName = Path.GetDirectoryName(targetName);
-            Debug.Assert(directoryName != null, nameof(directoryName) + " != null");
             var directoryId = GetDirectoryId(directoryName);
             var directory = DirectoryNodes.FirstOrDefault(node => node.Id.Equals(directoryId, StringComparison.OrdinalIgnoreCase));
             directoryId = directory?.Id ?? "TODO: unknown directory " + directoryName;
@@ -246,8 +242,7 @@ namespace tomenglertde.Wax.Model.Wix
             return s.ToString();
         }
 
-        [CanBeNull]
-        private WixComponentGroupNode ForceComponentGroup([NotNull] string directoryId)
+        private WixComponentGroupNode? ForceComponentGroup([NotNull] string directoryId)
         {
             return ComponentGroupNodes.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.FirstOrDefault()?.AddComponentGroup(directoryId);
         }

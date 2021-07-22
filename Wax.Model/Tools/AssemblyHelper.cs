@@ -18,8 +18,8 @@
 
     public static class AssemblyHelper
     {
-        [NotNull] private static readonly Dictionary<string, ReferenceCacheEntry> _referenceCache = new Dictionary<string, ReferenceCacheEntry>(StringComparer.OrdinalIgnoreCase);
-        [NotNull] private static readonly Dictionary<string, DirectoryCacheEntry> _directoryCache = new Dictionary<string, DirectoryCacheEntry>(StringComparer.OrdinalIgnoreCase);
+        [NotNull] private static readonly Dictionary<string, ReferenceCacheEntry> _referenceCache = new(StringComparer.OrdinalIgnoreCase);
+        [NotNull] private static readonly Dictionary<string, DirectoryCacheEntry> _directoryCache = new(StringComparer.OrdinalIgnoreCase);
 
         [NotNull]
         public static IReadOnlyCollection<AssemblyName> FindReferences([NotNull] string target, [NotNull] string outputDirectory)
@@ -58,7 +58,7 @@
                 existingAssemblies = files
                                         .Select(file => file.FullName)
                     .Select(TryGetAssemblyName)
-                    .Where(assemblyName => assemblyName != null)
+                    .ExceptNullItems()
                     .ToDictionary(assemblyName => assemblyName.Name);
 
                 _directoryCache[folder.FullName] = new DirectoryCacheEntry(existingAssemblies, hash);
@@ -67,8 +67,7 @@
             return existingAssemblies;
         }
 
-        [CanBeNull]
-        private static AssemblyName TryGetAssemblyName([NotNull] string assemblyFile)
+        private static AssemblyName? TryGetAssemblyName([NotNull] string assemblyFile)
         {
             try
             {
@@ -91,9 +90,9 @@
 
                 var referencedAssemblyNames = assembly.AssemblyReferences
     .Select(item => item?.Name)
-    .Where(item => item != null)
+    .ExceptNullItems()
     .Select(existingAssemblies.GetValueOrDefault)
-    .Where(item => item != null);
+    .ExceptNullItems();
 
                 usedAssemblies.AddRange(referencedAssemblyNames);
 
@@ -127,7 +126,7 @@
                     if ((entry.Key as string)?.EndsWith(".baml", StringComparison.Ordinal) != true)
                         continue;
 
-                    if (!(entry.Value is Stream bamlStream))
+                    if (entry.Value is not Stream bamlStream)
                         continue;
 
                     var records = Baml.ReadDocument(bamlStream);

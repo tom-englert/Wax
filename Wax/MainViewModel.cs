@@ -14,6 +14,8 @@
 
     using JetBrains.Annotations;
 
+    using PropertyChanged;
+
     using Throttle;
 
     using tomenglertde.Wax.Model.Mapping;
@@ -28,7 +30,7 @@
         private bool _wixProjectChanging;
 
         [NotNull]
-        private readonly ObservableCollection<Project> _selectedVSProjects = new ObservableCollection<Project>();
+        private readonly ObservableCollection<Project> _selectedVSProjects = new();
 
         public MainViewModel([NotNull] EnvDTE.Solution solution)
         {
@@ -41,8 +43,7 @@
         [NotNull]
         public Solution Solution { get; }
 
-        [CanBeNull]
-        public WixProject SelectedWixProject { get; set; }
+        public WixProject? SelectedWixProject { get; set; }
 
         [UsedImplicitly]
         private void OnSelectedWixProjectChanged()
@@ -73,23 +74,22 @@
         [NotNull]
         public IList SelectedVSProjects => _selectedVSProjects;
 
-        [CanBeNull]
-        public DirectoryMapping InstallDirectoryMapping { get; private set; }
+        public DirectoryMapping? InstallDirectoryMapping { get; private set; }
 
-        [CanBeNull, ItemNotNull]
-        public IList<DirectoryMapping> DirectoryMappings { get; private set; }
+        [ItemNotNull]
+        public IList<DirectoryMapping>? DirectoryMappings { get; private set; }
 
-        [CanBeNull, ItemNotNull]
-        public IList<FileMapping> FileMappings { get; private set; }
+        [ItemNotNull]
+        public IList<FileMapping>? FileMappings { get; private set; }
 
-        [CanBeNull, ItemNotNull]
-        public ICollection<FeatureMapping> FeatureMappings { get; private set; }
+        [ItemNotNull]
+        public ICollection<FeatureMapping>? FeatureMappings { get; private set; }
 
         public bool CanHideReferencedProjects { get; private set; }
 
+        [OnChangedMethod(nameof(OnDeploySymbolsChanged))]
         public bool DeploySymbols { get; set; }
 
-        [UsedImplicitly]
         private void OnDeploySymbolsChanged()
         {
             if (_wixProjectChanging)
@@ -141,7 +141,7 @@
             GenerateMappings(SelectedVSProjects, wixProject);
         }
 
-        public IList<UnmappedFile> UnmappedFileNodes { get; set; }
+        public IList<UnmappedFile>? UnmappedFileNodes { get; set; }
 
         public bool HasExternalChanges => ((SelectedWixProject != null) && (SelectedWixProject.HasChanges));
 
@@ -186,7 +186,7 @@
             GenerateMappings(_selectedVSProjects, wixProject);
         }
 
-        private void GenerateMappings([CanBeNull, ItemNotNull] IEnumerable vsProjects, [CanBeNull] WixProject wixProject)
+        private void GenerateMappings(IEnumerable? vsProjects, WixProject? wixProject)
         {
             if (vsProjects == null)
                 return;
@@ -194,7 +194,7 @@
             GenerateMappings(vsProjects.Cast<Project>().ToList().AsReadOnly(), wixProject);
         }
 
-        private void GenerateMappings([CanBeNull, ItemNotNull] IList<Project> vsProjects, [CanBeNull] WixProject wixProject)
+        private void GenerateMappings(IList<Project>? vsProjects, WixProject? wixProject)
         {
             if ((vsProjects == null) || (wixProject == null))
                 return;
@@ -243,13 +243,13 @@
 
                 var fileMappings = installedFileNodes
                     .Select(file => fileMappingsLookup.GetValueOrDefault(file.Id))
-                    .Where(item => item != null)
+                    .ExceptNullItems()
                     .ToList().AsReadOnly();
 
                 var installedTargetNames = new HashSet<string>(fileMappings.Select(fm => fm.TargetName));
 
                 var projects = vsProjects
-                    .Where(p => installedTargetNames.Contains(p.PrimaryOutputFileName))
+                    .Where(p => installedTargetNames.Contains(p.PrimaryOutputFileName!))
                     .ToList().AsReadOnly();
 
                 var requiredOutputs = projectOutputGroups
@@ -330,7 +330,7 @@
             OnPropertyChanged(nameof(AreAllFilesMapped));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void OnPropertyChanged([NotNull] string propertyName)
         {

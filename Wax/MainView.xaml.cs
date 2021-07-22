@@ -33,8 +33,7 @@
         public static readonly DependencyProperty IsDarkThemeProperty = DependencyProperty.Register(
             "IsDarkTheme", typeof(bool), typeof(MainView), new PropertyMetadata(default(bool)));
 
-        [CanBeNull]
-        internal MainViewModel ViewModel
+        internal MainViewModel? ViewModel
         {
             get => DataContext as MainViewModel;
             set => DataContext = value;
@@ -57,7 +56,7 @@
             Refresh(_dte.Solution);
         }
 
-        private void Refresh([CanBeNull] EnvDTE.Solution solution)
+        private void Refresh(EnvDTE.Solution? solution)
         {
             if (solution == null)
             {
@@ -82,7 +81,7 @@
             if (e.Property == DataContextProperty)
             {
 
-                if ((!(e.OldValue is MainViewModel oldViewModel)) || (!(e.NewValue is MainViewModel newViewModel)))
+                if ((e.OldValue is not MainViewModel oldViewModel) || (e.NewValue is not MainViewModel newViewModel))
                     return;
 
                 var oldSelectedProject = newViewModel.Solution.WixProjects.FirstOrDefault(p => p.Equals(oldViewModel.SelectedWixProject));

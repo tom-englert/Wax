@@ -17,29 +17,31 @@ namespace tomenglertde.Wax.Model.Wix
         {
         }
 
-        [CanBeNull]
-        public string Directory => GetAttribute("Directory");
+        public string? Directory => GetAttribute("Directory");
 
         [NotNull]
         public IEnumerable<string> Components => Node
             .Descendants(WixNames.ComponentNode)
             .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
-            .Where(id => !string.IsNullOrEmpty(id));
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ExceptNullItems();
 
         [NotNull]
         public IEnumerable<string> ComponentRefs => Node
             .Descendants(WixNames.ComponentRefNode)
             .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
-            .Where(id => !string.IsNullOrEmpty(id));
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ExceptNullItems();
 
         [NotNull]
         public IEnumerable<string> ComponentGroupRefs => Node
             .Descendants(WixNames.ComponentGroupRefNode)
             .Where(node => node.Parent == Node)
             .Select(node => node.GetAttribute("Id"))
-            .Where(id => !string.IsNullOrEmpty(id));
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ExceptNullItems();
 
         [NotNull]
         public WixFileNode AddFileComponent([NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)
@@ -51,14 +53,14 @@ namespace tomenglertde.Wax.Model.Wix
         public IEnumerable<WixComponentNode> EnumerateComponents([NotNull] IDictionary<string, WixComponentGroupNode> componentGroupNodes, [NotNull] IDictionary<string, WixComponentNode> componentNodes)
         {
             var byComponentGroupRef = ComponentGroupRefs.Select(componentGroupNodes.GetValueOrDefault)
-                .Where(item => item != null)
+                .ExceptNullItems()
                 .SelectMany(cg => cg.EnumerateComponents(componentGroupNodes, componentNodes));
 
             var byComponentRef = ComponentRefs.Select(componentNodes.GetValueOrDefault)
-                .Where(item => item != null);
+                .ExceptNullItems();
 
             var children = Components.Select(componentNodes.GetValueOrDefault)
-                .Where(item => item != null);
+                .ExceptNullItems();
 
 
             return byComponentGroupRef.Concat(byComponentRef).Concat(children);

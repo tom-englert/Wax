@@ -12,15 +12,14 @@ namespace tomenglertde.Wax.Model.Wix
 
     public class WixDirectoryNode : WixNode
     {
-        private WixDirectoryNode _parent;
+        private WixDirectoryNode? _parent;
 
         public WixDirectoryNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
             : base(sourceFile, node)
         {
         }
 
-        [CanBeNull]
-        public WixDirectoryNode Parent => _parent ?? (_parent = ResolveParent());
+        public WixDirectoryNode? Parent => _parent ??= ResolveParent();
 
         [NotNull]
         public string Path
@@ -33,7 +32,7 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [NotNull]
-        public WixDirectoryNode AddSubdirectory([NotNull] string id, [NotNull] string name)
+        public WixDirectoryNode AddSubDirectory([NotNull] string id, [NotNull] string name)
         {
             var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
 
@@ -44,22 +43,18 @@ namespace tomenglertde.Wax.Model.Wix
             return SourceFile.AddDirectoryNode(directoryElement);
         }
 
-        [CanBeNull]
-        private WixDirectoryNode ResolveParent()
+        private WixDirectoryNode? ResolveParent()
         {
             var parentElement = Node.Parent;
 
             if (parentElement == null)
                 return null;
 
-            switch (parentElement.Name.LocalName)
+            return parentElement.Name.LocalName switch
             {
-                case "Directory":
-                case "DirectoryRef":
-                    return SourceFile.Project.DirectoryNodes.FirstOrDefault(node => node.Id == parentElement.GetAttribute("Id"));
-            }
-
-            return null;
+                "Directory" or "DirectoryRef" => SourceFile.Project.DirectoryNodes.FirstOrDefault(node => node.Id == parentElement.GetAttribute("Id")),
+                _ => null,
+            };
         }
 
         public override string ToString()

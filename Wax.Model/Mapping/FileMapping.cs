@@ -88,8 +88,7 @@
         [NotNull]
         public Project Project => _projectOutputGroup.ProjectOutputs.First().Project;
 
-        [CanBeNull]
-        public WixFileNode MappedNodeSetter
+        public WixFileNode? MappedNodeSetter
         {
             get => null;
             set
@@ -101,17 +100,10 @@
             }
         }
 
-        [CanBeNull]
         [OnChangedMethod(nameof(OnMappedNodeChanged))]
-        public WixFileNode MappedNode { get; set; }
+        public WixFileNode? MappedNode { get; set; }
 
-        private void OnMappedNodeChanged([CanBeNull] object oldValue, [CanBeNull] object newValue)
-        {
-            OnMappedNodeChanged(oldValue as WixFileNode, newValue as WixFileNode);
-        }
-
-        [SuppressPropertyChangedWarnings]
-        private void OnMappedNodeChanged([CanBeNull] WixFileNode oldValue, [CanBeNull] WixFileNode newValue)
+        private void OnMappedNodeChanged(WixFileNode? oldValue, WixFileNode? newValue)
         {
             if (oldValue != null)
             {

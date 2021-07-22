@@ -31,7 +31,6 @@
 
                 foreach (var dependency in project.GetProjectReferences())
                 {
-                    Debug.Assert(dependency != null);
                     dependency.SourceProject?.ReferencedBy.Add(project);
                 }
             }
@@ -44,8 +43,7 @@
                 .ToList().AsReadOnly();
         }
 
-        [CanBeNull]
-        public string FullName => _solution.FullName;
+        public string? FullName => _solution.FullName;
 
         [NotNull, ItemNotNull]
         public IEnumerable<Project> Projects { get; }

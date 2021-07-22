@@ -24,13 +24,9 @@
     {
         private const BuildFileGroups AllDeployGroups = BuildFileGroups.Built | BuildFileGroups.ContentFiles | BuildFileGroups.LocalizedResourceDlls | BuildFileGroups.Symbols;
 
-        [NotNull]
         private readonly EnvDTE.Project _project;
-        [CanBeNull]
-        private readonly VSLangProj.VSProject _vsProject;
-        [NotNull, ItemNotNull]
+        private readonly VSLangProj.VSProject? _vsProject;
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
-        [NotNull]
         private readonly string _projectTypeGuids;
 
         public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
@@ -39,7 +35,6 @@
             _project = project;
             _vsProject = project.TryGetObject() as VSLangProj.VSProject;
 
-            Debug.Assert(_project.UniqueName != null);
             UniqueName = _project.UniqueName;
 
             _projectTypeGuids = _project.GetProjectTypeGuids();
@@ -100,19 +95,13 @@
             }
         }
 
-        [NotNull, ItemNotNull]
         public ICollection<Project> ReferencedBy => _referencedBy;
 
-        [NotNull]
-        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public string FullName => _project.FullName;
 
         [Equals(StringComparison.OrdinalIgnoreCase)]
-        [NotNull]
         public string UniqueName { get; }
 
-        [NotNull]
-        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public string RelativeFolder => Path.GetDirectoryName(UniqueName);
 
         public bool IsTestProject => _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}");
@@ -121,19 +110,10 @@
 
         public bool IsTopLevelProject => !IsTestProject && ReferencedBy.All(reference => reference.IsTestProject);
 
-        [Lazy, CanBeNull]
-        public string PrimaryOutputFileName => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
+        [Lazy]
+        public string? PrimaryOutputFileName => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
 
-        [NotNull]
-        public string Name
-        {
-            get
-            {
-                var name = _project.Name;
-                Debug.Assert(name != null);
-                return name;
-            }
-        }
+        public string Name => _project.Name;
 
         public bool IsImplicitSelected { get; private set; }
 
@@ -200,9 +180,6 @@
             return buildFileGroups;
         }
 
-        [NotNull, ItemNotNull]
-        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static IReadOnlyCollection<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName, bool deployExternalLocalizations, [NotNull] string outputDirectory)
         {
             try
@@ -232,7 +209,7 @@
                 // assembly cannot be loaded
             }
 
-            return new string[0];
+            return Array.Empty<string>();
         }
 
         [NotNull]
@@ -247,7 +224,7 @@
 
             var selectedOutputGroups = groupNames
                 .Select(groupName => outputGroups?.Item(groupName.ToString()))
-                .Where(item => item != null);
+                .ExceptNullItems();
 
             var buildFiles = selectedOutputGroups.SelectMany(item => GetProjectOutputForGroup(rootProject, item, binaryTargetDirectory));
 
@@ -263,7 +240,7 @@
         [NotNull, ItemNotNull]
         private IReadOnlyCollection<VSLangProj.Reference> GetReferences()
         {
-            return GetVsProjectReferences() ?? GetMpfProjectReferences() ?? new VSLangProj.Reference[0];
+            return GetVsProjectReferences() ?? GetMpfProjectReferences() ?? Array.Empty<VSLangProj.Reference>();
         }
 
         protected void AddProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
@@ -276,7 +253,7 @@
             var existingValues = referencesCollection
                 .OfType<VSLangProj.Reference>()
                 .Select(r => r.GetSourceProject()?.UniqueName)
-                .Where(r => r != null);
+                .ExceptNullItems();
 
             var existingReferences = new HashSet<string>(existingValues, StringComparer.OrdinalIgnoreCase);
 
@@ -315,8 +292,7 @@
             return _project.ProjectItems.AddFromFile(fileName);
         }
 
-        [CanBeNull]
-        private VSLangProj.References ReferencesCollection
+        private VSLangProj.References? ReferencesCollection
         {
             get
             {
@@ -341,8 +317,7 @@
             }
         }
 
-        [CanBeNull]
-        private IReadOnlyCollection<VSLangProj.Reference> GetMpfProjectReferences()
+        private IReadOnlyCollection<VSLangProj.Reference>? GetMpfProjectReferences()
         {
             try
             {
@@ -362,8 +337,7 @@
             }
         }
 
-        [CanBeNull]
-        private IReadOnlyCollection<VSLangProj.Reference> GetVsProjectReferences()
+        private IReadOnlyCollection<VSLangProj.Reference>? GetVsProjectReferences()
         {
             try
             {
@@ -393,7 +367,7 @@
             return projectOutputForGroup.ToList().AsReadOnly();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator, UsedImplicitly]
         protected virtual void OnPropertyChanged([NotNull] string propertyName)
@@ -409,8 +383,7 @@
 
     internal static class ProjectExtension
     {
-        [CanBeNull]
-        public static EnvDTE.Project GetSourceProject([NotNull] this VSLangProj.Reference reference)
+        public static EnvDTE.Project? GetSourceProject([NotNull] this VSLangProj.Reference reference)
         {
             try
             {
@@ -428,8 +401,7 @@
             return InternalGetFileNames(outputGroup) ?? Array.Empty<string>();
         }
 
-        [CanBeNull]
-        private static IReadOnlyCollection<string> InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        private static IReadOnlyCollection<string>? InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
         {
             try
             {

@@ -8,23 +8,24 @@ namespace tomenglertde.Wax.Model.Wix
 
     using JetBrains.Annotations;
 
+    using TomsToolbox.Essentials;
+
     [Serializable]
     [XmlType("Configuration")]
     public class ProjectConfiguration
     {
-        private string[] _deployProjectNames;
+        private string[]? _deployProjectNames;
 
         [XmlArray("DeployedProjects")]
         [NotNull]
         public string[] DeployedProjectNames
         {
-            get => _deployProjectNames ?? new string[0];
+            get => _deployProjectNames ?? Array.Empty<string>();
             set => _deployProjectNames = value;
         }
 
         [XmlArray("DirectoryMappings")]
         [NotNull]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public MappingItem[] DirectoryMappingNames
         {
             get => DirectoryMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
@@ -33,7 +34,6 @@ namespace tomenglertde.Wax.Model.Wix
 
         [XmlArray("FileMappings")]
         [NotNull]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public MappingItem[] FileMappingNames
         {
             get => FileMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
@@ -61,12 +61,12 @@ namespace tomenglertde.Wax.Model.Wix
         [NotNull]
         public string ExcludedProjectItemsValue
         {
-            get => string.IsNullOrEmpty(ExcludedProjectItems) ? "-" : ExcludedProjectItems;
+            get => ExcludedProjectItems.IsNullOrEmpty() ? "-" : ExcludedProjectItems;
             set => ExcludedProjectItems = value == "-" ? null : value;
         }
 
         [XmlIgnore]
-        public string ExcludedProjectItems { get; set; }
+        public string? ExcludedProjectItems { get; set; }
     }
 
     [Serializable]
@@ -78,13 +78,13 @@ namespace tomenglertde.Wax.Model.Wix
         {
             get;
             set;
-        }
+        } = string.Empty;
 
         [XmlAttribute("Value")]
         public string Value
         {
             get;
             set;
-        }
+        } = string.Empty;
     }
 }

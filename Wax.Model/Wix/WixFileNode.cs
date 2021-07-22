@@ -15,7 +15,7 @@ namespace tomenglertde.Wax.Model.Wix
     {
         [NotNull]
         private readonly IList<WixFileNode> _collection;
-        private WixComponentGroupNode _componentGroup;
+        private WixComponentGroupNode? _componentGroup;
 
         public WixFileNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node, [NotNull] IList<WixFileNode> collection)
             : base(sourceFile, node)
@@ -23,11 +23,9 @@ namespace tomenglertde.Wax.Model.Wix
             _collection = collection;
         }
 
-        [CanBeNull]
-        public string Source => GetAttribute("Source");
+        public string? Source => GetAttribute("Source");
 
-        [CanBeNull]
-        public WixComponentGroupNode ComponentGroup => _componentGroup ?? (_componentGroup = ResolveComponentGroup());
+        public WixComponentGroupNode? ComponentGroup => _componentGroup ??= ResolveComponentGroup();
 
         public void Remove()
         {
@@ -50,8 +48,7 @@ namespace tomenglertde.Wax.Model.Wix
             return string.Format(CultureInfo.CurrentCulture, "{0} ({1}, {2})", Id, Name, Source);
         }
 
-        [CanBeNull]
-        private WixComponentGroupNode ResolveComponentGroup()
+        private WixComponentGroupNode? ResolveComponentGroup()
         {
             var componentNode = Node.Parent;
 

@@ -11,7 +11,7 @@
     public static class SerializerExtensions
     {
         [NotNull]
-        public static T Deserialize<T>([CanBeNull] this string data) where T : class, new()
+        public static T Deserialize<T>(this string? data) where T : class, new()
         {
             if (string.IsNullOrEmpty(data))
                 return new T();

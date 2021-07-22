@@ -55,7 +55,7 @@
             return items;
         }
 
-        private static void GetSubProjects([CanBeNull] this IEnumerable projectItems, [NotNull] ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects(this IEnumerable? projectItems, [NotNull] ICollection<EnvDTE.Project> items)
         {
             if (projectItems == null)
                 return;
@@ -66,7 +66,7 @@
             }
         }
 
-        private static void GetSubProjects([CanBeNull] this EnvDTE.ProjectItem projectItem, [NotNull] ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects(this EnvDTE.ProjectItem? projectItem, [NotNull] ICollection<EnvDTE.Project> items)
         {
             var subProject = projectItem?.SubProject;
 
@@ -148,14 +148,12 @@
             return string.Empty;
         }
 
-        [CanBeNull]
-        private static T GetService<T>([NotNull] object serviceProvider) where T : class
+        private static T? GetService<T>([NotNull] object serviceProvider) where T : class
         {
-            return (T)GetService((IServiceProvider)serviceProvider, typeof(T).GUID);
+            return (T?)GetService((IServiceProvider)serviceProvider, typeof(T).GUID);
         }
 
-        [CanBeNull]
-        private static object GetService([NotNull] IServiceProvider serviceProvider, Guid guid)
+        private static object? GetService([NotNull] IServiceProvider serviceProvider, Guid guid)
         {
             var hr = serviceProvider.QueryService(guid, guid, out var serviceHandle);
 
@@ -173,8 +171,7 @@
             return null;
         }
 
-        [CanBeNull]
-        public static string TryGetFileName([NotNull] this EnvDTE.ProjectItem projectItem)
+        public static string? TryGetFileName([NotNull] this EnvDTE.ProjectItem projectItem)
         {
             try
             {
@@ -226,9 +223,6 @@
             }
         }
 
-        [NotNull]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private static string GetContent([NotNull] EnvDTE.TextDocument document)
         {
             return document.StartPoint.CreateEditPoint().GetText(document.EndPoint);
@@ -256,16 +250,14 @@
             }
         }
 
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        private static void SetContent([NotNull] EnvDTE.Document document, [CanBeNull] string text)
+        private static void SetContent([NotNull] EnvDTE.Document document, string? text)
         {
             var textDocument = (EnvDTE.TextDocument)document.Object("TextDocument");
 
             textDocument.StartPoint.CreateEditPoint().ReplaceText(textDocument.EndPoint, text, 0);
         }
 
-        [CanBeNull]
-        public static object? TryGetObject([CanBeNull] this EnvDTE.Project? project)
+        public static object? TryGetObject(this EnvDTE.Project? project)
         {
             try
             {
@@ -277,8 +269,7 @@
             }
         }
 
-        [CanBeNull]
-        public static EnvDTE80.DTE2? TryGetDte([CanBeNull] this EnvDTE.Project? project)
+        public static EnvDTE80.DTE2? TryGetDte(this EnvDTE.Project? project)
         {
             try
             {
@@ -290,7 +281,7 @@
             }
         }
 
-        public static bool GetCopyLocal([CanBeNull] this VSLangProj.Reference reference)
+        public static bool GetCopyLocal(this VSLangProj.Reference? reference)
         {
             if (reference == null)
                 return false;

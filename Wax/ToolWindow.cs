@@ -29,7 +29,7 @@
     [Guid("ba4ab97f-d341-4b14-b8c9-3cba5e401a5f")]
     public class ToolWindow : ToolWindowPane
     {
-        private EnvDTE80.DTE2 _dte;
+        private EnvDTE80.DTE2? _dte;
 
         /// <summary>
         /// Standard constructor for the tool window.
@@ -60,8 +60,6 @@
 
             _dte = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
 
-            Debug.Assert(_dte != null);
-
             Content = new ShellView { Content = new MainView(_dte) };
         }
 
@@ -84,7 +82,7 @@
         [Localizable(false)]
         private void CreateWebBrowser([NotNull] string url)
         {
-            var webBrowsingService = (IVsWebBrowsingService)GetService(typeof(SVsWebBrowsingService));
+            var webBrowsingService = (IVsWebBrowsingService?)GetService(typeof(SVsWebBrowsingService));
             if (webBrowsingService != null)
             {
                 var hr = webBrowsingService.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_WebURLOnly, out var pFrame);

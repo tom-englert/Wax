@@ -33,6 +33,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\Package.ico" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <Resource Include="Resources\refresh.png" />
   </ItemGroup>
   <ItemGroup>
@@ -44,19 +45,23 @@
   <ItemGroup>
     <PackageReference Include="Community.VisualStudio.Toolkit" Version="15.0.75.149" />
     <PackageReference Include="DataGridExtensions">
-      <Version>2.4.7</Version>
+      <Version>2.5.5</Version>
     </PackageReference>
     <PackageReference Include="Fody">
-      <Version>6.3.0</Version>
+      <Version>6.5.2</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="JetBrains.Annotations">
-      <Version>2020.3.0</Version>
+      <Version>2021.2.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Nullable.Extended.Analyzer" Version="1.2.4089">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
-      <Version>3.3.1</Version>
+      <Version>3.4.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
@@ -66,7 +71,7 @@
       <Version>1.7.0</Version>
     </PackageReference>
     <PackageReference Include="TomsToolbox.Wpf.Styles">
-      <Version>2.3.0</Version>
+      <Version>2.5.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" ExcludeAssets="runtime">
       <Version>15.0.1</Version>

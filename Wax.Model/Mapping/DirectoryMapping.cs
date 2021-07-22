@@ -43,8 +43,7 @@
         [NotNull]
         public ICommand ClearMappingCommand => new DelegateCommand(CanClearMapping, ClearMapping);
 
-        [CanBeNull]
-        public WixDirectoryNode MappedNodeSetter
+        public WixDirectoryNode? MappedNodeSetter
         {
             get => null;
             set
@@ -56,17 +55,10 @@
             }
         }
 
-        [CanBeNull]
         [OnChangedMethod(nameof(OnMappedNodeChanged))]
-        public WixDirectoryNode MappedNode { get; set; }
+        public WixDirectoryNode? MappedNode { get; set; }
 
-        private void OnMappedNodeChanged([CanBeNull] object oldValue, [CanBeNull] object newValue)
-        {
-            OnMappedNodeChanged(oldValue as WixDirectoryNode, newValue as WixDirectoryNode);
-        }
-
-        [SuppressPropertyChangedWarnings]
-        private void OnMappedNodeChanged([CanBeNull] WixDirectoryNode oldValue, [CanBeNull] WixDirectoryNode newValue)
+        private void OnMappedNodeChanged(WixDirectoryNode? oldValue, WixDirectoryNode? newValue)
         {
             if (oldValue != null)
             {

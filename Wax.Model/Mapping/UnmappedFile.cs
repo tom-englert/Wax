@@ -32,8 +32,7 @@
             return Node;
         }
 
-        [CanBeNull]
-        public static implicit operator WixFileNode([CanBeNull] UnmappedFile file) => file?.Node;
+        public static implicit operator WixFileNode?(UnmappedFile? file) => file?.Node;
 
         private void Delete()
         {
