@@ -6,11 +6,8 @@
     using System.Xml;
     using System.Xml.Serialization;
 
-    using JetBrains.Annotations;
-
     public static class SerializerExtensions
     {
-        [NotNull]
         public static T Deserialize<T>(this string? data) where T : class, new()
         {
             if (string.IsNullOrEmpty(data))
@@ -33,8 +30,7 @@
             return new T();
         }
 
-        [NotNull]
-        public static string Serialize<T>([NotNull] this T value)
+        public static string Serialize<T>(this T value)
         {
             var result = new StringBuilder();
 

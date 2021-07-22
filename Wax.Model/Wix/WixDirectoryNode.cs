@@ -4,8 +4,6 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Xml.Linq;
 
-    using JetBrains.Annotations;
-
     using tomenglertde.Wax.Model.Tools;
 
     using TomsToolbox.Essentials;
@@ -14,14 +12,13 @@ namespace tomenglertde.Wax.Model.Wix
     {
         private WixDirectoryNode? _parent;
 
-        public WixDirectoryNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
+        public WixDirectoryNode(WixSourceFile sourceFile, XElement node)
             : base(sourceFile, node)
         {
         }
 
         public WixDirectoryNode? Parent => _parent ??= ResolveParent();
 
-        [NotNull]
         public string Path
         {
             get
@@ -31,8 +28,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
-        public WixDirectoryNode AddSubDirectory([NotNull] string id, [NotNull] string name)
+        public WixDirectoryNode AddSubDirectory(string id, string name)
         {
             var directoryElement = new XElement(WixNames.DirectoryNode, new XAttribute("Id", id), new XAttribute("Name", name));
 

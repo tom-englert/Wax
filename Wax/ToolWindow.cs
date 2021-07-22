@@ -7,8 +7,6 @@
     using System.Windows;
     using System.Windows.Controls.Primitives;
 
-    using JetBrains.Annotations;
-
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -63,7 +61,7 @@
             Content = new ShellView { Content = new MainView(_dte) };
         }
 
-        private void Navigate_Click([NotNull] object sender, [NotNull] RoutedEventArgs e)
+        private void Navigate_Click(object sender, RoutedEventArgs e)
         {
             var source = e.OriginalSource as FrameworkElement;
 
@@ -80,7 +78,7 @@
 
 
         [Localizable(false)]
-        private void CreateWebBrowser([NotNull] string url)
+        private void CreateWebBrowser(string url)
         {
             var webBrowsingService = (IVsWebBrowsingService?)GetService(typeof(SVsWebBrowsingService));
             if (webBrowsingService != null)

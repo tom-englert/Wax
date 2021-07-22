@@ -4,13 +4,10 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Xml.Linq;
-
-    using JetBrains.Annotations;
 
     using Microsoft.VisualStudio.Shell.Flavor;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -24,8 +21,7 @@
         /// </summary>
         /// <param name="solution">The solution.</param>
         /// <returns>The projects.</returns>
-        [NotNull, ItemNotNull]
-        public static IReadOnlyCollection<EnvDTE.Project> GetProjects([NotNull] this EnvDTE.Solution solution)
+        public static IReadOnlyCollection<EnvDTE.Project> GetProjects(this EnvDTE.Solution solution)
         {
             var items = new List<EnvDTE.Project>();
 
@@ -55,7 +51,7 @@
             return items;
         }
 
-        private static void GetSubProjects(this IEnumerable? projectItems, [NotNull] ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects(this IEnumerable? projectItems, ICollection<EnvDTE.Project> items)
         {
             if (projectItems == null)
                 return;
@@ -66,7 +62,7 @@
             }
         }
 
-        private static void GetSubProjects(this EnvDTE.ProjectItem? projectItem, [NotNull] ICollection<EnvDTE.Project> items)
+        private static void GetSubProjects(this EnvDTE.ProjectItem? projectItem, ICollection<EnvDTE.Project> items)
         {
             var subProject = projectItem?.SubProject;
 
@@ -78,8 +74,7 @@
             subProject.ProjectItems.GetSubProjects(items);
         }
 
-        [NotNull, ItemNotNull]
-        public static IEnumerable<EnvDTE.ProjectItem> EnumerateAllProjectItems([NotNull] this EnvDTE.Project project)
+        public static IEnumerable<EnvDTE.ProjectItem> EnumerateAllProjectItems(this EnvDTE.Project project)
         {
             if (project.ProjectItems == null)
                 yield break;
@@ -95,8 +90,7 @@
             }
         }
 
-        [NotNull, ItemNotNull]
-        private static IEnumerable<EnvDTE.ProjectItem> EnumerateProjectItems([NotNull] EnvDTE.ProjectItem projectItem)
+        private static IEnumerable<EnvDTE.ProjectItem> EnumerateProjectItems(EnvDTE.ProjectItem projectItem)
         {
             if (projectItem.ProjectItems == null)
                 yield break;
@@ -112,8 +106,7 @@
             }
         }
 
-        [NotNull]
-        public static string GetProjectTypeGuids([NotNull] this EnvDTE.Project proj)
+        public static string GetProjectTypeGuids(this EnvDTE.Project proj)
         {
             try
             {
@@ -148,12 +141,12 @@
             return string.Empty;
         }
 
-        private static T? GetService<T>([NotNull] object serviceProvider) where T : class
+        private static T? GetService<T>(object serviceProvider) where T : class
         {
             return (T?)GetService((IServiceProvider)serviceProvider, typeof(T).GUID);
         }
 
-        private static object? GetService([NotNull] IServiceProvider serviceProvider, Guid guid)
+        private static object? GetService(IServiceProvider serviceProvider, Guid guid)
         {
             var hr = serviceProvider.QueryService(guid, guid, out var serviceHandle);
 
@@ -171,7 +164,7 @@
             return null;
         }
 
-        public static string? TryGetFileName([NotNull] this EnvDTE.ProjectItem projectItem)
+        public static string? TryGetFileName(this EnvDTE.ProjectItem projectItem)
         {
             try
             {
@@ -189,14 +182,12 @@
             return null;
         }
 
-        [NotNull]
-        public static XDocument GetXmlContent([NotNull] this EnvDTE.ProjectItem projectItem, LoadOptions loadOptions)
+        public static XDocument GetXmlContent(this EnvDTE.ProjectItem projectItem, LoadOptions loadOptions)
         {
             return XDocument.Parse(projectItem.GetContent(), loadOptions);
         }
 
-        [NotNull]
-        public static string GetContent([NotNull] this EnvDTE.ProjectItem projectItem)
+        public static string GetContent(this EnvDTE.ProjectItem projectItem)
         {
             try
             {
@@ -223,12 +214,12 @@
             }
         }
 
-        private static string GetContent([NotNull] EnvDTE.TextDocument document)
+        private static string GetContent(EnvDTE.TextDocument document)
         {
             return document.StartPoint.CreateEditPoint().GetText(document.EndPoint);
         }
 
-        public static void SetContent([NotNull] this EnvDTE.ProjectItem projectItem, [NotNull] string text)
+        public static void SetContent(this EnvDTE.ProjectItem projectItem, string text)
         {
             if (!projectItem.IsOpen)
                 projectItem.Open(EnvDTE.Constants.vsViewKindCode);
@@ -250,7 +241,7 @@
             }
         }
 
-        private static void SetContent([NotNull] EnvDTE.Document document, string? text)
+        private static void SetContent(EnvDTE.Document document, string? text)
         {
             var textDocument = (EnvDTE.TextDocument)document.Object("TextDocument");
 

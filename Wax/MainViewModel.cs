@@ -29,10 +29,9 @@
     {
         private bool _wixProjectChanging;
 
-        [NotNull]
         private readonly ObservableCollection<Project> _selectedVSProjects = new();
 
-        public MainViewModel([NotNull] EnvDTE.Solution solution)
+        public MainViewModel(EnvDTE.Solution solution)
         {
             _selectedVSProjects.CollectionChanged += SelectedVSProjects_CollectionChanged;
             Solution = new Solution(solution);
@@ -40,7 +39,6 @@
             CommandManager.RequerySuggested += CommandManager_RequerySuggested;
         }
 
-        [NotNull]
         public Solution Solution { get; }
 
         public WixProject? SelectedWixProject { get; set; }
@@ -71,18 +69,14 @@
             _wixProjectChanging = false;
         }
 
-        [NotNull]
         public IList SelectedVSProjects => _selectedVSProjects;
 
         public DirectoryMapping? InstallDirectoryMapping { get; private set; }
 
-        [ItemNotNull]
         public IList<DirectoryMapping>? DirectoryMappings { get; private set; }
 
-        [ItemNotNull]
         public IList<FileMapping>? FileMappings { get; private set; }
 
-        [ItemNotNull]
         public ICollection<FeatureMapping>? FeatureMappings { get; private set; }
 
         public bool CanHideReferencedProjects { get; private set; }
@@ -151,10 +145,9 @@
 
         public bool IsUpdating { get; set; }
 
-        [NotNull]
         public static IEnumerable<BuildFileGroups> ProjectOutputs => Enum.GetValues(typeof(BuildFileGroups)).Cast<BuildFileGroups>().Where(item => item != 0);
 
-        private void SelectedVSProjects_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
+        private void SelectedVSProjects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             SelectedVSProjects_CollectionChanged();
         }
@@ -226,7 +219,7 @@
             }
         }
 
-        private void GenerateFeatureMappings([NotNull, ItemNotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull, ItemNotNull] IList<Project> vsProjects, [NotNull] WixProject wixProject)
+        private void GenerateFeatureMappings(IList<ProjectOutputGroup> projectOutputGroups, IList<Project> vsProjects, WixProject wixProject)
         {
             Debug.Assert(FileMappings != null);
 
@@ -284,7 +277,7 @@
                 .ToList().AsReadOnly();
         }
 
-        private void GenerateFileMappings([NotNull, ItemNotNull] IList<ProjectOutputGroup> projectOutputGroups, [NotNull] WixProject wixProject)
+        private void GenerateFileMappings(IList<ProjectOutputGroup> projectOutputGroups, WixProject wixProject)
         {
             var unmappedFileNodes = new ObservableCollection<UnmappedFile>();
             // ReSharper disable once ImplicitlyCapturedClosure
@@ -298,7 +291,7 @@
             UnmappedFileNodes = unmappedFileNodes;
         }
 
-        private void GenerateDirectoryMappings([NotNull, ItemNotNull] IEnumerable<ProjectOutput> projectOutputs, [NotNull] WixProject wixProject)
+        private void GenerateDirectoryMappings(IEnumerable<ProjectOutput> projectOutputs, WixProject wixProject)
         {
             var directories = projectOutputs
                 .Select(projectOutput => Path.GetDirectoryName(projectOutput.TargetName))
@@ -324,7 +317,7 @@
             }
         }
 
-        private void CommandManager_RequerySuggested([NotNull] object sender, [NotNull] EventArgs e)
+        private void CommandManager_RequerySuggested(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(AreAllDirectoriesMapped));
             OnPropertyChanged(nameof(AreAllFilesMapped));
@@ -332,7 +325,7 @@
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private void OnPropertyChanged([NotNull] string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

@@ -3,30 +3,24 @@
     using System.Collections.Generic;
     using System.Windows.Input;
 
-    using JetBrains.Annotations;
-
     using tomenglertde.Wax.Model.Wix;
 
     using TomsToolbox.Wpf;
 
     public class UnmappedFile
     {
-        [NotNull]
         private readonly IList<UnmappedFile> _allUnmappedFiles;
 
-        public UnmappedFile([NotNull] WixFileNode node, [NotNull] IList<UnmappedFile> allUnmappedFiles)
+        public UnmappedFile(WixFileNode node, IList<UnmappedFile> allUnmappedFiles)
         {
             Node = node;
             _allUnmappedFiles = allUnmappedFiles;
         }
 
-        [NotNull]
         public ICommand DeleteCommand => new DelegateCommand(Delete);
 
-        [NotNull]
         public WixFileNode Node { get; }
 
-        [NotNull]
         public WixFileNode ToWixFileNode()
         {
             return Node;

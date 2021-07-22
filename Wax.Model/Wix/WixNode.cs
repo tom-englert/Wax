@@ -11,32 +11,28 @@ namespace tomenglertde.Wax.Model.Wix
     [ImplementsEquatable]
     public class WixNode
     {
-        public WixNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
+        public WixNode(WixSourceFile sourceFile, XElement node)
         {
             SourceFile = sourceFile;
             Node = node;
         }
 
         [Equals]
-        [NotNull, UsedImplicitly]
+        [UsedImplicitly]
         public string Kind => Node.Name.LocalName;
 
         [Equals]
-        [NotNull]
         public string Id => GetAttribute("Id") ?? string.Empty;
 
         public string? Name => GetAttribute("Name");
 
-        [NotNull]
         internal XElement Node { get; }
 
-        [NotNull]
         public WixSourceFile SourceFile { get; }
 
-        [NotNull]
         public WixNames WixNames => SourceFile.WixNames;
 
-        protected string? GetAttribute([NotNull] string name)
+        protected string? GetAttribute(string name)
         {
             return Node.GetAttribute(name);
         }

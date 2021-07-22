@@ -4,11 +4,9 @@
     using System.Xml;
     using System.Xml.Linq;
 
-    using JetBrains.Annotations;
-
     public static class XmlExtensions
     {
-        public static void RemoveSelfAndWhiteSpace([NotNull] this XElement element)
+        public static void RemoveSelfAndWhiteSpace(this XElement element)
         {
             if ((element.PreviousNode is XText previous) && string.IsNullOrWhiteSpace(previous.Value))
             {
@@ -18,7 +16,7 @@
             element.Remove();
         }
 
-        public static void AddWithFormatting([NotNull] this XElement parent, [NotNull] XElement item)
+        public static void AddWithFormatting(this XElement parent, XElement item)
         {
             var firstNode = parent.FirstNode;
             var lastNode = parent.LastNode;
@@ -39,7 +37,7 @@
             }
         }
 
-        private static int GetDefaultIndent([NotNull] this XObject item)
+        private static int GetDefaultIndent(this XObject item)
         {
             return item.Parent?.GetDefaultIndent() ?? 0 + 2;
         }

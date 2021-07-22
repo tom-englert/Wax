@@ -2,19 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
-
-    using JetBrains.Annotations;
 
     using tomenglertde.Wax.Model.Wix;
 
     public class Solution
     {
-        [NotNull]
         private readonly EnvDTE.Solution _solution;
 
-        public Solution([NotNull] EnvDTE.Solution solution)
+        public Solution(EnvDTE.Solution solution)
         {
             _solution = solution;
 
@@ -45,13 +41,10 @@
 
         public string? FullName => _solution.FullName;
 
-        [NotNull, ItemNotNull]
         public IEnumerable<Project> Projects { get; }
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixProject> WixProjects { get; }
 
-        [NotNull, ItemNotNull]
         public IEnumerable<Project> EnumerateTopLevelProjects => Projects
             .Where(project => project.IsTopLevelProject)
             .OrderBy(project => project.Name);

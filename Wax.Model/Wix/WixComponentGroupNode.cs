@@ -4,22 +4,19 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Xml.Linq;
 
-    using JetBrains.Annotations;
-
     using tomenglertde.Wax.Model.Mapping;
 
     using TomsToolbox.Essentials;
 
     public class WixComponentGroupNode : WixNode
     {
-        public WixComponentGroupNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node)
+        public WixComponentGroupNode(WixSourceFile sourceFile, XElement node)
             : base(sourceFile, node)
         {
         }
 
         public string? Directory => GetAttribute("Directory");
 
-        [NotNull]
         public IEnumerable<string> Components => Node
             .Descendants(WixNames.ComponentNode)
             .Where(node => node.Parent == Node)
@@ -27,7 +24,6 @@ namespace tomenglertde.Wax.Model.Wix
             .Where(id => !string.IsNullOrEmpty(id))
             .ExceptNullItems();
 
-        [NotNull]
         public IEnumerable<string> ComponentRefs => Node
             .Descendants(WixNames.ComponentRefNode)
             .Where(node => node.Parent == Node)
@@ -35,7 +31,6 @@ namespace tomenglertde.Wax.Model.Wix
             .Where(id => !string.IsNullOrEmpty(id))
             .ExceptNullItems();
 
-        [NotNull]
         public IEnumerable<string> ComponentGroupRefs => Node
             .Descendants(WixNames.ComponentGroupRefNode)
             .Where(node => node.Parent == Node)
@@ -43,14 +38,12 @@ namespace tomenglertde.Wax.Model.Wix
             .Where(id => !string.IsNullOrEmpty(id))
             .ExceptNullItems();
 
-        [NotNull]
-        public WixFileNode AddFileComponent([NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)
+        public WixFileNode AddFileComponent(string id, string name, FileMapping fileMapping)
         {
             return SourceFile.AddFileComponent(this, id, name, fileMapping);
         }
 
-        [NotNull]
-        public IEnumerable<WixComponentNode> EnumerateComponents([NotNull] IDictionary<string, WixComponentGroupNode> componentGroupNodes, [NotNull] IDictionary<string, WixComponentNode> componentNodes)
+        public IEnumerable<WixComponentNode> EnumerateComponents(IDictionary<string, WixComponentGroupNode> componentGroupNodes, IDictionary<string, WixComponentNode> componentNodes)
         {
             var byComponentGroupRef = ComponentGroupRefs.Select(componentGroupNodes.GetValueOrDefault)
                 .ExceptNullItems()

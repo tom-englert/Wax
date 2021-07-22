@@ -9,8 +9,6 @@
     using System.Linq;
     using System.Windows.Input;
 
-    using JetBrains.Annotations;
-
     using PropertyChanged;
 
     using tomenglertde.Wax.Model.VisualStudio;
@@ -22,20 +20,14 @@
     [AddINotifyPropertyChangedInterface]
     public class FileMapping
     {
-        [NotNull]
         private readonly ProjectOutputGroup _projectOutputGroup;
-        [NotNull, ItemNotNull]
         private readonly ObservableCollection<ProjectOutputGroup> _allUnmappedProjectOutputs;
-        [NotNull, ItemNotNull]
         private readonly ObservableFilteredCollection<ProjectOutputGroup> _unmappedProjectOutputs;
-        [NotNull]
         private readonly WixProject _wixProject;
-        [NotNull, ItemNotNull]
         private readonly IList<UnmappedFile> _allUnmappedFiles;
-        [NotNull, ItemNotNull]
         private readonly ObservableFilteredCollection<UnmappedFile> _unmappedFiles;
 
-        public FileMapping([NotNull] ProjectOutputGroup projectOutputGroup, [NotNull] ObservableCollection<ProjectOutputGroup> allUnmappedProjectOutputs, [NotNull] WixProject wixProject, [NotNull] IList<UnmappedFile> allUnmappedFiles)
+        public FileMapping(ProjectOutputGroup projectOutputGroup, ObservableCollection<ProjectOutputGroup> allUnmappedProjectOutputs, WixProject wixProject, IList<UnmappedFile> allUnmappedFiles)
         {
             _projectOutputGroup = projectOutputGroup;
             _allUnmappedProjectOutputs = allUnmappedProjectOutputs;
@@ -55,37 +47,29 @@
             UpdateMappingState();
         }
 
-        [NotNull]
         public string DisplayName => _projectOutputGroup.FileName;
 
-        [NotNull]
         public string Id { get; }
 
-        [NotNull]
         public string UniqueName => _projectOutputGroup.TargetName;
 
-        [NotNull]
         public string Extension => Path.GetExtension(_projectOutputGroup.TargetName);
 
-        [NotNull]
         public string TargetName => _projectOutputGroup.TargetName;
 
-        [NotNull]
         public string SourceName => _projectOutputGroup.SourceName;
 
-        [NotNull]
         public IList<UnmappedFile> UnmappedNodes => _unmappedFiles;
 
-        [NotNull, DoNotNotify]
+        [DoNotNotify]
         public ICommand AddFileCommand => new DelegateCommand<IEnumerable>(_ => CanAddFile(), AddFile);
 
-        [NotNull, DoNotNotify]
+        [DoNotNotify]
         public ICommand ClearMappingCommand => new DelegateCommand<IEnumerable>(_ => CanClearMapping(), ClearMapping);
 
-        [NotNull, DoNotNotify]
+        [DoNotNotify]
         public ICommand ResolveFileCommand => new DelegateCommand<IEnumerable>(_ => CanResolveFile(), ResolveFile);
 
-        [NotNull]
         public Project Project => _projectOutputGroup.ProjectOutputs.First().Project;
 
         public WixFileNode? MappedNodeSetter
@@ -125,12 +109,12 @@
 
         public MappingState MappingState { get; set; }
 
-        private void UnmappedNodes_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
+        private void UnmappedNodes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             UpdateMappingState();
         }
 
-        private void UnmappedProjectOutputs_CollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs e)
+        private void UnmappedProjectOutputs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             UpdateMappingState();
         }

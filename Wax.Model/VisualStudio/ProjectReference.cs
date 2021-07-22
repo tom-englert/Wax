@@ -5,17 +5,13 @@
 
     using Equatable;
 
-    using JetBrains.Annotations;
-
     [ImplementsEquatable]
     public class ProjectReference
     {
-        [NotNull]
         private readonly Solution _solution;
-        [NotNull]
         private readonly VSLangProj.Reference _reference;
 
-        public ProjectReference([NotNull] Solution solution, [NotNull] VSLangProj.Reference reference)
+        public ProjectReference(Solution solution, VSLangProj.Reference reference)
         {
             _solution = solution;
             _reference = reference;

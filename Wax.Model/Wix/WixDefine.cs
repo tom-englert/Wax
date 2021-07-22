@@ -5,25 +5,20 @@
 
     using Equatable;
 
-    using JetBrains.Annotations;
-
     [ImplementsEquatable]
     public class WixDefine
     {
-        public WixDefine([NotNull] WixSourceFile sourceFile, [NotNull] XProcessingInstruction node)
+        public WixDefine(WixSourceFile sourceFile, XProcessingInstruction node)
         {
             SourceFile = sourceFile;
             Node = node;
         }
 
-        [NotNull]
         public string Name => Node.Data.Split('=').Select(item => item.Trim()).FirstOrDefault() ?? "<invalid>";
 
         [Equals]
-        [NotNull]
         public XProcessingInstruction Node { get; }
 
-        [NotNull]
         public WixSourceFile SourceFile { get; }
     }
 }

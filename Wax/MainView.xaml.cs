@@ -6,17 +6,14 @@
     using System.Windows.Controls;
     using System.Windows.Media;
 
-    using JetBrains.Annotations;
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainView
     {
-        [NotNull]
         private readonly EnvDTE80.DTE2 _dte;
 
-        public MainView([NotNull] EnvDTE80.DTE2 dte)
+        public MainView(EnvDTE80.DTE2 dte)
         {
             _dte = dte;
 
@@ -39,7 +36,7 @@
             set => DataContext = value;
         }
 
-        private void Self_Loaded([NotNull] object sender, [NotNull] RoutedEventArgs e)
+        private void Self_Loaded(object sender, RoutedEventArgs e)
         {
             var viewModel = ViewModel;
 
@@ -51,7 +48,7 @@
             }
         }
 
-        private void Refresh_Click([NotNull] object sender, [NotNull] RoutedEventArgs e)
+        private void Refresh_Click(object sender, RoutedEventArgs e)
         {
             Refresh(_dte.Solution);
         }
@@ -107,7 +104,7 @@
             return color?.R * 0.21 + color?.G * 0.72 + color?.B * 0.07 ?? 0.0;
         }
 
-        private void SetupProjectListBox_Loaded([NotNull] object sender, [NotNull] RoutedEventArgs e)
+        private void SetupProjectListBox_Loaded(object sender, RoutedEventArgs e)
         {
             var listBox = (ListBox)sender;
 

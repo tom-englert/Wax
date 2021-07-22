@@ -5,19 +5,16 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Linq;
     using System.Xml.Linq;
 
-    using JetBrains.Annotations;
-
     using tomenglertde.Wax.Model.Tools;
 
     using TomsToolbox.Essentials;
 
     public class WixFileNode : WixNode
     {
-        [NotNull]
         private readonly IList<WixFileNode> _collection;
         private WixComponentGroupNode? _componentGroup;
 
-        public WixFileNode([NotNull] WixSourceFile sourceFile, [NotNull] XElement node, [NotNull] IList<WixFileNode> collection)
+        public WixFileNode(WixSourceFile sourceFile, XElement node, IList<WixFileNode> collection)
             : base(sourceFile, node)
         {
             _collection = collection;

@@ -10,19 +10,16 @@
 
     using Baml;
 
-    using JetBrains.Annotations;
-
     using Mono.Cecil;
 
     using TomsToolbox.Essentials;
 
     public static class AssemblyHelper
     {
-        [NotNull] private static readonly Dictionary<string, ReferenceCacheEntry> _referenceCache = new(StringComparer.OrdinalIgnoreCase);
-        [NotNull] private static readonly Dictionary<string, DirectoryCacheEntry> _directoryCache = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, ReferenceCacheEntry> _referenceCache = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, DirectoryCacheEntry> _directoryCache = new(StringComparer.OrdinalIgnoreCase);
 
-        [NotNull]
-        public static IReadOnlyCollection<AssemblyName> FindReferences([NotNull] string target, [NotNull] string outputDirectory)
+        public static IReadOnlyCollection<AssemblyName> FindReferences(string target, string outputDirectory)
         {
             var timeStamp = File.GetLastWriteTime(target);
 
@@ -40,8 +37,7 @@
             return references;
         }
 
-        [NotNull]
-        private static Dictionary<string, AssemblyName> FindExistingAssemblies([NotNull] string outputDirectory)
+        private static Dictionary<string, AssemblyName> FindExistingAssemblies(string outputDirectory)
         {
             var folder = new DirectoryInfo(outputDirectory);
             var files = folder.GetFiles("*.dll");
@@ -67,7 +63,7 @@
             return existingAssemblies;
         }
 
-        private static AssemblyName? TryGetAssemblyName([NotNull] string assemblyFile)
+        private static AssemblyName? TryGetAssemblyName(string assemblyFile)
         {
             try
             {
@@ -79,8 +75,7 @@
             }
         }
 
-        [NotNull]
-        private static IReadOnlyCollection<AssemblyName> FindReferences([NotNull] string target, [NotNull] IDictionary<string, AssemblyName> existingAssemblies)
+        private static IReadOnlyCollection<AssemblyName> FindReferences(string target, IDictionary<string, AssemblyName> existingAssemblies)
         {
             try
             {
@@ -104,8 +99,7 @@
             }
         }
 
-        [NotNull]
-        private static HashSet<AssemblyName> FindXamlReferences([NotNull] IDictionary<string, AssemblyName> existingAssemblies, [NotNull] ModuleDefinition assembly)
+        private static HashSet<AssemblyName> FindXamlReferences(IDictionary<string, AssemblyName> existingAssemblies, ModuleDefinition assembly)
         {
             var assemblyResources = assembly.Resources?.OfType<EmbeddedResource>().FirstOrDefault(res => res.Name?.EndsWith("g.resources", StringComparison.Ordinal) == true);
 
@@ -146,7 +140,7 @@
 
         private class ReferenceCacheEntry
         {
-            public ReferenceCacheEntry([NotNull] IReadOnlyCollection<AssemblyName> references, DateTime timeStamp)
+            public ReferenceCacheEntry(IReadOnlyCollection<AssemblyName> references, DateTime timeStamp)
             {
                 References = references;
                 TimeStamp = timeStamp;
@@ -159,13 +153,12 @@
 
         private class DirectoryCacheEntry
         {
-            public DirectoryCacheEntry([NotNull] Dictionary<string, AssemblyName> assemblyNames, int hash)
+            public DirectoryCacheEntry(Dictionary<string, AssemblyName> assemblyNames, int hash)
             {
                 AssemblyNames = assemblyNames;
                 Hash = hash;
             }
 
-            [NotNull]
             public Dictionary<string, AssemblyName> AssemblyNames { get; }
 
             public int Hash { get; }

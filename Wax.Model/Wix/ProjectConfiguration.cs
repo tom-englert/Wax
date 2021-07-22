@@ -2,11 +2,8 @@ namespace tomenglertde.Wax.Model.Wix
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Xml.Serialization;
-
-    using JetBrains.Annotations;
 
     using TomsToolbox.Essentials;
 
@@ -17,7 +14,6 @@ namespace tomenglertde.Wax.Model.Wix
         private string[]? _deployProjectNames;
 
         [XmlArray("DeployedProjects")]
-        [NotNull]
         public string[] DeployedProjectNames
         {
             get => _deployProjectNames ?? Array.Empty<string>();
@@ -25,7 +21,6 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlArray("DirectoryMappings")]
-        [NotNull]
         public MappingItem[] DirectoryMappingNames
         {
             get => DirectoryMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
@@ -33,7 +28,6 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlArray("FileMappings")]
-        [NotNull]
         public MappingItem[] FileMappingNames
         {
             get => FileMappings.Select(item => new MappingItem { Key = item.Key, Value = item.Value }).ToArray();
@@ -41,11 +35,9 @@ namespace tomenglertde.Wax.Model.Wix
         }
 
         [XmlIgnore]
-        [NotNull]
         public Dictionary<string, string> DirectoryMappings { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         [XmlIgnore]
-        [NotNull]
         public Dictionary<string, string> FileMappings { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         [XmlElement("DeploySymbols")]
@@ -58,7 +50,6 @@ namespace tomenglertde.Wax.Model.Wix
         public bool DeployExternalLocalizations { get; set; }
 
         [XmlElement("ExcludedProjectItems")]
-        [NotNull]
         public string ExcludedProjectItemsValue
         {
             get => ExcludedProjectItems.IsNullOrEmpty() ? "-" : ExcludedProjectItems;

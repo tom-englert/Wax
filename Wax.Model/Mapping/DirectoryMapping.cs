@@ -4,8 +4,6 @@
     using System.Linq;
     using System.Windows.Input;
 
-    using JetBrains.Annotations;
-
     using PropertyChanged;
 
     using tomenglertde.Wax.Model.Wix;
@@ -15,10 +13,9 @@
     [AddINotifyPropertyChangedInterface]
     public class DirectoryMapping
     {
-        [NotNull]
         private readonly WixProject _wixProject;
 
-        public DirectoryMapping([NotNull] string directory, [NotNull] WixProject wixProject, [NotNull] IList<WixDirectoryNode> unmappedNodes)
+        public DirectoryMapping(string directory, WixProject wixProject, IList<WixDirectoryNode> unmappedNodes)
         {
             Directory = directory;
             _wixProject = wixProject;
@@ -28,19 +25,14 @@
             MappedNode = wixProject.DirectoryNodes.FirstOrDefault(node => node.Id == Id);
         }
 
-        [NotNull]
         public string Directory { get; }
 
-        [NotNull]
         public string Id { get; }
 
-        [NotNull]
         public IList<WixDirectoryNode> UnmappedNodes { get; }
 
-        [NotNull]
         public ICommand AddDirectoryCommand => new DelegateCommand(CanAddDirectory, AddDirectory);
 
-        [NotNull]
         public ICommand ClearMappingCommand => new DelegateCommand(CanClearMapping, ClearMapping);
 
         public WixDirectoryNode? MappedNodeSetter

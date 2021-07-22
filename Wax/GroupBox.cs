@@ -4,8 +4,6 @@
     using System.Windows;
     using System.Windows.Controls;
 
-    using JetBrains.Annotations;
-
     using TomsToolbox.Wpf;
 
     public class GroupBox : HeaderedContentControl
@@ -25,7 +23,6 @@
         /// <summary>
         /// Identifies the IsOk dependency property
         /// </summary>
-        [NotNull]
         public static readonly DependencyProperty IsOkProperty =
             DependencyProperty.Register("IsOk", typeof(bool), typeof(GroupBox));
 
@@ -38,7 +35,6 @@
         /// <summary>
         /// Identifies the Ordinal dependency property
         /// </summary>
-        [NotNull]
         public static readonly DependencyProperty OrdinalProperty =
             DependencyProperty.Register("Ordinal", typeof(int), typeof(GroupBox));
     }

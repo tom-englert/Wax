@@ -10,36 +10,24 @@ namespace tomenglertde.Wax.Model.Wix
     using System.Xml;
     using System.Xml.Linq;
 
-    using JetBrains.Annotations;
-
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
     using tomenglertde.Wax.Model.VisualStudio;
 
     public class WixSourceFile
     {
-        [NotNull]
         private readonly EnvDTE.ProjectItem _projectItem;
-        [NotNull]
         private readonly XDocument _xmlFile;
-        [NotNull]
         private XDocument _rawXmlFile;
-        [NotNull]
         private readonly XElement _root;
-        [NotNull, ItemNotNull]
         private readonly List<WixFileNode> _fileNodes;
-        [NotNull, ItemNotNull]
         private readonly List<WixDirectoryNode> _directoryNodes;
-        [NotNull, ItemNotNull]
         private readonly List<WixComponentGroupNode> _componentGroupNodes;
-        [NotNull, ItemNotNull]
         private readonly List<WixComponentNode> _componentNodes;
-        [NotNull, ItemNotNull]
         private readonly List<WixFeatureNode> _featureNodes;
-        [NotNull, ItemNotNull]
         private readonly List<WixDefine> _defines;
 
-        public WixSourceFile([NotNull] WixProject project, [NotNull] EnvDTE.ProjectItem projectItem)
+        public WixSourceFile(WixProject project, EnvDTE.ProjectItem projectItem)
         {
             Project = project;
             _projectItem = projectItem;
@@ -100,25 +88,18 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
         public WixNames WixNames { get; }
 
-        [NotNull]
         public IEnumerable<WixFileNode> FileNodes => new ReadOnlyCollection<WixFileNode>(_fileNodes);
 
-        [NotNull]
         public IEnumerable<WixDirectoryNode> DirectoryNodes => new ReadOnlyCollection<WixDirectoryNode>(_directoryNodes);
 
-        [NotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroupNodes => new ReadOnlyCollection<WixComponentGroupNode>(_componentGroupNodes);
 
-        [NotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes => new ReadOnlyCollection<WixFeatureNode>(_featureNodes);
 
-        [NotNull]
         public IEnumerable<WixComponentNode> ComponentNodes => new ReadOnlyCollection<WixComponentNode>(_componentNodes);
 
-        [NotNull]
         public WixProject Project { get; }
 
         public bool HasChanges
@@ -138,8 +119,7 @@ namespace tomenglertde.Wax.Model.Wix
             }
         }
 
-        [NotNull]
-        internal WixDirectoryNode AddDirectory([NotNull] string id, [NotNull] string name, [NotNull] string parentId)
+        internal WixDirectoryNode AddDirectory(string id, string name, string parentId)
         {
             var root = _root;
 
@@ -157,16 +137,14 @@ namespace tomenglertde.Wax.Model.Wix
             return AddDirectoryNode(directoryElement);
         }
 
-        [NotNull]
-        public WixDirectoryNode AddDirectoryNode([NotNull] XElement directoryElement)
+        public WixDirectoryNode AddDirectoryNode(XElement directoryElement)
         {
             var directoryNode = new WixDirectoryNode(this, directoryElement);
             _directoryNodes.Add(directoryNode);
             return directoryNode;
         }
 
-        [NotNull]
-        internal WixComponentGroupNode AddComponentGroup([NotNull] string directoryId)
+        internal WixComponentGroupNode AddComponentGroup(string directoryId)
         {
             var root = _root;
 
@@ -183,8 +161,7 @@ namespace tomenglertde.Wax.Model.Wix
             return componentGroup;
         }
 
-        [NotNull]
-        internal WixFileNode AddFileComponent([NotNull] WixComponentGroupNode componentGroup, [NotNull] string id, [NotNull] string name, [NotNull] FileMapping fileMapping)
+        internal WixFileNode AddFileComponent(WixComponentGroupNode componentGroup, string id, string name, FileMapping fileMapping)
         {
             Debug.Assert(componentGroup.SourceFile.Equals(this));
 
@@ -217,7 +194,7 @@ namespace tomenglertde.Wax.Model.Wix
             _rawXmlFile = _projectItem.GetXmlContent(LoadOptions.None);
         }
 
-        private void ForceDirectoryVariable([NotNull] string variableName, [NotNull] Project project)
+        private void ForceDirectoryVariable(string variableName, Project project)
         {
             if (_defines.Any(d => d.Name.Equals(variableName, StringComparison.Ordinal)))
                 return;

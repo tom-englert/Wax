@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -29,7 +27,7 @@
         private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
         private readonly string _projectTypeGuids;
 
-        public Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
+        public Project(Solution solution, EnvDTE.Project project)
         {
             Solution = solution;
             _project = project;
@@ -40,14 +38,12 @@
             _projectTypeGuids = _project.GetProjectTypeGuids();
         }
 
-        [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectReference> GetProjectReferences()
         {
             return GetProjectReferences(References);
         }
 
-        [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectReference> GetProjectReferences([NotNull, ItemNotNull] IEnumerable<VSLangProj.Reference> references)
+        private IReadOnlyCollection<ProjectReference> GetProjectReferences(IEnumerable<VSLangProj.Reference> references)
         {
             var projectReferences = references
                 .Where(reference => reference.GetSourceProject() != null)
@@ -57,8 +53,7 @@
             return projectReferences.ToList().AsReadOnly();
         }
 
-        [NotNull, ItemNotNull]
-        private static IReadOnlyCollection<ProjectOutput> GetLocalFileReferences([NotNull] Project project, [NotNull] Project rootProject, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
+        private static IReadOnlyCollection<ProjectOutput> GetLocalFileReferences(Project project, Project rootProject, bool deployExternalLocalizations, string outputDirectory, string relativeTargetDirectory)
         {
             var targetDirectory = Path.Combine(outputDirectory, relativeTargetDirectory);
 
@@ -84,7 +79,7 @@
             return references;
         }
 
-        private static void ResolveReferences([NotNull] string filePath, bool deployExternalLocalizations, [NotNull] string targetDirectory, [NotNull] ISet<string> resolvedOutputs)
+        private static void ResolveReferences(string filePath, bool deployExternalLocalizations, string targetDirectory, ISet<string> resolvedOutputs)
         {
             foreach (var reference in GetReferencedAssemblyNames(filePath, deployExternalLocalizations, targetDirectory))
             {
@@ -117,7 +112,7 @@
 
         public bool IsImplicitSelected { get; private set; }
 
-        public bool UpdateIsImplicitSelected([NotNull, ItemNotNull] ICollection<Project> selectedVSProjects)
+        public bool UpdateIsImplicitSelected(ICollection<Project> selectedVSProjects)
         {
             if (!IsVsProject)
                 return false;
@@ -125,20 +120,18 @@
             return IsImplicitSelected = ReferencedBy.Any(project => selectedVSProjects.Contains(project) || project.UpdateIsImplicitSelected(selectedVSProjects));
         }
 
-        [Lazy, NotNull, ItemNotNull]
+        [Lazy]
         private IReadOnlyCollection<ProjectOutput> BuildFiles => GetBuildFiles(this, AllDeployGroups, Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty);
 
-        [Lazy, NotNull, ItemNotNull]
+        [Lazy]
         private IReadOnlyCollection<VSLangProj.Reference> References => GetReferences();
 
-        [Lazy, NotNull, ItemNotNull]
+        [Lazy]
         private IReadOnlyCollection<ProjectReference> ProjectReferences => GetProjectReferences();
 
-        [NotNull, ItemNotNull]
         public IReadOnlyCollection<ProjectOutput> GetProjectOutput(bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations)
         {
             var properties = _project.ConfigurationManager?.ActiveConfiguration?.Properties;
-            // ReSharper disable once AssignNullToNotNullAttribute
             var outputDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(_project.FullName), properties?.Item(@"OutputPath")?.Value as string ?? string.Empty));
             var relativeTargetDirectory = Path.GetDirectoryName(PrimaryOutputFileName) ?? string.Empty;
 
@@ -149,8 +142,7 @@
             return projectOutput;
         }
 
-        [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectOutput> GetProjectOutput([NotNull] IDictionary<Project, IReadOnlyCollection<ProjectOutput>> cache, [NotNull] Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, [NotNull] string outputDirectory, [NotNull] string relativeTargetDirectory)
+        private IReadOnlyCollection<ProjectOutput> GetProjectOutput(IDictionary<Project, IReadOnlyCollection<ProjectOutput>> cache, Project rootProject, bool deploySymbols, bool deployLocalizations, bool deployExternalLocalizations, string outputDirectory, string relativeTargetDirectory)
         {
             if (cache.TryGetValue(this, out var result))
                 return result;
@@ -180,7 +172,7 @@
             return buildFileGroups;
         }
 
-        private static IReadOnlyCollection<string> GetReferencedAssemblyNames([NotNull] string assemblyFileName, bool deployExternalLocalizations, [NotNull] string outputDirectory)
+        private static IReadOnlyCollection<string> GetReferencedAssemblyNames(string assemblyFileName, bool deployExternalLocalizations, string outputDirectory)
         {
             try
             {
@@ -212,11 +204,9 @@
             return Array.Empty<string>();
         }
 
-        [NotNull]
         protected Solution Solution { get; }
 
-        [NotNull, ItemNotNull]
-        private IReadOnlyCollection<ProjectOutput> GetBuildFiles([NotNull] Project rootProject, BuildFileGroups groups, [NotNull] string binaryTargetDirectory)
+        private IReadOnlyCollection<ProjectOutput> GetBuildFiles(Project rootProject, BuildFileGroups groups, string binaryTargetDirectory)
         {
             var groupNames = Enum.GetValues(typeof(BuildFileGroups)).OfType<BuildFileGroups>().Where(item => (groups & item) != 0);
 
@@ -231,19 +221,17 @@
             return buildFiles.ToList().AsReadOnly();
         }
 
-        [NotNull, ItemNotNull]
         protected IReadOnlyCollection<EnvDTE.ProjectItem> GetAllProjectItems()
         {
             return _project.EnumerateAllProjectItems().ToList().AsReadOnly();
         }
 
-        [NotNull, ItemNotNull]
         private IReadOnlyCollection<VSLangProj.Reference> GetReferences()
         {
             return GetVsProjectReferences() ?? GetMpfProjectReferences() ?? Array.Empty<VSLangProj.Reference>();
         }
 
-        protected void AddProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
+        protected void AddProjectReferences(IEnumerable<Project> projects)
         {
             var referencesCollection = ReferencesCollection;
 
@@ -270,7 +258,7 @@
             }
         }
 
-        protected void RemoveProjectReferences([NotNull, ItemNotNull] IEnumerable<Project> projects)
+        protected void RemoveProjectReferences(IEnumerable<Project> projects)
         {
             var references = References.Where(item => item.SourceProject != null)
                 .ToDictionary(item => item.SourceProject.UniqueName, StringComparer.OrdinalIgnoreCase);
@@ -286,8 +274,7 @@
             }
         }
 
-        [NotNull]
-        protected EnvDTE.ProjectItem AddItemFromFile([NotNull] string fileName)
+        protected EnvDTE.ProjectItem AddItemFromFile(string fileName)
         {
             return _project.ProjectItems.AddFromFile(fileName);
         }
@@ -352,8 +339,7 @@
             }
         }
 
-        [NotNull, ItemNotNull]
-        private static IReadOnlyCollection<ProjectOutput> GetProjectOutputForGroup([NotNull] Project project, [NotNull] EnvDTE.OutputGroup outputGroup, [NotNull] string binaryTargetDirectory)
+        private static IReadOnlyCollection<ProjectOutput> GetProjectOutputForGroup(Project project, EnvDTE.OutputGroup outputGroup, string binaryTargetDirectory)
         {
             var canonicalName = outputGroup.CanonicalName;
 
@@ -370,7 +356,7 @@
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator, UsedImplicitly]
-        protected virtual void OnPropertyChanged([NotNull] string propertyName)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -383,7 +369,7 @@
 
     internal static class ProjectExtension
     {
-        public static EnvDTE.Project? GetSourceProject([NotNull] this VSLangProj.Reference reference)
+        public static EnvDTE.Project? GetSourceProject(this VSLangProj.Reference reference)
         {
             try
             {
@@ -395,13 +381,12 @@
             }
         }
 
-        [NotNull, ItemNotNull]
-        public static IEnumerable<string> GetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        public static IEnumerable<string> GetFileNames(this EnvDTE.OutputGroup outputGroup)
         {
             return InternalGetFileNames(outputGroup) ?? Array.Empty<string>();
         }
 
-        private static IReadOnlyCollection<string>? InternalGetFileNames([NotNull] this EnvDTE.OutputGroup outputGroup)
+        private static IReadOnlyCollection<string>? InternalGetFileNames(this EnvDTE.OutputGroup outputGroup)
         {
             try
             {

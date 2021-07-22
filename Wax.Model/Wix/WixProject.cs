@@ -2,13 +2,10 @@ namespace tomenglertde.Wax.Model.Wix
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
-
-    using JetBrains.Annotations;
 
     using tomenglertde.Wax.Model.Mapping;
     using tomenglertde.Wax.Model.Tools;
@@ -16,20 +13,15 @@ namespace tomenglertde.Wax.Model.Wix
 
     public class WixProject : Project
     {
-        [NotNull]
         private static readonly string[] _wixFileExtensions = { ".wxs", ".wxi" };
-        [NotNull]
         private static readonly string[] _wellKnownPublicMsiProperties = { "x86", "x64" };
         private const string WaxConfigurationFileExtension = ".wax";
 
-        [NotNull]
         private readonly EnvDTE.ProjectItem _configurationFileProjectItem;
-        [NotNull]
         private readonly ProjectConfiguration _configuration;
-        [NotNull, ItemNotNull]
         private readonly IList<WixSourceFile> _sourceFiles;
 
-        public WixProject([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
+        public WixProject(Solution solution, EnvDTE.Project project)
             : base(solution, project)
         {
             _configurationFileProjectItem = GetConfigurationFileProjectItem();
@@ -60,25 +52,18 @@ namespace tomenglertde.Wax.Model.Wix
                 .ToList().AsReadOnly();
         }
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixSourceFile> SourceFiles => _sourceFiles;
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixFileNode> FileNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.FileNodes);
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixDirectoryNode> DirectoryNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.DirectoryNodes);
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixFeatureNode> FeatureNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.FeatureNodes);
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixComponentNode> ComponentNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentNodes);
 
-        [NotNull, ItemNotNull]
         public IEnumerable<WixComponentGroupNode> ComponentGroupNodes => _sourceFiles.SelectMany(sourceFile => sourceFile.ComponentGroupNodes);
 
-        [NotNull, ItemNotNull]
         public IEnumerable<Project> DeployedProjects
         {
             get
@@ -119,26 +104,24 @@ namespace tomenglertde.Wax.Model.Wix
 
         public bool HasChanges => HasConfigurationChanges | HasSourceFileChanges;
 
-        [NotNull]
-        public string GetDirectoryId([NotNull] string directory)
+        public string GetDirectoryId(string directory)
         {
             return (_configuration.DirectoryMappings.TryGetValue(directory, out var value) && (value != null)) ? value : GetDefaultId(directory);
         }
 
-        public void UnmapDirectory([NotNull] string directory)
+        public void UnmapDirectory(string directory)
         {
             _configuration.DirectoryMappings.Remove(directory);
 
             SaveProjectConfiguration();
         }
 
-        public void MapDirectory([NotNull] string directory, [NotNull] WixDirectoryNode node)
+        public void MapDirectory(string directory, WixDirectoryNode node)
         {
             MapElement(directory, node, _configuration.DirectoryMappings);
         }
 
-        [NotNull]
-        public WixDirectoryNode AddDirectoryNode([NotNull] string directory)
+        public WixDirectoryNode AddDirectoryNode(string directory)
         {
             var name = Path.GetFileName(directory);
             var id = GetDirectoryId(directory);
@@ -164,7 +147,7 @@ namespace tomenglertde.Wax.Model.Wix
             return parent.AddSubDirectory(id, name);
         }
 
-        public bool HasDefaultDirectoryId([NotNull] DirectoryMapping directoryMapping)
+        public bool HasDefaultDirectoryId(DirectoryMapping directoryMapping)
         {
             var directory = directoryMapping.Directory;
 
@@ -174,25 +157,24 @@ namespace tomenglertde.Wax.Model.Wix
             return id == defaultId;
         }
 
-        [NotNull]
-        public string GetFileId([NotNull] string filePath)
+        public string GetFileId(string filePath)
         {
             return (_configuration.FileMappings.TryGetValue(filePath, out var value) && value != null) ? value : GetDefaultId(filePath);
         }
 
-        public void UnmapFile([NotNull] string filePath)
+        public void UnmapFile(string filePath)
         {
             _configuration.FileMappings.Remove(filePath);
 
             SaveProjectConfiguration();
         }
 
-        public void MapFile([NotNull] string filePath, [NotNull] WixFileNode node)
+        public void MapFile(string filePath, WixFileNode node)
         {
             MapElement(filePath, node, _configuration.FileMappings);
         }
 
-        public WixFileNode? AddFileNode([NotNull] FileMapping fileMapping)
+        public WixFileNode? AddFileNode(FileMapping fileMapping)
         {
             var targetName = fileMapping.TargetName;
 
@@ -213,8 +195,7 @@ namespace tomenglertde.Wax.Model.Wix
             return componentGroup.AddFileComponent(id, name, fileMapping);
         }
 
-        [NotNull]
-        private static string GetDefaultId([NotNull] string path)
+        private static string GetDefaultId(string path)
         {
             if (path.Length == 0)
                 return "_";
@@ -242,12 +223,12 @@ namespace tomenglertde.Wax.Model.Wix
             return s.ToString();
         }
 
-        private WixComponentGroupNode? ForceComponentGroup([NotNull] string directoryId)
+        private WixComponentGroupNode? ForceComponentGroup(string directoryId)
         {
             return ComponentGroupNodes.FirstOrDefault(group => group.Directory == directoryId) ?? _sourceFiles.FirstOrDefault()?.AddComponentGroup(directoryId);
         }
 
-        private void ForceFeatureRef([NotNull] string componentGroupId)
+        private void ForceFeatureRef(string componentGroupId)
         {
             if (FeatureNodes.Any(feature => feature.ComponentGroupRefs.Contains(componentGroupId)))
                 return;
@@ -260,7 +241,7 @@ namespace tomenglertde.Wax.Model.Wix
             firstFeature.SourceFile.Save();
         }
 
-        public bool HasDefaultFileId([NotNull] FileMapping fileMapping)
+        public bool HasDefaultFileId(FileMapping fileMapping)
         {
             var filePath = fileMapping.TargetName;
             var id = GetFileId(filePath);
@@ -269,7 +250,7 @@ namespace tomenglertde.Wax.Model.Wix
             return id == defaultId;
         }
 
-        private void MapElement([NotNull] string path, [NotNull] WixNode node, [NotNull] IDictionary<string, string> mappings)
+        private void MapElement(string path, WixNode node, IDictionary<string, string> mappings)
         {
             if (node.Id.Equals(GetDefaultId(path)))
                 mappings.Remove(path);
@@ -296,7 +277,6 @@ namespace tomenglertde.Wax.Model.Wix
                 _configurationFileProjectItem.SetContent(configurationText);
         }
 
-        [NotNull]
         private EnvDTE.ProjectItem GetConfigurationFileProjectItem()
         {
             var configurationFileProjectItem = GetAllProjectItems().FirstOrDefault(item => WaxConfigurationFileExtension.Equals(Path.GetExtension(item.Name), StringComparison.OrdinalIgnoreCase));
