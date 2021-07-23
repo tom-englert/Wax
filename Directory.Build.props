@@ -14,5 +14,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <RuntimeIdentifiers>win</RuntimeIdentifiers>
   </PropertyGroup>
 </Project>
