@@ -34,14 +34,14 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     SourceFolder: '$(build.sourcesdirectory)'
-    Contents: '**\bin\$(BuildConfiguration)\**'
+    Contents: '**\bin\$(BuildConfiguration)\**\*.vsix'
     TargetFolder: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: VSIX'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)\wax\bin\$(BuildConfiguration)\net472\wax.vsix'
+    PathtoPublish: '$(build.artifactstagingdirectory)wax.vsix'
     ArtifactName: VSIX
 
 - task: PowerShell@1
@@ -52,4 +52,4 @@ steps:
     inlineScript: |
      (new-object Net.WebClient).DownloadString("https://raw.github.com/tom-englert/BuildScripts/master/BuildScripts.ps1") | iex
      
-     Vsix-PublishToGallery "$(build.artifactstagingdirectory)\wax\bin\$(BuildConfiguration)\net472\wax.vsix"
+     Vsix-PublishToGallery "$(build.artifactstagingdirectory)wax.vsix"
