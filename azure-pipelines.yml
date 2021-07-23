@@ -1,0 +1,55 @@
+name: $(Build.DefinitionName) $(date:yyyyMMdd)$(rev:.r)
+
+pool:
+  vmImage: 'windows-latest'
+  demands:
+  - msbuild
+  - vstest
+
+variables:
+  BuildPlatform: 'Any CPU'
+  BuildConfiguration: 'Release'
+
+steps:
+- task: PowerShell@1
+  displayName: 'Set build version'
+  inputs:
+    scriptType: inlineScript
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    inlineScript: |
+     (new-object Net.WebClient).DownloadString("https://raw.github.com/tom-englert/BuildScripts/master/BuildScripts.ps1") | iex
+     $version = Project-SetVersion "Directory.Build.props"
+     $version | Build-AppendVersionToBuildNumber
+
+- task: VSBuild@1
+  displayName: 'Build solution **\*.sln'
+  inputs:
+    vsVersion: 16.0
+    msbuildArgs: '-restore'
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
+    createLogFile: true
+
+- task: CopyFiles@1
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+  inputs:
+    SourceFolder: '$(build.sourcesdirectory)'
+    Contents: '**\bin\$(BuildConfiguration)\**'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: VSIX'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\wax\bin\$(BuildConfiguration)\net472\wax.vsix'
+    ArtifactName: VSIX
+
+- task: PowerShell@1
+  displayName: 'Publish to vsix-gallery'
+  inputs:
+    scriptType: inlineScript
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    inlineScript: |
+     (new-object Net.WebClient).DownloadString("https://raw.github.com/tom-englert/BuildScripts/master/BuildScripts.ps1") | iex
+     
+     Vsix-PublishToGallery "$(build.artifactstagingdirectory)\wax\bin\$(BuildConfiguration)\net472\wax.vsix"
