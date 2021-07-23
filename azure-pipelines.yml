@@ -22,9 +22,10 @@ steps:
      $version | Build-AppendVersionToBuildNumber
 
 - task: VSBuild@1
-  displayName: 'Build solution **\*.sln'
+  displayName: 'Build solution'
   inputs:
-    vsVersion: 16.0
+    solution: 'wax.sln'
+    vsVersion: '16'
     msbuildArgs: '-restore'
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
