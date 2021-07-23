@@ -7,7 +7,7 @@
              xmlns:wax="urn:wax"
              xmlns:toms="urn:TomsToolbox"
              xmlns:local="clr-namespace:tomenglertde.Wax"
-             xmlns:properties="clr-namespace:tomenglertde.Wax"
+             xmlns:properties="clr-namespace:tomenglertde.Wax.Properties"
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:styles="urn:TomsToolbox.Wpf.Styles"
              Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
@@ -46,7 +46,7 @@
         </Setter.Value>
       </Setter>
       <Style.Triggers>
-        <DataTrigger Binding="{Binding InstallDirectoryMapping.MappedNode}" Value="{x:Null}">
+        <DataTrigger Binding="{Binding InstallDirectoryMapping.MappedNode, FallbackValue={x:Null}}" Value="{x:Null}">
           <Setter Property="IsEnabled" Value="False" />
         </DataTrigger>
       </Style.Triggers>
@@ -233,7 +233,7 @@
                 </CheckBox.Style>
               </CheckBox>
               <ListBox x:Name="ProjectsListBox" SelectionMode="Multiple"
-                       toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedVSProjects}"
+                       toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedVsProjects}"
                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                   <DataTemplate DataType="wax:Project">
@@ -253,7 +253,10 @@
                         <Setter Property="ToolTip">
                           <Setter.Value>
                             <ToolTip Style="{StaticResource {x:Static styles:ResourceKeys.ToolTipStyle}}">
-                              <TextBlock><Run Text="Referenced by: " /><Run Text="{Binding ImplicitSelectedBy, Mode=OneWay}" /></TextBlock>
+                              <TextBlock>
+                                <Run Text="{x:Static properties:Resources.ReferencedBy}" />
+                                <Run Text="{Binding ImplicitSelectedBy, Mode=OneWay}" />
+                              </TextBlock>
                             </ToolTip>
                           </Setter.Value>
                         </Setter>

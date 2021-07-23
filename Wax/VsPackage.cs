@@ -59,7 +59,7 @@
             var window = FindToolWindow(typeof(ToolWindow), 0, true);
             if (window?.Frame == null)
             {
-                throw new NotSupportedException(Resources.CanNotCreateWindow);
+                throw new NotSupportedException(Properties.Resources.CanNotCreateWindow);
             }
             var windowFrame = (IVsWindowFrame)window.Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());

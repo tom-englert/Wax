@@ -3,17 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31402.337
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{305BD4E4-C124-4172-9F2C-49CCA08CCFD1}"
-	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
-		LICENSE = LICENSE
-		README.md = README.md
-		ReleaseNotes.md = ReleaseNotes.md
-		Screenshot.png = Screenshot.png
-		Wax\source.extension.vsixmanifest = Wax\source.extension.vsixmanifest
-		Version.cs = Version.cs
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wax", "Wax\Wax.csproj", "{A9900171-C65D-40ED-8764-74C80E05DB9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wax.Model", "Wax.Model\Wax.Model.csproj", "{A3F2A655-5194-4A7A-AA66-E9A536F3E352}"
@@ -21,6 +10,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A77E932-3BEE-4FCB-A6C6-CBEDCE1B927D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
+		ReleaseNotes.md = ReleaseNotes.md
+		Screenshot.png = Screenshot.png
 	EndProjectSection
 EndProject
 Global

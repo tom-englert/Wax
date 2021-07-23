@@ -38,7 +38,7 @@
             // Just to reference something to force load of referenced libraries.
             BindingErrorTracer.Start(msg => { Debug.WriteLine(msg); });
 
-            Caption = Resources.ToolWindowTitle;
+            Caption = Properties.Resources.ToolWindowTitle;
 
             BitmapResourceID = 301;
             BitmapIndex = 1;

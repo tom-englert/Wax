@@ -29,11 +29,11 @@
     {
         private bool _wixProjectChanging;
 
-        private readonly ObservableCollection<Project> _selectedVSProjects = new();
+        private readonly ObservableCollection<Project> _selectedVsProjects = new();
 
         public MainViewModel(EnvDTE.Solution solution)
         {
-            _selectedVSProjects.CollectionChanged += SelectedVSProjects_CollectionChanged;
+            _selectedVsProjects.CollectionChanged += SelectedVSProjects_CollectionChanged;
             Solution = new Solution(solution);
 
             CommandManager.RequerySuggested += CommandManager_RequerySuggested;
@@ -61,15 +61,15 @@
             var topLevelProjects = new HashSet<Project>(Solution.EnumerateTopLevelProjects);
             CanHideReferencedProjects = deployedProjects.All(p => topLevelProjects.Contains(p));
 
-            _selectedVSProjects.Clear();
-            _selectedVSProjects.AddRange(deployedProjects);
+            _selectedVsProjects.Clear();
+            _selectedVsProjects.AddRange(deployedProjects);
 
             GenerateMappings(deployedProjects, newValue);
 
             _wixProjectChanging = false;
         }
 
-        public IList SelectedVSProjects => _selectedVSProjects;
+        public IList SelectedVsProjects => _selectedVsProjects;
 
         public DirectoryMapping? InstallDirectoryMapping { get; private set; }
 
@@ -96,7 +96,7 @@
 
             wixProject.DeploySymbols = DeploySymbols;
 
-            GenerateMappings(SelectedVSProjects, wixProject);
+            GenerateMappings(SelectedVsProjects, wixProject);
         }
 
         public bool DeployLocalizations { get; set; }
@@ -114,7 +114,7 @@
 
             wixProject.DeployLocalizations = DeployLocalizations;
 
-            GenerateMappings(SelectedVSProjects, wixProject);
+            GenerateMappings(SelectedVsProjects, wixProject);
         }
 
         public bool DeployExternalLocalizations { get; set; }
@@ -132,7 +132,7 @@
 
             wixProject.DeployExternalLocalizations = DeployExternalLocalizations;
 
-            GenerateMappings(SelectedVSProjects, wixProject);
+            GenerateMappings(SelectedVsProjects, wixProject);
         }
 
         public IList<UnmappedFile>? UnmappedFileNodes { get; set; }
@@ -157,13 +157,13 @@
         {
             var topLevelProjects = new HashSet<Project>(Solution.EnumerateTopLevelProjects);
 
-            CanHideReferencedProjects = _selectedVSProjects.All(p => topLevelProjects.Contains(p));
+            CanHideReferencedProjects = _selectedVsProjects.All(p => topLevelProjects.Contains(p));
 
             var vsProjects = Solution.Projects.Where(p => p.IsVsProject);
 
             foreach (var project in vsProjects)
             {
-                project.UpdateIsImplicitSelected(new HashSet<Project>(_selectedVSProjects));
+                project.UpdateIsImplicitSelected(new HashSet<Project>(_selectedVsProjects));
             }
 
             if (_wixProjectChanging)
@@ -174,14 +174,14 @@
             if (wixProject == null)
                 return;
 
-            var deployedProjects = _selectedVSProjects.Where(project => !project.IsImplicitSelected).ToList();
+            var deployedProjects = _selectedVsProjects.Where(project => !project.IsImplicitSelected).ToList();
             if (deployedProjects.Select(project => project.UniqueName).OrderBy(name => name)
                 .SequenceEqual(wixProject.DeployedProjects.Select(project => project.UniqueName).OrderBy(name => name)))
                 return;
 
             wixProject.DeployedProjects = deployedProjects;
 
-            GenerateMappings(_selectedVSProjects, wixProject);
+            GenerateMappings(_selectedVsProjects, wixProject);
         }
 
         private void GenerateMappings(IEnumerable? vsProjects, WixProject? wixProject)
