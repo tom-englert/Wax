@@ -165,7 +165,7 @@ namespace tomenglertde.Wax.Model.Wix
         {
             Debug.Assert(componentGroup.SourceFile.Equals(this));
 
-            var project = fileMapping.Project;
+            var project = fileMapping.TopLevelProject;
 
             var variableName = string.Format(CultureInfo.InvariantCulture, "{0}_TargetDir", project.Name);
 

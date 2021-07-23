@@ -70,7 +70,26 @@
         [DoNotNotify]
         public ICommand ResolveFileCommand => new DelegateCommand<IEnumerable>(_ => CanResolveFile(), ResolveFile);
 
-        public Project Project => _projectOutputGroup.ProjectOutputs.First().Project;
+        public Project Project =>
+            _projectOutputGroup.ProjectOutputs
+                .Select(output => output.Project)
+                .SortByRelevance()
+                .First();
+
+        public Project TopLevelProject
+        {
+            get
+            {
+                var project = Project;
+                while (true)
+                {
+                    var referencedBy = project.ImplicitSelectedByProjects.SortByRelevance().FirstOrDefault();
+                    if (referencedBy == null)
+                        return project;
+                    project = referencedBy;
+                }
+            }
+        }
 
         public WixFileNode? MappedNodeSetter
         {

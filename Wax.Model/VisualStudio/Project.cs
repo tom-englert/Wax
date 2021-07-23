@@ -114,14 +114,19 @@
 
         public string? ImplicitSelectedBy { get; private set; }
 
-        public bool UpdateIsImplicitSelected(ICollection<Project> selectedVSProjects)
+        public ICollection<Project> ImplicitSelectedByProjects { get; private set; } = Array.Empty<Project>();
+
+        public bool UpdateIsImplicitSelected(ICollection<Project> selectedVsProjects)
         {
             if (!IsVsProject)
                 return false;
 
-            ImplicitSelectedBy = string.Join(", ", ReferencedBy
-                .Where(project => selectedVSProjects.Contains(project) || project.UpdateIsImplicitSelected(selectedVSProjects))
-                .Select(project => project.Name));
+            ImplicitSelectedByProjects = ReferencedBy
+                .Where(project => selectedVsProjects.Contains(project) ||
+                                  project.UpdateIsImplicitSelected(selectedVsProjects))
+                .ToList().AsReadOnly();
+
+            ImplicitSelectedBy = string.Join(", ", ImplicitSelectedByProjects.Select(project => project.Name));
 
             return IsImplicitSelected = !string.IsNullOrEmpty(ImplicitSelectedBy);
         }
@@ -390,6 +395,13 @@
         public static IEnumerable<string> GetFileNames(this EnvDTE.OutputGroup outputGroup)
         {
             return InternalGetFileNames(outputGroup) ?? Array.Empty<string>();
+        }
+
+        public static IOrderedEnumerable<Project> SortByRelevance(this IEnumerable<Project> projects)
+        {
+            return projects
+                .OrderBy(project => project.IsImplicitSelected ? 1 : 0)
+                .ThenByDescending(project => Path.GetExtension(project.PrimaryOutputFileName)?.ToUpperInvariant() ?? string.Empty);
         }
 
         private static IReadOnlyCollection<string>? InternalGetFileNames(this EnvDTE.OutputGroup outputGroup)

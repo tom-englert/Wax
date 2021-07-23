@@ -2,3 +2,12 @@
 
 # VSTHRD010: Invoke single-threaded types on Main thread
 dotnet_diagnostic.VSTHRD010.severity = suggestion
+
+# IDE0008: Use explicit type
+csharp_style_var_elsewhere = true
+
+# IDE0008: Use explicit type
+csharp_style_var_for_built_in_types = true
+
+# IDE0008: Use explicit type
+csharp_style_var_when_type_is_apparent = true
