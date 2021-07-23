@@ -15,17 +15,17 @@ steps:
   displayName: 'Set build version'
   inputs:
     scriptType: inlineScript
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     inlineScript: |
      (new-object Net.WebClient).DownloadString("https://raw.github.com/tom-englert/BuildScripts/master/BuildScripts.ps1") | iex
      $version = Project-SetVersion "Directory.Build.props"
      $version | Build-AppendVersionToBuildNumber
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
 
 - task: VSBuild@1
   displayName: 'Build solution'
   inputs:
     solution: 'wax.sln'
-    vsVersion: '16'
+    vsVersion: '16.0'
     msbuildArgs: '-restore'
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
@@ -49,8 +49,8 @@ steps:
   displayName: 'Publish to vsix-gallery'
   inputs:
     scriptType: inlineScript
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     inlineScript: |
      (new-object Net.WebClient).DownloadString("https://raw.github.com/tom-englert/BuildScripts/master/BuildScripts.ps1") | iex
      
      Vsix-PublishToGallery "$(build.artifactstagingdirectory)wax.vsix"
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
