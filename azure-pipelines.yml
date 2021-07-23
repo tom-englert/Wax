@@ -42,7 +42,7 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: VSIX'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)wax.vsix'
+    PathtoPublish: '$(build.artifactstagingdirectory)\wax.vsix'
     ArtifactName: VSIX
 
 - task: PowerShell@1
@@ -52,5 +52,5 @@ steps:
     inlineScript: |
      (new-object Net.WebClient).DownloadString("https://raw.github.com/tom-englert/BuildScripts/master/BuildScripts.ps1") | iex
      
-     Vsix-PublishToGallery "$(build.artifactstagingdirectory)wax.vsix"
+     Vsix-PublishToGallery "$(build.artifactstagingdirectory)\wax.vsix"
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
