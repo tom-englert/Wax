@@ -71,14 +71,14 @@
 
         public IEnumerable<WixFileNode> EnumerateInstalledFiles(IDictionary<string, WixComponentGroupNode> componentGroupNodes, IDictionary<string, WixComponentNode> componentNodes, IDictionary<string, WixFileNode> fileNodes)
         {
-            var byComponentGroupRef = ComponentGroupRefs.Select(componentGroupNodes.GetValueOrDefault)
+            var byComponentGroupRef = ComponentGroupRefs.Select(componentGroupNodes.GetValueOrDefault!)
                 .ExceptNullItems()
                 .SelectMany(cg => cg.EnumerateComponents(componentGroupNodes, componentNodes));
 
-            var byComponentRef = ComponentRefs.Select(componentNodes.GetValueOrDefault)
+            var byComponentRef = ComponentRefs.Select(componentNodes.GetValueOrDefault!)
                 .ExceptNullItems();
 
-            var children = Components.Select(componentNodes.GetValueOrDefault)
+            var children = Components.Select(componentNodes.GetValueOrDefault!)
                 .ExceptNullItems();
 
             var files = byComponentGroupRef.Concat(byComponentRef).Concat(children).SelectMany(c => c?.EnumerateFiles(fileNodes));

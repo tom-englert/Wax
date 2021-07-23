@@ -174,7 +174,12 @@
             if (wixProject == null)
                 return;
 
-            wixProject.DeployedProjects = _selectedVSProjects;
+            var deployedProjects = _selectedVSProjects.Where(project => !project.IsImplicitSelected).ToList();
+            if (deployedProjects.Select(project => project.UniqueName).OrderBy(name => name)
+                .SequenceEqual(wixProject.DeployedProjects.Select(project => project.UniqueName).OrderBy(name => name)))
+                return;
+
+            wixProject.DeployedProjects = deployedProjects;
 
             GenerateMappings(_selectedVSProjects, wixProject);
         }

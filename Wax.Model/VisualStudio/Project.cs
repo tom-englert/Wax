@@ -24,7 +24,6 @@
 
         private readonly EnvDTE.Project _project;
         private readonly VSLangProj.VSProject? _vsProject;
-        private readonly ICollection<Project> _referencedBy = new HashSet<Project>();
         private readonly string _projectTypeGuids;
 
         public Project(Solution solution, EnvDTE.Project project)
@@ -90,7 +89,7 @@
             }
         }
 
-        public ICollection<Project> ReferencedBy => _referencedBy;
+        public ICollection<Project> ReferencedBy { get; } = new HashSet<Project>();
 
         public string FullName => _project.FullName;
 
@@ -99,7 +98,8 @@
 
         public string RelativeFolder => Path.GetDirectoryName(UniqueName);
 
-        public bool IsTestProject => _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}");
+        [Lazy]
+        public bool IsTestProject => _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}") || References.Any(r => string.Equals(r.Name, "Microsoft.VisualStudio.TestPlatform.TestFramework", StringComparison.OrdinalIgnoreCase));
 
         public bool IsVsProject => _vsProject != null;
 
@@ -112,12 +112,18 @@
 
         public bool IsImplicitSelected { get; private set; }
 
+        public string? ImplicitSelectedBy { get; private set; }
+
         public bool UpdateIsImplicitSelected(ICollection<Project> selectedVSProjects)
         {
             if (!IsVsProject)
                 return false;
 
-            return IsImplicitSelected = ReferencedBy.Any(project => selectedVSProjects.Contains(project) || project.UpdateIsImplicitSelected(selectedVSProjects));
+            ImplicitSelectedBy = string.Join(", ", ReferencedBy
+                .Where(project => selectedVSProjects.Contains(project) || project.UpdateIsImplicitSelected(selectedVSProjects))
+                .Select(project => project.Name));
+
+            return IsImplicitSelected = !string.IsNullOrEmpty(ImplicitSelectedBy);
         }
 
         [Lazy]

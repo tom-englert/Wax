@@ -232,12 +232,12 @@
                   </Style>
                 </CheckBox.Style>
               </CheckBox>
-              <ListBox x:Name="ProjectsListBox" SelectionMode="Extended"
+              <ListBox x:Name="ProjectsListBox" SelectionMode="Multiple"
                        toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedVSProjects}"
                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                   <DataTemplate DataType="wax:Project">
-                    <CheckBox Style="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}"
+                    <CheckBox x:Name="CheckBox" Style="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}"
                               IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}">
                       <TextBlock x:Name="TextBlock">
                         <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
@@ -247,6 +247,16 @@
                     <DataTemplate.Triggers>
                       <DataTrigger Binding="{Binding IsImplicitSelected}" Value="True">
                         <Setter TargetName="TextBlock" Property="Opacity" Value=".5" />
+                        <Setter TargetName="CheckBox" Property="IsThreeState" Value="True" />
+                        <Setter TargetName="CheckBox" Property="IsChecked" Value="{x:Null}" />
+                        <Setter TargetName="CheckBox" Property="IsEnabled" Value="False" />
+                        <Setter Property="ToolTip">
+                          <Setter.Value>
+                            <ToolTip Style="{StaticResource {x:Static styles:ResourceKeys.ToolTipStyle}}">
+                              <TextBlock><Run Text="Referenced by: " /><Run Text="{Binding ImplicitSelectedBy, Mode=OneWay}" /></TextBlock>
+                            </ToolTip>
+                          </Setter.Value>
+                        </Setter>
                       </DataTrigger>
                     </DataTemplate.Triggers>
                   </DataTemplate>
