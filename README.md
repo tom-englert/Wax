@@ -1,4 +1,4 @@
-# Wax ![Badge](https://tom-englert.visualstudio.com/_apis/public/build/definitions/75bf84d2-d359-404a-a712-07c9f693f635/6/badge)
+# Wax [![Build Status](https://dev.azure.com/tom-englert/Open%20Source/_apis/build/status/Wax?branchName=master)](https://dev.azure.com/tom-englert/Open%20Source/_build/latest?definitionId=47&branchName=master)
 An interactive editor for [WiX Toolset](http://wixtoolset.org/) setup projects.
 
 _Wax keeps your candle burning_
@@ -110,5 +110,5 @@ Wax will add a ComponentGroupRef node for all component groups it creates to the
   
 Now you should be able to build the setup project.
 
-Powerd by&nbsp;&nbsp;&nbsp;<a href="http://www.jetbrains.com/resharper/"><img src="http://www.tom-englert.de/Images/icon_ReSharper.png" alt="ReSharper" width="64" height="64" /></a> &nbsp;&nbsp;&nbsp; <a href="http://research.microsoft.com/en-us/projects/contracts/"><img src="http://www.tom-englert.de/Images/codecontracts_sm.png" alt="CodeContracts" width="90" height="56" /></a>&nbsp;</p>
+Powerd by&nbsp;&nbsp;&nbsp;<a href="http://www.jetbrains.com/resharper/"><img src="http://www.tom-englert.de/Images/icon_ReSharper.png" alt="ReSharper" width="64" height="64" /></a></p>
 <p>Support this Project: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=799WX673GPQM8"> <img style="border: none; margin-bottom: -6px;" title="Donate" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate" /></a></p>
