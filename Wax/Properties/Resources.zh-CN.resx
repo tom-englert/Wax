@@ -216,4 +216,10 @@
   <data name="LocalizationsToolTip" xml:space="preserve">
     <value>在安装项目中包含本地化内容。</value>
   </data>
+  <data name="ReferencedBy" xml:space="preserve">
+    <value>引用者:</value>
+  </data>
+  <data name="ProjectType" xml:space="preserve">
+    <value>项目类型:</value>
+  </data>
 </root>

@@ -259,6 +259,19 @@
                       </StackPanel>
                     </CheckBox>
                     <DataTemplate.Triggers>
+                      <DataTrigger Binding="{Binding IsSpecialProject}" Value="True">
+                        <Setter TargetName="TextBlock" Property="Opacity" Value=".5" />
+                        <Setter Property="ToolTip">
+                          <Setter.Value>
+                            <ToolTip Style="{StaticResource {x:Static styles:ResourceKeys.ToolTipStyle}}">
+                              <TextBlock>
+                                <Run Text="{x:Static properties:Resources.ProjectType}" />
+                                <Run Text="{Binding ProjectType, Mode=OneWay}" />
+                              </TextBlock>
+                            </ToolTip>
+                          </Setter.Value>
+                        </Setter>
+                      </DataTrigger>
                       <DataTrigger Binding="{Binding IsImplicitSelected}" Value="True">
                         <Setter TargetName="TextBlock" Property="Opacity" Value=".5" />
                         <Setter TargetName="CheckBox" Property="IsThreeState" Value="True" />

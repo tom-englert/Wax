@@ -216,4 +216,10 @@
   <data name="LocalizationsToolTip" xml:space="preserve">
     <value>Ajouter aussi les librairies satellites dans le projet d'installation.</value>
   </data>
+  <data name="ReferencedBy" xml:space="preserve">
+    <value>Référencé par:</value>
+  </data>
+  <data name="ProjectType" xml:space="preserve">
+    <value>Type de projet:</value>
+  </data>
 </root>

@@ -232,6 +232,15 @@ namespace tomenglertde.Wax.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Project type:.
+        /// </summary>
+        public static string ProjectType {
+            get {
+                return ResourceManager.GetString("ProjectType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Referenced by:.
         /// </summary>
         public static string ReferencedBy {

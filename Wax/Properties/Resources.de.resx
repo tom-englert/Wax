@@ -219,4 +219,7 @@
   <data name="ReferencedBy" xml:space="preserve">
     <value>Referenziert von:</value>
   </data>
+  <data name="ProjectType" xml:space="preserve">
+    <value>Projekttyp:</value>
+  </data>
 </root>
