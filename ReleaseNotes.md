@@ -1,3 +1,11 @@
+1.6:
+- Detect new SDK style test projects: all projects referencing MSTest.TestFramework.
+- Drop support of VS2017.
+- Support of VS2022.
+- Improve resolving of binary source dir by favoring top level project output.
+- Improve display of implicit selected items.
+- UX improvements
+
 1.5:
 - Support dark mode
 - Allow filtering of project items
