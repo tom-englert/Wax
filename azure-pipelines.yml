@@ -37,6 +37,7 @@ steps:
     SourceFolder: '$(build.sourcesdirectory)'
     Contents: '**\bin\$(BuildConfiguration)\**\*.vsix'
     TargetFolder: '$(build.artifactstagingdirectory)'
+    flattenFolders: true
   condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1
