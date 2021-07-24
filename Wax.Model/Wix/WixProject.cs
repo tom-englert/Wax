@@ -104,6 +104,8 @@ namespace tomenglertde.Wax.Model.Wix
 
         public bool HasChanges => HasConfigurationChanges | HasSourceFileChanges;
 
+        public bool IsBootstrapper => WixExtensionReferences.Contains("WixBalExtension");
+
         public string GetDirectoryId(string directory)
         {
             return (_configuration.DirectoryMappings.TryGetValue(directory, out var value) && (value != null)) ? value : GetDefaultId(directory);

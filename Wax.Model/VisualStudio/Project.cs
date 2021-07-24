@@ -17,6 +17,13 @@
 
     using TomsToolbox.Essentials;
 
+    public enum ProjectType
+    {
+        Default,
+        Test,
+        WixCustomAction
+    }
+
     [ImplementsEquatable]
     public class Project : INotifyPropertyChanged
     {
@@ -99,11 +106,28 @@
         public string RelativeFolder => Path.GetDirectoryName(UniqueName);
 
         [Lazy]
-        public bool IsTestProject => _projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}") || References.Any(r => string.Equals(r.Name, "Microsoft.VisualStudio.TestPlatform.TestFramework", StringComparison.OrdinalIgnoreCase));
+        public ProjectType ProjectType
+        {
+            get
+            {
+                if (_projectTypeGuids.Contains("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}"))
+                    return ProjectType.Test;
+
+                if (References.Any(reference => string.Equals(reference.Name, "Microsoft.VisualStudio.TestPlatform.TestFramework", StringComparison.Ordinal)))
+                    return ProjectType.Test;
+
+                if (References.Any(reference => string.Equals(reference.Name, "Microsoft.Deployment.WindowsInstaller", StringComparison.Ordinal)))
+                    return ProjectType.WixCustomAction;
+
+                return ProjectType.Default;
+            }
+        }
+
+        public bool IsSpecialProject => ProjectType != ProjectType.Default;
 
         public bool IsVsProject => _vsProject != null;
 
-        public bool IsTopLevelProject => !IsTestProject && ReferencedBy.All(reference => reference.IsTestProject);
+        public bool IsTopLevelProject => !IsSpecialProject && ReferencedBy.All(reference => reference.IsSpecialProject);
 
         [Lazy]
         public string? PrimaryOutputFileName => _project.ConfigurationManager?.ActiveConfiguration?.OutputGroups?.Item(BuildFileGroups.Built.ToString())?.GetFileNames().FirstOrDefault();
@@ -136,6 +160,9 @@
 
         [Lazy]
         private IReadOnlyCollection<VSLangProj.Reference> References => GetReferences();
+
+        [Lazy]
+        protected IReadOnlyCollection<string> WixExtensionReferences => new HashSet<string>(EnumerateWixExtensionReferences() ?? Enumerable.Empty<string>());
 
         [Lazy]
         private IReadOnlyCollection<ProjectReference> ProjectReferences => GetProjectReferences();
@@ -315,6 +342,26 @@
             }
         }
 
+        private IEnumerable<string>? EnumerateWixExtensionReferences()
+        {
+            try
+            {
+                var projectItems = _project.ProjectItems;
+
+                return projectItems?
+                    .OfType<EnvDTE.ProjectItem>()
+                    .Where(p => p.Object is VSLangProj.References)
+                    .Take(1)
+                    .SelectMany(projectItem => projectItem.ProjectItems.OfType<EnvDTE.ProjectItem>())
+                    .Where(item => item.Object.GetType().Name == "WixExtensionReferenceNode")
+                    .Select(item => item.Name);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private IReadOnlyCollection<VSLangProj.Reference>? GetMpfProjectReferences()
         {
             try
@@ -326,8 +373,9 @@
                     .Select(p => p.Object)
                     .OfType<VSLangProj.References>()
                     .Take(1)
-                                        .SelectMany(references => references.OfType<VSLangProj.Reference>())
-                    .ToList().AsReadOnly();
+                    .SelectMany(references => references.OfType<VSLangProj.Reference>())
+                    .ToList()
+                    .AsReadOnly();
             }
             catch
             {
