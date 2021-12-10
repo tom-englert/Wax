@@ -1,3 +1,7 @@
+1.7:
+- Fix #76: Prerequisites outdated
+- Fix color scheme
+
 1.6:
 - Detect new SDK style test projects: all projects referencing MSTest.TestFramework.
 - Drop support of VS2017.
