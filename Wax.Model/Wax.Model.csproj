@@ -19,15 +19,15 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Fody">
-      <Version>6.5.2</Version>
+      <Version>6.6.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="JetBrains.Annotations">
-      <Version>2021.2.0</Version>
+      <Version>2021.3.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Lazy.Fody">
-      <Version>1.9.0</Version>
+      <Version>1.10.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -37,7 +37,7 @@
     <PackageReference Include="Mono.Cecil">
       <Version>0.11.4</Version>
     </PackageReference>
-    <PackageReference Include="Nullable.Extended.Analyzer" Version="1.2.4089">
+    <PackageReference Include="Nullable.Extended.Analyzer" Version="1.10.4539">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -49,7 +49,7 @@
     <PackageReference Include="System.ComponentModel.Composition" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="TomsToolbox.Wpf">
-      <Version>2.5.5</Version>
+      <Version>2.7.4</Version>
     </PackageReference>
   </ItemGroup>
 </Project>
